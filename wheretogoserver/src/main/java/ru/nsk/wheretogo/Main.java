@@ -30,13 +30,13 @@ public class Main {
 
             connection = DriverManager.getConnection(connectionUrl, login, password);
             if(connection != null){
-                System.out.println("We are connected!");
+                System.out.println("Подключение прошло успешно!");
             }
 
         } catch (SQLException exception) {
-            System.err.println("Не удалось подключиться");
+            System.err.println("Не удалось установить соединение!");
         } catch (IOException e) {
-            System.err.println("ОШИБКА: Файл свойств отсуствует!");
+            System.err.println("Файл свойств отсуствует!");
         }
 
     }
