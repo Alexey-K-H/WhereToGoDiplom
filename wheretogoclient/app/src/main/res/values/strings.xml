@@ -1,20 +1,24 @@
 <resources>
-    <string name="app_name">Where To Go</string>
-    <string name="title_activity_maps">MapsActivity</string>
-    <string name="option_get_place">Get place</string>
-    <string name="default_info_title">Default Location</string>
-    <string name="default_info_snippet">No places found, because location permission is disabled.</string>
-    <string name="pick_place">Choose a place</string>
-    <string name="open_map">Открыть карту</string>
+    <string name="app_name">StartUpApp</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyD6SV3yCg0YvwunxtVTRDsY12JrxLAMUZw</string>
     <string name="favorite">Избранное</string>
     <string name="visited">Посещенное</string>
     <string name="filter">Фильтры</string>
     <string name="profilebutton">profileButton</string>
-    <string name="email_str">e-mail</string>
-    <string name="pwd_str">Пароль</string>
-    <string name="EnterButton">Enter button</string>
-    <string name="name_str">Имя</string>
-    <string name="RegisterButton">Register button</string>
     <string name="wheretogo_nsk">WhereToGo.NSK</string>
     <string name="title_additional_info">Интеллектуальный гид по Новосибирску</string>
+    <string name="open_map">открыть карту</string>
+    <string name="register_str">Зарегистрироваться</string>
+    <string name="login_str">Войти</string>
+    <string name="email_str">Email</string>
+    <string name="pwd_str">Пароль</string>
+    <string name="submit_reg_str">Зарегистрироваться</string>
+    <string name="register_title">РЕГИСТРАЦИЯ</string>
+    <string name="name_str">Имя</string>
+    <string name="back_from_short_info">Назад</string>
+    <string name="default_place_name">Название места</string>
+    <string name="place_title">Название места</string>
+    <string name="place_description">Информация о месте</string>
+    <string name="reviews">Отзывы</string>
 </resources>

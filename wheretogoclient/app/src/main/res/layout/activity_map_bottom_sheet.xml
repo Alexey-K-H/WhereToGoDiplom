@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottomSheetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bottom_sheet_background">
+
+    <ImageButton
+        android:id="@+id/back_btn"
+        android:layout_width="254dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="307dp"
+        android:layout_marginBottom="11dp"
+        android:background="@android:color/transparent"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+
+        android:src="@drawable/back_btn"
+        app:layout_constraintBottom_toTopOf="@+id/place_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.183"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/place_image"
+        android:layout_width="177dp"
+        android:layout_height="170dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="428dp"
+        android:background="@android:color/white"
+        android:src="@drawable/unknown"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/more_info_btn"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_btn" />
+
+    <ImageButton
+        android:id="@+id/path_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="19dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/make_path"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/visited_btn"
+        app:layout_constraintTop_toBottomOf="@+id/place_name"
+        tools:ignore="MissingConstraints" />
+
+    <ImageButton
+        android:id="@+id/visited_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/add_to_visited"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        app:layout_constraintEnd_toStartOf="@+id/path_btn"
+        app:layout_constraintStart_toEndOf="@+id/favour_btn"
+        app:layout_constraintTop_toBottomOf="@+id/place_name" />
+
+    <ImageButton
+        android:id="@+id/more_info_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="437dp"
+        android:background="@android:color/white"
+        android:onClick="openFullPlaceInfo"
+        android:src="@drawable/more_info"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/path_btn" />
+
+    <ImageButton
+        android:id="@+id/favour_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/add_to_favour"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        app:layout_constraintEnd_toStartOf="@+id/visited_btn"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/place_name" />
+
+    <TextView
+        android:id="@+id/place_name"
+        android:layout_width="201dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="123dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/default_place_name"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/path_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
