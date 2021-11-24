@@ -1,4 +1,4 @@
-package com.example.startupapp;
+package com.example.wheretogo;
 
 import android.content.Context;
 

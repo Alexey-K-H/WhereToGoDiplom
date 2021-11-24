@@ -1,4 +1,4 @@
-package com.example.startupapp.ui.map;
+package com.example.wheretogo.ui.map;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -16,12 +16,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.startupapp.R;
-import com.example.startupapp.databinding.ActivityMapBinding;
-import com.example.startupapp.model.marker.ClusterMarker;
-import com.example.startupapp.model.place.Place;
-import com.example.startupapp.model.place.PlaceLocation;
-import com.example.startupapp.util.ClusterManagerRenderer;
+import com.example.wheretogo.R;
+import com.example.wheretogo.databinding.ActivityMapBinding;
+import com.example.wheretogo.model.marker.ClusterMarker;
+import com.example.wheretogo.model.place.Place;
+import com.example.wheretogo.model.place.PlaceLocation;
+import com.example.wheretogo.util.ClusterManagerRenderer;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -83,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Retrieve the content view that renders the map.
-        com.example.startupapp.databinding.ActivityMapBinding binding = ActivityMapBinding.inflate(getLayoutInflater());
+        com.example.wheretogo.databinding.ActivityMapBinding binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Construct a PlacesClient

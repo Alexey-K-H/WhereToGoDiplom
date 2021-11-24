@@ -1,4 +1,4 @@
-package com.example.startupapp.util;
+package com.example.wheretogo.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,8 +7,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
-import com.example.startupapp.R;
-import com.example.startupapp.model.marker.ClusterMarker;
+import com.example.wheretogo.R;
+import com.example.wheretogo.model.marker.ClusterMarker;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;

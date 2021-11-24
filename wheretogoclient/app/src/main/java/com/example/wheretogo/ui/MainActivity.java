@@ -1,4 +1,4 @@
-package com.example.startupapp.ui;
+package com.example.wheretogo.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.startupapp.R;
-import com.example.startupapp.ui.map.MapsActivity;
+import com.example.wheretogo.R;
+import com.example.wheretogo.ui.map.MapsActivity;
 
 public class MainActivity extends AppCompatActivity {
 

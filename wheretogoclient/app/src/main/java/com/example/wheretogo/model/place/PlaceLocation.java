@@ -1,4 +1,4 @@
-package com.example.startupapp.model.place;
+package com.example.wheretogo.model.place;
 
 import androidx.annotation.NonNull;
 

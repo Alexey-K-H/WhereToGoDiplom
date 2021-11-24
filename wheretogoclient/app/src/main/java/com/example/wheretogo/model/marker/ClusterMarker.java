@@ -1,8 +1,8 @@
-package com.example.startupapp.model.marker;
+package com.example.wheretogo.model.marker;
 
 import androidx.annotation.NonNull;
 
-import com.example.startupapp.model.place.Place;
+import com.example.wheretogo.model.place.Place;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 

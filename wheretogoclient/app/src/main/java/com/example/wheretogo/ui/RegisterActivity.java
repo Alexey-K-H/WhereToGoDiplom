@@ -1,9 +1,9 @@
-package com.example.startupapp.ui;
+package com.example.wheretogo.ui;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.startupapp.R;
+import com.example.wheretogo.R;
 
 //TODO:описать класс регистрации, добавить функцию перенаправления на окно входа
 public class RegisterActivity extends AppCompatActivity {
