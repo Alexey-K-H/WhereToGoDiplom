@@ -4,9 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
-
 import com.example.wheretogo.R;
 import com.example.wheretogo.model.marker.ClusterMarker;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,6 +14,7 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
+import com.squareup.picasso.Picasso;
 
 public class ClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker> {
 
@@ -37,7 +36,16 @@ public class ClusterManagerRenderer extends DefaultClusterRenderer<ClusterMarker
     }
 
     @Override
-    protected void onBeforeClusterItemRendered(ClusterMarker item, MarkerOptions markerOptions) {
+    protected void onBeforeClusterItemRendered(ClusterMarker item, @NonNull MarkerOptions markerOptions) {
+
+//        if(!item.getIconThumbnail().equals("unknown")){
+//            Picasso.get().setLoggingEnabled(true);
+//            Picasso.get().load(item.getIconThumbnail()).into(imageView);
+//        }
+//        else {
+//            imageView.setImageResource(item.getIconPicture());
+//        }
+
         imageView.setImageResource(item.getIconPicture());
         Bitmap icon = iconGenerator.makeIcon();
         markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon)).title(item.getTitle());

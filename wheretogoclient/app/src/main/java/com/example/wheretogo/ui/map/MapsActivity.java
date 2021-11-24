@@ -46,7 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Default location (Novosibirsk Rechnoy Vokzal)
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
-    private static final int DEFAULT_ZOOM = 12;
+    private static final int DEFAULT_ZOOM = 10;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
@@ -112,9 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     "Побережье Новосибирского водохранилища c холмистой местностью" +
                             " напоминает сказочную природу Исландии и подходит для уютных пикников" +
                             " и семейных прогулок.",
-                    "Ссылка на фотки",
+                    "unknown",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.island_part)));
             mPlaceList.add(new Place(2,
                     "Беловский водопад",
@@ -126,9 +125,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             " лес и просторные поляны. Сказочным видом водопада можно любоваться как" +
                             " летом, наблюдая за стремительным потоком воды, так и зимой, рассматривая" +
                             " причудливые формы застывших волн.",
-                    "Ссылка на фотки",
+                    "https://static.tildacdn.com/tild6132-3661-4666-a331-333162643065/64.png",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.waterfall)));
             mPlaceList.add(new Place(3,
                     "Мира Парк",
@@ -142,9 +140,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             "Активити-парк объединяет объекты, которые ведут к самопознанию " +
                             "через активность: веревочный и батутный парки, памп-трек параллельной" +
                             " гонки, цирковая трапеция, баланс-парк и другие зоны.",
-                    "Ссылка на фотки",
+                    "https://static.tildacdn.com/tild3636-3836-4431-a234-376666626565/15.png",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.mirapark)));
             mPlaceList.add(new Place(4,
                     "Затопленный корабль",
@@ -152,9 +149,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             " лежат на дне и по берегам на огромном участке Обской акватории" +
                             " от Алтая до Салехарда. Вот и это заброшенное судно, отслужившее" +
                             " на воде более полувека, теперь навсегда приковано к берегу.",
-                    "Ссылка на фотки",
+                    "https://static.tildacdn.com/tild3735-6462-4737-a264-613638373635/___1.png",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.ship)));
             mPlaceList.add(new Place(5,
                     "Заброшенная ГЭС",
@@ -162,9 +158,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             " Эта гидроэлектростанция была построена в 1947 году, однако сейчас она" +
                             " уже не выполняет своих функций. ГЭС забросили много лет назад, оставив" +
                             " только дамбу и руины кирпичных построек.",
-                    "Ссылка на фотки",
+                    "unknown",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.gess)));
             mPlaceList.add(new Place(6,
                     "Речкуновка",
@@ -174,10 +169,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             " он считался лучшим в стране — сюда направляли за большие заслуги" +
                             " сотрудников промышленности и хозяйства. Дворец здоровья закрыт" +
                             " в 2004 году, а здания так и не нашли нового хозяина.",
-                    "Ссылка на фотки",
+                    "unknown",
                     "дата появления",
-                    1,
                     String.valueOf(R.drawable.rechkunova)));
+
+            mPlaceList.add(new Place(7,
+                    "Страшно красивое место",
+                    "Новосибирский крематорий",
+                    "https://static.tildacdn.com/tild3262-3264-4764-a133-363061626231/57.png",
+                    "дата появления",
+                    String.valueOf(R.drawable.crematori)
+                    ));
+
+            mPlaceList.add(new Place(8,
+                    "Новое яркое пятно в городе",
+                    "Новое колесо обозрения в Новосибирске",
+                    "https://static.tildacdn.com/tild3835-6161-4134-b635-616661363765/104.png",
+                    "дата появления",
+                    String.valueOf(R.drawable.ring_view)));
+
+            mPlaceList.add(new Place(9,
+                    "Реконструкция старого города",
+                    "Недостроенный исторический комплекс в Бердске",
+                    "https://static.tildacdn.com/tild3564-3537-4533-b732-313634313034/58.png",
+                    "дата появления",
+                    String.valueOf(R.drawable.history_city)));
 
             //create array of place locations
             mPlaceLocations.add(new PlaceLocation(1,
@@ -198,6 +214,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mPlaceLocations.add(new PlaceLocation(6,
                     new LatLng(54.792613, 83.097182),
                     mPlaceList.get(5)));
+            mPlaceLocations.add(new PlaceLocation(7,
+                    new LatLng(55.07472, 83.063172),
+                    mPlaceList.get(6)));
+            mPlaceLocations.add(new PlaceLocation(8,
+                    new LatLng(55.00626,  82.93973),
+                    mPlaceList.get(7)));
         }
     }
 

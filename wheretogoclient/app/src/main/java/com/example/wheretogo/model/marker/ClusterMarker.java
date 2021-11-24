@@ -12,13 +12,19 @@ public class ClusterMarker implements ClusterItem {
     private String title;
     private String snippet;
     private int iconPicture;
+    private String iconThumbnail;
     private Place place;
 
-    public ClusterMarker(LatLng position, String title, String snippet, int iconPicture, Place place) {
+    public ClusterMarker(LatLng position,
+                         String title,
+                         String snippet,
+                         int iconPicture,
+                         Place place) {
         this.position = position;
         this.title = title;
         this.snippet = snippet;
         this.iconPicture = iconPicture;
+        this.iconThumbnail = place.getThumbnail();
         this.place = place;
     }
 
@@ -68,5 +74,11 @@ public class ClusterMarker implements ClusterItem {
         this.iconPicture = iconPicture;
     }
 
+    public String getIconThumbnail() {
+        return iconThumbnail;
+    }
 
+    public void setIconThumbnail(String iconThumbnail) {
+        this.iconThumbnail = iconThumbnail;
+    }
 }

@@ -18,7 +18,6 @@ public class Place implements Serializable {
     private String description;
     private String thumbnail;
     private Date upload_at;
-    private float radius;
 
     //TODO:потом это нужно убрать, так как картинки должны храниться на сервере
     private String avatar;
@@ -31,14 +30,12 @@ public class Place implements Serializable {
                  String description,
                  String thumbnail,
                  String upload_at,
-                 float radius,
                  String avatar) {
         this.place_id = place_id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
         this.upload_at = FromStr2Date(upload_at);
-        this.radius = radius;
 
         this.avatar = avatar;
     }
@@ -85,14 +82,6 @@ public class Place implements Serializable {
         this.upload_at = upload_at;
     }
 
-    public float getRadius() {
-        return radius;
-    }
-
-    public void setRadius(float radius) {
-        this.radius = radius;
-    }
-
     private Date FromStr2Date(String str){
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
         Date date;
@@ -115,7 +104,6 @@ public class Place implements Serializable {
                 ", description='" + description + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", upload_at='" + upload_at.toString() + '\'' +
-                ", radius='" + radius + '\'' +
                 '}';
     }
 }
