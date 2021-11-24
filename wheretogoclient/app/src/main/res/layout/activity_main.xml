@@ -10,54 +10,37 @@
 
     <ImageButton
         android:id="@+id/login"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="38dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="61dp"
+        android:layout_marginBottom="78dp"
         android:background="@android:color/transparent"
         android:onClick="openLogin"
         android:src="@drawable/login_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.733"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/register"
         tools:ignore="UsingOnClickInXml" />
 
     <ImageButton
         android:id="@+id/register"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="61dp"
         android:background="@android:color/transparent"
         android:onClick="openRegister"
         android:src="@drawable/register_btn"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.733"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        tools:ignore="UsingOnClickInXml" />
-
-    <ImageButton
-        android:id="@+id/open_map"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="180dp"
-        android:layout_marginTop="262dp"
-        android:layout_marginEnd="180dp"
-        android:layout_marginBottom="75dp"
-        android:background="@android:color/transparent"
-        android:onClick="openMap"
-        android:scaleX="2"
-        android:scaleY="2"
-        android:src="@drawable/open_map_btn"
-        android:text="@string/open_map"
-        app:layout_constraintBottom_toTopOf="@+id/title_open_s"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="UsingOnClickInXml" />
 
     <TextView
@@ -65,29 +48,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="79dp"
+        android:layout_marginTop="366dp"
         android:layout_marginEnd="79dp"
         android:text="@string/wheretogo_nsk"
         android:textSize="34sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/textView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/open_map" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="52dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="52dp"
-        android:layout_marginBottom="68dp"
         android:text="@string/title_additional_info"
         android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/register"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_open_s" />
 
