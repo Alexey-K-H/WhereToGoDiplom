@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">StartUpApp</string>
+    <string name="app_name">WhereToGo</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyD6SV3yCg0YvwunxtVTRDsY12JrxLAMUZw</string>
     <string name="favorite">Избранное</string>
