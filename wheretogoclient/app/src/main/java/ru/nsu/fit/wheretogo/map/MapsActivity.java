@@ -378,7 +378,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomSheetView.findViewById(R.id.more_info_btn).setOnClickListener(view -> {
             bottomSheetDialog.dismiss();
-            //openFullPlaceInfo(view);
+            //openFullPlaceInfo(view, item);
         });
 
         bottomSheetDialog.setContentView(bottomSheetView);
