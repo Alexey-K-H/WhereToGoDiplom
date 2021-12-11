@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,9 +40,11 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.nsu.fit.wheretogo.AccountActivity;
 import ru.nsu.fit.wheretogo.FavouritesActivity;
+import ru.nsu.fit.wheretogo.ForYouActivity;
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.databinding.ActivityMapsBinding;
+import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
@@ -95,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Retrieve the content view that renders the map.
-        ru.nsu.fit.wheretogo.databinding.ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        ru.nsu.fit.wheretogo.databinding.ActivityMapBinding binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Construct a PlacesClient
@@ -111,6 +114,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
+
+        //Buttons init
+        ImageButton recommenderButton = (ImageButton) findViewById(R.id.for_you_btn);
+        ImageButton favoritesButton = (ImageButton) findViewById(R.id.favorites_btn);
+        ImageButton visitedButton = (ImageButton) findViewById(R.id.visited_btn_map);
+        ImageButton filters = (ImageButton) findViewById(R.id.filters_btn);
+        ImageButton userPrefs = (ImageButton) findViewById(R.id.user_settings_btn);
+
+        //Buttons listeners
+        recommenderButton.setOnClickListener(this::openRecommenders);
+        userPrefs.setOnClickListener(this::openUserPrefs);
+        favoritesButton.setOnClickListener(this::openFavourites);
     }
 
 
@@ -379,6 +394,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void openFavourites(View view) {
         Intent intent = new Intent(this, FavouritesActivity.class);
+        startActivity(intent);
+    }
+
+    private void openRecommenders(View view){
+        finish();
+        Intent intent = new Intent(this, ForYouActivity.class);
+        startActivity(intent);
+    }
+
+    private void openUserPrefs(View view){
+        Intent intent = new Intent(this, AccountActivity.class);
         startActivity(intent);
     }
 

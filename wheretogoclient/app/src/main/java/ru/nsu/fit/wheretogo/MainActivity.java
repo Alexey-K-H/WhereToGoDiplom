@@ -14,6 +14,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
+    }
+
     public void openLogin(View view){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);

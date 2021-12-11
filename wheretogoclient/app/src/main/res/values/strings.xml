@@ -28,4 +28,17 @@
     <string name="wrongEmailFormatMsg">Неверный формат адреса электронной почты</string>
     <string name="emptyEmailMsg">Введите адрес электронной почты</string>
     <string name="emptyUsernameMsg">Введите имя пользователя</string>
+
+    <string name="register_str">Зарегистрироваться</string>
+    <string name="login_str">Войти</string>
+    <string name="submit_reg_str">Зарегистрироваться</string>
+    <string name="register_title">РЕГИСТРАЦИЯ</string>
+    <string name="back_from_short_info">Назад</string>
+    <string name="place_title">Название места</string>
+    <string name="place_description">Информация о месте</string>
+    <string name="reviews">Отзывы</string>
+    <string name="user_name_str">Имя пользователя</string>
+    <string name="edit_profile_str">Редактировать профиль</string>
+    <string name="exit_account_str">Выйти</string>
+
 </resources>

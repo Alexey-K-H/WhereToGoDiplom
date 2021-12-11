@@ -81,6 +81,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void openMap() {
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
@@ -88,7 +89,9 @@ public class RegistrationActivity extends AppCompatActivity {
     private void showUnexpectedErrorMessage() {
         showNotification(getString(R.string.unexpectedErrorMsg));
     }
+
     private void showNotification(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
+
 }

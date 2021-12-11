@@ -45,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void openMap() {
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
