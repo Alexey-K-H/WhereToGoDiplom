@@ -20,6 +20,7 @@
     <string name="default_place_name">Название места</string>
     <string name="back_button">Назад</string>
     <string name="favourite_text">❤ ️Избранное</string>
+    <string name="visited_text">📍 Посещенное</string>
 
     <string name="unexpectedErrorMsg">Произошла непредвиденная ошибка</string>
     <string name="usernameAlreadyRegisteredMsg">Пользователь с таким именем уже существует</string>

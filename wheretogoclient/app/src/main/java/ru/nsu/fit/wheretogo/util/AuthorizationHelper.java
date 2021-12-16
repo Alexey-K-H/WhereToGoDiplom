@@ -3,6 +3,7 @@ package ru.nsu.fit.wheretogo.util;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import java.util.function.Consumer;
@@ -57,7 +58,7 @@ public class AuthorizationHelper {
         userService.registerUser(email, username, password).enqueue(new Callback<User>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
                     AuthorizationHelper.setUserProfile(response.body());
                     onSuccess.accept(response);
@@ -68,7 +69,7 @@ public class AuthorizationHelper {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 onUnexpectedError.run();
                 Log.e("registration", t.getMessage());
             }
@@ -87,7 +88,7 @@ public class AuthorizationHelper {
         userService.getCurrentUser().enqueue(new Callback<User>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
                     AuthorizationHelper.setUserProfile(response.body());
                     onSuccess.accept(response);
@@ -98,7 +99,7 @@ public class AuthorizationHelper {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 onUnexpectedError.run();
                 Log.e("authorization", t.getMessage());
             }

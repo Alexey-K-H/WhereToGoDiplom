@@ -43,7 +43,9 @@ import retrofit2.Response;
 import ru.nsu.fit.wheretogo.AccountActivity;
 import ru.nsu.fit.wheretogo.FavouritesActivity;
 import ru.nsu.fit.wheretogo.ForYouActivity;
+import ru.nsu.fit.wheretogo.PlaceActivity;
 import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.VisitedActivity;
 import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.PlaceList;
@@ -126,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         recommenderButton.setOnClickListener(this::openRecommenders);
         userPrefs.setOnClickListener(this::openUserPrefs);
         favoritesButton.setOnClickListener(this::openFavourites);
+        visitedButton.setOnClickListener(this::openVisited);
     }
 
 
@@ -313,9 +316,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (clusterManager == null) {
                 clusterManager = new ClusterManager<>(this.getApplicationContext(), map);
                 clusterManager.setOnClusterItemClickListener(item -> {
-                    //TODO:вставить сюда код, который отвечает за реакцию на нажатие маркера
+                    //Выбранное место
                     selectedPlace = item;
-                    openShortPlaceInfo(selectedPlace);
+                    openShortPlaceInfo();
                     return false;
                 });
             }
@@ -334,24 +337,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + place.getLatitude().toString()
                         + place.getLongitude().toString());
                 try {
-                    //TODO:подумать, что писать в подзаголовок маркера (либо его убрать)
-                    String snippet = "на основе вашего местоположения";
-
-                    // дефолт иконка, пока не скачаются иконки мест
-                    Bitmap avatar = BitmapFactory.decodeResource(getResources(), R.drawable.unknown);
-
-                    ClusterMarker newClusterMarker = new ClusterMarker(
-                            new LatLng(place.getLatitude(), place.getLongitude()),
-                            place.getName(),
-                            snippet,
-                            avatar,
-                            place
-                    );
-                    clusterManager.addItem(newClusterMarker);
-                    clusterMarkers.add(newClusterMarker);
-
                     // асинхронная загрузка иконок
-                    PictureLoader.loadPlaceThumbnail(place.getThumbnailLink(), placeNum,
+                    PictureLoader.loadPlaceThumbnail(this, place, placeNum,
                             clusterMarkers, clusterManager);
 
                     placeNum++;
@@ -362,7 +349,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void openShortPlaceInfo(ClusterMarker item) {
+    private void openShortPlaceInfo() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
                 MapsActivity.this, R.style.ButtonSheetDialogTheme
         );
@@ -372,15 +359,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         findViewById(R.id.bottomSheetContainer)
                 );
 
-        fillShortPlaceInfo(bottomSheetView, item);
+        fillShortPlaceInfo(bottomSheetView, selectedPlace);
 
         bottomSheetView.findViewById(R.id.back_btn).setOnClickListener(view -> bottomSheetDialog.dismiss());
 
         bottomSheetView.findViewById(R.id.more_info_btn).setOnClickListener(view -> {
             bottomSheetDialog.dismiss();
-            //openFullPlaceInfo(view, item);
+            openFullPlaceInfo(view);
         });
 
+        bottomSheetView.findViewById(R.id.favour_btn).setOnClickListener(this::addFavoritePlace);
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
@@ -405,6 +393,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void openUserPrefs(View view){
         Intent intent = new Intent(this, AccountActivity.class);
+        startActivity(intent);
+    }
+
+    private void openFullPlaceInfo(View view){
+        System.out.println(selectedPlace.getPlace().toString());
+        Intent intent = new Intent(this, PlaceActivity.class);
+        intent.putExtra("title", selectedPlace.getTitle());
+        intent.putExtra("desc", selectedPlace.getPlace().getDescription());
+        //intent.putExtra("bitmap", selectedPlace.getIconPicture());
+        startActivity(intent);
+    }
+
+    public void addFavoritePlace(View view) {
+
+    }
+
+    public void openVisited(View view) {
+        Intent intent = new Intent(this, VisitedActivity.class);
         startActivity(intent);
     }
 

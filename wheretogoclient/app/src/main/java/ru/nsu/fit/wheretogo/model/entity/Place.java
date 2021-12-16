@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.model.entity;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -138,4 +140,14 @@ public class Place {
         this.coords.setLatitude(longitude);
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return "\nname: " + getName() + "\n" +
+                "description: " + getDescription() + "\n" +
+                "cords: " + getCoords().toString() + "\n" +
+                "averageScore: " + getAverageScore() + "\n" +
+                "thumbnailLink: " + getThumbnailLink() + "\n" +
+                "uploadedAt: " + getUploadedAt();
+    }
 }

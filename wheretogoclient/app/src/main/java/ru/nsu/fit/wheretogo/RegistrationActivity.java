@@ -61,6 +61,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 ),
                 regFailResponse -> {
                     try {
+                        assert regFailResponse.errorBody() != null;
                         String errorMessage = new JSONObject(regFailResponse.errorBody().string()).getString("message");
                         switch (errorMessage) {
                             case "email_already_registered":

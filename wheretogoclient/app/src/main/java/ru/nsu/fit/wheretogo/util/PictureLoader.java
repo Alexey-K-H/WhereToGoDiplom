@@ -1,54 +1,59 @@
 package ru.nsu.fit.wheretogo.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-import com.google.android.gms.maps.GoogleMap;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterManager;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.List;
 
 import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
+import ru.nsu.fit.wheretogo.model.entity.Place;
 
 public class PictureLoader {
     private static final String TAG = MapsActivity.class.getSimpleName();
 
-    public static void loadPlaceThumbnail(String link,
+    public static void loadPlaceThumbnail(Context context, Place place,
                                           int clusterNumber,
                                           List<ClusterMarker> clusterMarkers,
                                           ClusterManager<ClusterMarker> clusterManager) {
-        try {
-            Picasso.get().load(link).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    Log.i(TAG, "The image was obtained correctly");
-                    // clusterManager.updateItem() не работает,
-                    // поэтому приходится заново присваивать лист маркеров при обновлении иконки
-                    clusterManager.clearItems();
-                    clusterManager.getClusterMarkerCollection().clear();
+        Glide.with(context)
+                .asBitmap()
+                .load(place.getThumbnailLink())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource,
+                                                @Nullable Transition<? super Bitmap> transition) {
+                        Log.i(TAG, "The image was obtained correctly");
 
-                    // Меняем иконку у маркера и снова присваиваем маркеры менеджеру
-                    clusterMarkers.get(clusterNumber).setIconPicture(bitmap);
-                    clusterManager.addItems(clusterMarkers);
-                    clusterManager.cluster();
-                }
+                        ClusterMarker newClusterMarker = new ClusterMarker(
+                                place.getId(),
+                                new LatLng(place.getLatitude(), place.getLongitude()),
+                                place.getName(),
+                                "",
+                                resource,
+                                place
+                        );
 
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    Log.e(TAG, "The image was not obtained");
-                }
+                        clusterManager.addItem(newClusterMarker);
+                        clusterMarkers.add(newClusterMarker);
+                        clusterManager.cluster();
+                    }
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    Log.i(TAG, "Getting ready to get the image");
-                }
-            });
-        } catch (java.lang.IllegalArgumentException e){
-            Log.e(TAG, "The image was not obtained: NULL url");
-        }
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                    }
+                });
     }
+
 }

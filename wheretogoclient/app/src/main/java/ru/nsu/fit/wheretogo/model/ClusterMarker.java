@@ -8,17 +8,20 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.io.Serializable;
+
 import ru.nsu.fit.wheretogo.model.entity.Place;
 
-public class ClusterMarker implements ClusterItem {
-
+public class ClusterMarker implements Serializable, ClusterItem {
+    private int id;
     private LatLng position;
     private String title;
     private String snippet;
     private Bitmap iconPicture;
     private Place place;
 
-    public ClusterMarker(LatLng position, String title, String snippet, Bitmap iconPicture, Place place) {
+    public ClusterMarker(int id, LatLng position, String title, String snippet, Bitmap iconPicture, Place place) {
+        this.id = id;
         this.position = position;
         this.title = title;
         this.snippet = snippet;
@@ -33,6 +36,14 @@ public class ClusterMarker implements ClusterItem {
     @Override
     public LatLng getPosition() {
         return position;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setPosition(LatLng position) {

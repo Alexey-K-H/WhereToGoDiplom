@@ -67,6 +67,7 @@
         android:textColorLink="#673AB7"
         android:textSize="18sp"
         android:textStyle="bold"
+        android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/registerButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
