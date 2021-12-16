@@ -72,7 +72,7 @@ public class Place {
                 .setName(dto.getName())
                 .setDescription(dto.getDescription())
                 .setCoords(dto.getCoords())
-                .setThumbnail(dto.getThumbnailLink())
+                .setThumbnail(dto.getThumbnail())
                 .setCategories(categories);
     }
 

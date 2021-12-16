@@ -11,7 +11,6 @@ import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.PlacePicture;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class PlaceDescriptionDTO {
     private String name;
     private String description;
     private Coords coords;
-    private String thumbnailLink;
+    private String thumbnail;
     private Instant uploadedAt;
     private List<CategoryDTO> categories;
     private List<String> picturesLinks;
@@ -47,7 +46,7 @@ public class PlaceDescriptionDTO {
                 .setName(entity.getName())
                 .setDescription(entity.getDescription())
                 .setCoords(entity.getCoords())
-                .setThumbnailLink(entity.getThumbnail())
+                .setThumbnail(entity.getThumbnail())
                 .setUploadedAt(entity.getUploadedAt())
                 .setCategories(categories)
                 .setPicturesLinks(entity.getPicturesLinks().stream().map((PlacePicture::getUrl)).toList());

@@ -4,8 +4,7 @@ import lombok.Getter;
 
 public enum PlaceSortBy {
     NAME("name"),
-    //SCORE("averageScore"),
-    //RADIUS("radius"),
+    SCORE("averageScore")
     ;
 
     @Getter
