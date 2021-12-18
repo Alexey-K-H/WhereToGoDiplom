@@ -1,10 +1,9 @@
 package ru.nsu.fit.wheretogo.map;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -52,6 +52,7 @@ import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
+import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 
@@ -205,7 +206,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 PlaceList placeList = response.body();
                 assert placeList != null;
                 places.addAll(placeList.getList());
-                addMapMarkers();
+                updateMapMarkers();
             }
 
             @Override
@@ -311,7 +312,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    private void addMapMarkers() {
+    private void updateMapMarkers() {
         if (map != null) {
             if (clusterManager == null) {
                 clusterManager = new ClusterManager<>(this.getApplicationContext(), map);
@@ -332,6 +333,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             int placeNum = 0;
+            clusterManager.clearItems();
+            clusterMarkers.clear();
+            clusterManager.cluster();
             for (Place place : places) {
                 Log.d(TAG, "addMapMarkers: location: "
                         + place.getLatitude().toString()
@@ -369,6 +373,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         bottomSheetView.findViewById(R.id.favour_btn).setOnClickListener(this::addFavoritePlace);
+        bottomSheetView.findViewById(R.id.visited_btn).setOnClickListener(this::addVisitedPlace);
+
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
     }
@@ -378,6 +384,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         placeName.setText(item.getTitle());
         ImageView placeImage = view.findViewById(R.id.place_image);
         placeImage.setImageBitmap(item.getIconPicture());
+
+        PlaceService placeService = ServiceGenerator.createService(PlaceService.class);
+        Call<Place> placeCall = placeService.getPlace(item.getId());
+        placeCall.enqueue(new Callback<Place>() {
+            @Override
+            public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
+                TextView placeDescription = view.findViewById(R.id.place_description);
+                assert response.body() != null;
+                String descriptionText = response.body().getDescription();
+                descriptionText = descriptionText.substring(0, 1).toUpperCase()
+                        + descriptionText.substring(1);
+                placeDescription.setText(descriptionText);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
     public void openFavourites(View view) {
@@ -406,7 +431,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void addFavoritePlace(View view) {
+        Call<Place> call = ServiceGenerator.createService(PlaceService.class)
+                .addFavoritePlace(selectedPlace.getId());
+        Context context = this;
+        call.enqueue(new Callback<Place>() {
+            @Override
+            public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(context, "Added",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    private void addVisitedPlace(View view) {
+        Call<Place> call = ServiceGenerator.createService(PlaceService.class)
+                .addVisitedPlace(selectedPlace.getId());
+        Context context = this;
+        call.enqueue(new Callback<Place>() {
+            @Override
+            public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(context, "Added",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
     public void openVisited(View view) {

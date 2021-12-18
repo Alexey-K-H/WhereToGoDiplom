@@ -16,6 +16,7 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
+import ru.nsu.fit.wheretogo.RecyclerViewAdapter;
 import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.entity.Place;
@@ -54,6 +55,32 @@ public class PictureLoader {
                     public void onLoadCleared(@Nullable Drawable placeholder) {
                     }
                 });
+    }
+
+    public static void loadRecyclerPictures(Context context,
+                                            List<Place> places,
+                                            RecyclerViewAdapter adapter) {
+        for (Place place : places) {
+            Glide.with(context)
+                    .asBitmap()
+                    .load(place.getThumbnailLink())
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource,
+                                                    @Nullable Transition<? super Bitmap> transition) {
+                            Log.i(TAG, "Favourites: The image was obtained correctly");
+                            adapter.getImages().add(resource);
+                            adapter.getNames().add(place.getName());
+                            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+                        }
+                    });
+
+
+        }
     }
 
 }

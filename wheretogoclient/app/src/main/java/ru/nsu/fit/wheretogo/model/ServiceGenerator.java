@@ -8,7 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
 public class ServiceGenerator {
-    private static final String BASE_URL = "http://10.0.2.2:8080/";
+    //private static final String BASE_URL = "http://10.0.2.2:8080/";
+    private static final String BASE_URL = "http://192.168.1.102:8080/";
 
     private static final OkHttpClient.Builder httpClient
             = new OkHttpClient.Builder().authenticator((route, response) -> {

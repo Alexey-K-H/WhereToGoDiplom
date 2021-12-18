@@ -13,14 +13,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.nsu.fit.wheretogo.util.ImageResizer;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     private final int height;
     // Declare variables to store data from the constructor
     private final Context context;
-    private final String[] names;
-    private final int[] images;
+    private final List<String> names = new ArrayList<>();
+    private final List<Bitmap> images = new ArrayList<>();
 
     // Create a static inner class and provide references to all the Views for each data item.
     // This is particularly useful for caching the Views within the item layout for fast access.
@@ -39,11 +42,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     // Provide a suitable constructor
-    public RecyclerViewAdapter(Context context, String[] names, int[] images, int height) {
+    public RecyclerViewAdapter(Context context, int height) {
         // Initialize the class scope variables with values received from constructor
         this.context = context;
-        this.names = names;
-        this.images = images;
         this.height = height;
     }
 
@@ -66,18 +67,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public int getItemCount() {
-        return names.length;
+        return names.size();
     }
 
     // Replace the contents of a view to be invoked by the layout manager
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Get element from your dataset at this position and replace the contents of the View with that element
-        holder.rowName.setText(names[position]);
+        holder.rowName.setText(names.get(position));
 
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), images[position]);
-        icon = ImageResizer.resize(icon, icon.getWidth(), height / 5);
+        Bitmap icon = ImageResizer.resize(images.get(position),
+                images.get(position).getWidth(),
+                height / 5);
         holder.rowImage.setImageBitmap(icon);
+    }
+
+    public List<String> getNames() {
+        return names;
+    }
+
+    public List<Bitmap> getImages() {
+        return images;
     }
 
 
