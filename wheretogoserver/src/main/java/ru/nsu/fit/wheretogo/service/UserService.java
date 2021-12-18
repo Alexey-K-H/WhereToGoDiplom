@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.exception.EmailAlreadyRegistered;
 import ru.nsu.fit.wheretogo.exception.UsernameAlreadyRegistered;
@@ -13,6 +15,7 @@ import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import javax.validation.ValidationException;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,10 +47,14 @@ public class UserService {
         SecurityContextHelper.setNotAuthenticated();
     }
 
-    public UserDto getCurrentUser() {
+    //TODO:Добавили поиск не только сущности но и DTO объекта
+    public UserDto getCurrentUserDto() {
         return UserDto.getFromEntity(userRepository.findByEmail(SecurityContextHelper.email()).orElse(null));
     }
 
+    public User getCurrentUser() {
+        return userRepository.findByEmail(SecurityContextHelper.email()).orElse(null);
+    }
     public UserDto getUser(Long userId) {
         return UserDto.getFromEntity(userRepository.findById(userId).orElse(null));
     }
@@ -62,5 +69,44 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyRegistered();
         }
+    }
+
+    //TODO:Добавлены запросы для добавления избранных, посещенных и получения информации о них
+    @Transactional(readOnly = true)
+    public List<PlaceBriefDTO> getFavourite() {
+        return userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getFavouritePlaces().stream().map(
+                PlaceBriefDTO::getFromEntity
+        ).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlaceBriefDTO> getVisited() {
+        return userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
+                PlaceBriefDTO::getFromEntity
+        ).toList();
+    }
+
+    @Transactional
+    public void addFavourite(Long placeId) {
+        if (placeId == null) {
+            return;
+        }
+        Place place = new Place();
+        place.setId(placeId);
+        userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                currentUser -> currentUser.getFavouritePlaces().add(place)
+        );
+    }
+
+    @Transactional
+    public void addVisited(Long placeId) {
+        if (placeId == null) {
+            return;
+        }
+        Place place = new Place();
+        place.setId(placeId);
+        userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                currentUser -> currentUser.getVisitedPlaces().add(place)
+        );
     }
 }

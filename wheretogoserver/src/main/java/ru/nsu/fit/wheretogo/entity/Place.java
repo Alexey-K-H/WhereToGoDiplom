@@ -52,8 +52,8 @@ public class Place {
     @ManyToMany
     @JoinTable(
             name = "place_category",
-            joinColumns = @JoinColumn(name = "category_id"),
-            inverseJoinColumns = @JoinColumn(name = "place_id")
+            joinColumns = @JoinColumn(name = "place_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> categories;
 

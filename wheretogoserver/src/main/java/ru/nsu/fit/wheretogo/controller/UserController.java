@@ -41,7 +41,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<UserDto> getCurrentUser() {
-        return checkIfFound(userService.getCurrentUser());
+        return checkIfFound(userService.getCurrentUserDto());
     }
 
     @GetMapping("/{id}")

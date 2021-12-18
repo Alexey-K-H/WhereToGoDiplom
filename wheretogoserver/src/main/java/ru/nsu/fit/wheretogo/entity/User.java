@@ -14,7 +14,7 @@ import ru.nsu.fit.wheretogo.dto.UserDto;
 @Getter
 @Setter
 @Accessors(chain = true)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

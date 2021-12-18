@@ -2,8 +2,10 @@ package ru.nsu.fit.wheretogo.service.fetch;
 
 import ru.nsu.fit.wheretogo.utils.SortDirection;
 
+import java.util.List;
+
 public record PlaceFetchParameters(String name,
-                                   Integer categoryId,
+                                   List<Integer> categoryIds,
                                    Integer page,
                                    Integer pageSize,
                                    SortDirection sortDirection,

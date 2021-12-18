@@ -69,10 +69,20 @@ public class PlaceService {
                     "%" + parameters.name().toLowerCase() + "%"));//то же самое что и в фильтре WHERE name LIKE %...%
             // многоточие-это строчка, которую в имени найти надо
         }
-        if (parameters.categoryId() != null) {
-            Join<Place, Category> categoryJoin = root.join("categories");////сперва необходимо определять соединение со связанной сущностью путем вызова одного из методов From.join для корневого объекта запроса или другого объекта соединения
-            Predicate categoryPredicate = criteriaBuilder.equal(categoryJoin.get("id"), parameters.categoryId());//сраниваем айди из параметров и из джойна, в случае эквпивалентности пихаем в categoryPredicate
-            predicates.add(categoryPredicate);//добавляем в список предикаты
+        if (parameters.categoryIds() != null  && !parameters.categoryIds().isEmpty()) {
+            Join<Place, Category> categoryJoin = root.join("categories", JoinType.LEFT);////сперва необходимо определять соединение со связанной сущностью путем вызова одного из методов From.join для корневого объекта запроса или другого объекта соединения
+//            Predicate categoryPredicate = criteriaBuilder.equal(categoryJoin.get("id"), parameters.categoryIds());//сраниваем айди из параметров и из джойна, в случае эквпивалентности пихаем в categoryPredicate
+//            predicates.add(categoryPredicate);//добавляем в список предикаты
+            //TODO:Ниже выполняется тоже самое, только все сразу в одном вызове без создание построителя условия извне
+            Predicate criteriaPredicate = criteriaBuilder.or(parameters.categoryIds().stream()
+                    .filter(categoryId -> categoryId != Integer.MAX_VALUE)
+                    .map(categoryId -> criteriaBuilder.equal(categoryJoin.get("id"), categoryId))
+                    .toArray(Predicate[]::new));
+            //TODO:Проверка для случая, когда фильтры пустые (наверное, уточни у Ильи)
+            if (parameters.categoryIds().contains(Integer.MAX_VALUE)) {
+                criteriaPredicate = criteriaBuilder.or(criteriaPredicate, categoryJoin.isNull());
+            }
+            predicates.add(criteriaPredicate);
         }
         return predicates;//в списке предикатов будут сами параметры
     }

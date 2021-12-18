@@ -11,11 +11,13 @@ import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.service.PlacePicturesService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
+import ru.nsu.fit.wheretogo.service.UserService;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceSortBy;
 import ru.nsu.fit.wheretogo.utils.SortDirection;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/place")
@@ -23,6 +25,7 @@ import javax.validation.Valid;
 public class PlaceController {
     private final PlaceService service;
     private final PlacePicturesService picturesService;
+    private final UserService userService;//нужен для работы с посещенными и понравившимися
 
     @PostMapping
     public ResponseEntity<String> savePlace(@RequestBody @Valid PlaceDescriptionDTO place) {
@@ -70,10 +73,53 @@ public class PlaceController {
         }
     }
 
+    //TODO:Запросы для работы с посещенными, избранными
+    @PostMapping("/favourite")
+    public ResponseEntity<String> addFavourite(
+            @RequestParam(name = "placeId") Long placeId
+    ) {
+        try {
+            userService.addFavourite(placeId);
+            return ResponseEntity.ok().build();
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/visited")
+    public ResponseEntity<String> addVisited(
+            @RequestParam(name = "placeId") Long placeId
+    ) {
+        try {
+            userService.addVisited(placeId);
+            return ResponseEntity.ok().build();
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/favourite")
+    public ResponseEntity<List<PlaceBriefDTO>> getFavourite() {
+        try {
+            return ResponseEntity.ok(userService.getFavourite());
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/visited")
+    public ResponseEntity<List<PlaceBriefDTO>> getVisited() {
+        try {
+            return ResponseEntity.ok(userService.getVisited());
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @GetMapping("/list")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> searchPlaces(
             @RequestParam(name = "name", defaultValue = "") String name,
-            @RequestParam(name = "category", required = false) Integer categoryId,
+            @RequestParam(name = "category", required = false) List<Integer> categoryId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(name = "sortDirection", defaultValue = "NONE") SortDirection sortDirection,
