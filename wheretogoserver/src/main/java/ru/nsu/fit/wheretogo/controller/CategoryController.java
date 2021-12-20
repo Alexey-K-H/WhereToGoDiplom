@@ -17,22 +17,22 @@ import ru.nsu.fit.wheretogo.service.CategoryService;
 @RestController
 @RequestMapping("/category")
 public class CategoryController {
-    
+
     @Autowired
     private CategoryService service;
-    
-    @PostMapping("/add")
+
+    @PostMapping()
     public ResponseEntity<String> saveCategory(@RequestBody CategoryDTO categoryDTO) {
         service.addCategory(categoryDTO);
         return ResponseEntity.ok("OK");
     }
-    
-    @DeleteMapping("/delete/{id}")
+
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable(name = "id") Integer id) {
         service.deleteCategory(new CategoryDTO().setId(id));
         return new ResponseEntity<>("Deleted", HttpStatus.NO_CONTENT);
     }
-    
+
     @GetMapping("/list")
     public ResponseEntity<List<CategoryDTO>> getCategories() {
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);

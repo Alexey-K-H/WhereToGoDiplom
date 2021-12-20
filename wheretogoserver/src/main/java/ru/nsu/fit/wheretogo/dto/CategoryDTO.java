@@ -15,9 +15,11 @@ import ru.nsu.fit.wheretogo.entity.Category;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryDTO extends BaseDTO {
+
     private Integer id;
 
-    @NotNull(message = "Category must have name")
+    @NotNull(message = "Enter category name")
+    @Size(min = 1, max = 40, message = "Invalid category name length (can be up to 40 characters)")
     private String name;
 
     public static CategoryDTO getFromEntity(Category category) {

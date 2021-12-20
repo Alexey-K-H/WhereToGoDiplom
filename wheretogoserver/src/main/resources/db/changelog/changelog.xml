@@ -43,5 +43,14 @@
     <changeSet id="13" author="npogodaev">
         <sqlFile path="remove_place_radius.sql" relativeToChangelogFile="true"/>
     </changeSet>
+    <changeSet id="14" author="ikondratev">
+        <sqlFile path="task-7383_test_data.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="15" author="kzonov">
+        <sqlFile path="task-7474_fix_review.sql" relativeToChangelogFile="true"/>
+    </changeSet>
+    <changeSet id="15" author="ikondratev">
+        <sqlFile path="task-7472_change_sequences.sql" relativeToChangelogFile="true"/>
+    </changeSet>
 
 </databaseChangeLog>
