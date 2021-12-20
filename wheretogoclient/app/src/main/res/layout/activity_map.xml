@@ -1,111 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.slidingpanelayout.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mapSlidingPane"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".map.MapsActivity">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="128dp"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintHorizontal_bias="0.0"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="0dp"
-        android:layout_height="126dp"
-        android:layout_marginTop="8dp"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@+id/map">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".map.MapsActivity">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="128dp"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintHorizontal_bias="0.0"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="0dp"
+            android:layout_height="126dp"
+            android:layout_marginTop="8dp"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/map">
+
+            <ImageButton
+                android:id="@+id/favorites_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/favour"
+                map:layout_constraintBottom_toBottomOf="parent"
+                map:layout_constraintEnd_toStartOf="@+id/visited_btn_map"
+                map:layout_constraintStart_toStartOf="parent"
+                map:layout_constraintTop_toTopOf="parent"
+                map:strokeColor="#FFFFFF"
+                map:strokeWidth="5dp"
+                tools:ignore="SmallSp" />
+
+            <ImageButton
+                android:id="@+id/visited_btn_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/visit"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                map:layout_constraintBottom_toBottomOf="parent"
+                map:layout_constraintEnd_toStartOf="@+id/filters_btn"
+                map:layout_constraintTop_toTopOf="parent"
+                map:strokeColor="#FFFFFF"
+                map:strokeWidth="5dp"
+                tools:ignore="SmallSp" />
+
+            <ImageButton
+                android:id="@+id/filters_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="21dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/filter"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                map:layout_constraintBottom_toBottomOf="parent"
+                map:layout_constraintEnd_toStartOf="@+id/for_you_btn"
+                map:layout_constraintTop_toTopOf="parent"
+                map:strokeColor="#FFFFFF"
+                map:strokeWidth="5dp"
+                tools:ignore="SmallSp" />
+
+            <ImageButton
+                android:id="@+id/for_you_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@android:color/transparent"
+                android:onClick="openRecommenders"
+                android:src="@drawable/recommnd"
+                map:layout_constraintBottom_toBottomOf="parent"
+                map:layout_constraintEnd_toEndOf="parent"
+                map:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageButton
-            android:id="@+id/favorites_btn"
+            android:id="@+id/user_settings_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="21dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="60dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/favour"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toStartOf="@+id/visited_btn_map"
-            map:layout_constraintStart_toStartOf="parent"
-            map:layout_constraintTop_toTopOf="parent"
-            map:strokeColor="#FFFFFF"
-            map:strokeWidth="5dp"
-            tools:ignore="SmallSp" />
+            android:src="@drawable/profile_settings"
+            map:layout_constraintStart_toStartOf="@+id/map"
+            map:layout_constraintTop_toTopOf="@+id/map" />
 
-        <ImageButton
-            android:id="@+id/visited_btn_map"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="21dp"
-            android:layout_marginBottom="16dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/visit"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toStartOf="@+id/filters_btn"
-            map:layout_constraintTop_toTopOf="parent"
-            map:strokeColor="#FFFFFF"
-            map:strokeWidth="5dp"
-            tools:ignore="SmallSp" />
-
-        <ImageButton
-            android:id="@+id/filters_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="21dp"
-            android:layout_marginBottom="16dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/filter"
-            android:textSize="10sp"
-            android:textStyle="bold"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toStartOf="@+id/for_you_btn"
-            map:layout_constraintTop_toTopOf="parent"
-            map:strokeColor="#FFFFFF"
-            map:strokeWidth="5dp"
-            tools:ignore="SmallSp" />
-
-        <ImageButton
-            android:id="@+id/for_you_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@android:color/transparent"
-            android:onClick="openRecommenders"
-            android:src="@drawable/recommnd"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toEndOf="parent"
-            map:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <ImageButton
-        android:id="@+id/user_settings_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="60dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/profile_settings"
-        map:layout_constraintStart_toStartOf="@+id/map"
-        map:layout_constraintTop_toTopOf="@+id/map" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/categoriesHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/categoriesHeader"
+            android:textSize="30dp"
+            android:layout_margin="100dp"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/filtersLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/categoriesHeader"
+            android:layout_marginTop="50dp"
+            android:orientation="vertical"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.slidingpanelayout.widget.SlidingPaneLayout>

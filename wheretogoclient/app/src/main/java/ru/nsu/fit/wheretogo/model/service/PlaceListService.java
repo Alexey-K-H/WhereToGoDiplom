@@ -10,7 +10,7 @@ import ru.nsu.fit.wheretogo.model.PlaceList;
 public interface PlaceListService {
     @GET("/place/list")
     Call<PlaceList> getPlaceList(
-            @Query("category") List<String> categories,
+            @Query("category") List<Integer> categoryIds,
             @Query("per_page") int per_page,
             @Query("page") int page
     );

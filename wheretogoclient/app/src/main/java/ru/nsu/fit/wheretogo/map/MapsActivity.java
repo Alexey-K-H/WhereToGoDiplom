@@ -10,17 +10,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -36,6 +40,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,7 +58,9 @@ import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
+import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.service.CategoryService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
@@ -58,6 +68,8 @@ import ru.nsu.fit.wheretogo.util.PictureLoader;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
+
+    private Map<Integer, CategoryNameChosen> categories;
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -89,10 +101,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap map;
 
+    private SlidingPaneLayout mapSlidingPane;
+    private LinearLayout filtersLayout;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getCategories(null, null);
 
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
@@ -103,6 +120,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Retrieve the content view that renders the map.
         ru.nsu.fit.wheretogo.databinding.ActivityMapBinding binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mapSlidingPane = findViewById(R.id.mapSlidingPane);
+        mapSlidingPane.setLockMode(SlidingPaneLayout.LOCK_MODE_LOCKED_CLOSED);
+        mapSlidingPane.addPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(@NonNull View panel, float slideOffset) {
+            }
+
+            @Override
+            public void onPanelOpened(@NonNull View panel) {
+            }
+
+            @Override
+            public void onPanelClosed(@NonNull View panel) {
+                sendPlacesRequest();
+            }
+        });
+        filtersLayout = findViewById(R.id.filtersLayout);
+
 
         // Construct a PlacesClient
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
@@ -130,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         userPrefs.setOnClickListener(this::openUserPrefs);
         favoritesButton.setOnClickListener(this::openFavourites);
         visitedButton.setOnClickListener(this::openVisited);
+        filters.setOnClickListener(this::openFilters);
     }
 
 
@@ -150,6 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Manipulates the map when it's available.
      * This callback is triggered when the map is ready to be used.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
@@ -195,17 +233,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         sendPlacesRequest();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void sendPlacesRequest() {
         PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
-        Call<PlaceList> placeCall = placeService.getPlaceList(null, 1, 0);
+        if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
+            categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
+        }
+
+        Call<PlaceList> placeCall = placeService.getPlaceList(
+                categories.entrySet().stream()
+                        .filter(entry -> entry.getValue().chosen)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList()),
+                1, 0);
 
         placeCall.enqueue(new Callback<PlaceList>() {
             @Override
             public void onResponse(@NonNull Call<PlaceList> call,
                                    @NonNull Response<PlaceList> response) {
                 PlaceList placeList = response.body();
-                assert placeList != null;
-                places.addAll(placeList.getList());
+                places.clear();
+                if (placeList != null) {
+                    places.addAll(placeList.getList());
+                }
                 updateMapMarkers();
             }
 
@@ -479,6 +529,85 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void openVisited(View view) {
         Intent intent = new Intent(this, VisitedActivity.class);
         startActivity(intent);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void openFilters(View view) {
+        filtersLayout.removeAllViews();
+        getCategories(() -> {
+            List<Integer> categoryIds = new ArrayList<>();
+            categories.forEach((id, categoryNameChosen) -> categoryIds.add(id));
+            categoryIds.sort(Integer::compareTo);
+            categoryIds.forEach(id -> {
+                CategoryNameChosen categoryNameChosen = categories.get(id);
+                assert categoryNameChosen != null;
+                filtersLayout.addView(categoryView(id, categoryNameChosen.name, categoryNameChosen.chosen));
+            });
+        }, mapSlidingPane::close);
+        mapSlidingPane.open();
+    }
+
+    private View categoryView(int id, String name, boolean checked) {
+        CheckBox checkBox = new CheckBox(this);
+        checkBox.setChecked(checked);
+        checkBox.setText(name);
+        checkBox.setTextSize(20);
+        checkBox.setPadding(10, 10, 10, 10);
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> categories.put(id, new CategoryNameChosen(name, isChecked)));
+        return checkBox;
+    }
+
+    private void getCategories(@Nullable Runnable onSuccess, @Nullable Runnable onFail) {
+        BooleanWrapper firstFilling = new BooleanWrapper(false);
+        if (categories == null) {
+            categories = new HashMap<>();
+            firstFilling.value = true;
+        }
+        CategoryService categoryService = ServiceGenerator.createService(CategoryService.class);
+        categoryService.getCategories().enqueue(new Callback<List<Category>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(@NonNull Call<List<Category>> call,
+                                   @NonNull Response<List<Category>> response) {
+                assert response.body() != null;
+                response.body().forEach(category -> {
+                    if (firstFilling.value) {
+                        categories.put(category.getId(), new CategoryNameChosen(category.getName(), true));
+                    } else {
+                        categories.putIfAbsent(category.getId(), new CategoryNameChosen(category.getName(), true));
+                    }
+                });
+                if (onSuccess != null) {
+                    onSuccess.run();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+                Log.w("Categories", "Could not load categories (" + t.getMessage() + ")");
+                if (onFail != null) {
+                    onFail.run();
+                }
+            }
+        });
+    }
+
+    private static class BooleanWrapper {
+        public boolean value;
+
+        public BooleanWrapper(boolean value) {
+            this.value = value;
+        }
+    }
+
+    private static class CategoryNameChosen {
+        public String name;
+        public boolean chosen;
+
+        public CategoryNameChosen(String name, boolean chosen) {
+            this.name = name;
+            this.chosen = chosen;
+        }
     }
 
 }

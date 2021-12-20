@@ -10,8 +10,5 @@ import java.util.List;
 
 public interface CategoryService {
     @GET("/category/list")
-    Call<List<Category>> getCategories(
-            @Query("per_page") int per_page,
-            @Query("page") int page
-    );
+    Call<List<Category>> getCategories();
 }
