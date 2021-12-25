@@ -490,6 +490,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (response.isSuccessful()) {
                     Toast.makeText(context, "Added",
                             Toast.LENGTH_SHORT).show();
+                } else if (response.code() == 400) {
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
@@ -513,6 +514,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (response.isSuccessful()) {
                     Toast.makeText(context, "Added",
                             Toast.LENGTH_SHORT).show();
+                } else if (response.code() == 400) {
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
@@ -583,7 +585,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             @Override
-            public void onFailure(Call<List<Category>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
                 Log.w("Categories", "Could not load categories (" + t.getMessage() + ")");
                 if (onFail != null) {
                     onFail.run();

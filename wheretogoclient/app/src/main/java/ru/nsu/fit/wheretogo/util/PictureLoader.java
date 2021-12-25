@@ -70,7 +70,7 @@ public class PictureLoader {
                                                     @Nullable Transition<? super Bitmap> transition) {
                             Log.i(TAG, "Favourites: The image was obtained correctly");
                             adapter.getImages().add(resource);
-                            adapter.getNames().add(place.getName());
+                            adapter.getPlaces().add(place);
                             adapter.notifyItemInserted(adapter.getItemCount() - 1);
                         }
 
