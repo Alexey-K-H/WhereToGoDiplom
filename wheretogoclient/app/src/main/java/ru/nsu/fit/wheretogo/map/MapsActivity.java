@@ -446,6 +446,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 descriptionText = descriptionText.substring(0, 1).toUpperCase()
                         + descriptionText.substring(1);
                 placeDescription.setText(descriptionText);
+
+                selectedPlace.getPlace().setDescription(descriptionText);
+                selectedPlace.setId(item.getId());
             }
 
             @Override
@@ -472,11 +475,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void openFullPlaceInfo(View view){
-        System.out.println(selectedPlace.getPlace().toString());
         Intent intent = new Intent(this, PlaceActivity.class);
+
         intent.putExtra("title", selectedPlace.getTitle());
         intent.putExtra("desc", selectedPlace.getPlace().getDescription());
-        //intent.putExtra("bitmap", selectedPlace.getIconPicture());
+        intent.putExtra("link", selectedPlace.getPlace().getThumbnailLink());
+
         startActivity(intent);
     }
 

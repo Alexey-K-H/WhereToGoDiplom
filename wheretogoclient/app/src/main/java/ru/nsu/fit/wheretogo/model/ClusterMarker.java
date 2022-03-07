@@ -84,5 +84,4 @@ public class ClusterMarker implements Serializable, ClusterItem {
         this.iconPicture = iconPicture;
     }
 
-
 }
