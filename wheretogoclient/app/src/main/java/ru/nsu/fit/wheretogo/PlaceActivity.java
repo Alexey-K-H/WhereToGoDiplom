@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -37,6 +39,16 @@ public class PlaceActivity extends AppCompatActivity {
         placeFullDescView.findViewById(R.id.back_from_full_info).setOnClickListener(view -> finish());
 
         setContentView(placeFullDescView);
+
+        //Полоска рейтинга места
+        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void fillPlaceFields(View view){
