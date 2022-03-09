@@ -9,20 +9,17 @@
 
     <ImageButton
         android:id="@+id/back_btn"
-        android:layout_width="254dp"
-        android:layout_height="55dp"
+        android:layout_width="141dp"
+        android:layout_height="43dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="307dp"
         android:layout_marginBottom="11dp"
         android:background="@android:color/transparent"
+
         android:scaleX="0.7"
         android:scaleY="0.7"
-
         android:src="@drawable/back_btn"
         app:layout_constraintBottom_toTopOf="@+id/place_image"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.183"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,11 +42,10 @@
         android:id="@+id/path_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="19dp"
-        android:layout_marginBottom="5dp"
-        android:src="@drawable/make_path"
         android:background="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        android:src="@drawable/make_path"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/visited_btn"
         app:layout_constraintTop_toBottomOf="@+id/place_name"
@@ -61,23 +57,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="5dp"
-        android:src="@drawable/add_to_visited"
         android:background="@android:color/white"
+        android:src="@drawable/add_to_visited"
         app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
         app:layout_constraintEnd_toStartOf="@+id/path_btn"
         app:layout_constraintStart_toEndOf="@+id/favour_btn"
-        app:layout_constraintTop_toBottomOf="@+id/place_name" />
+        app:layout_constraintTop_toBottomOf="@+id/place_name"
+        app:layout_constraintVertical_bias="0.078" />
 
     <ImageButton
         android:id="@+id/more_info_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="48dp"
-        android:layout_marginBottom="437dp"
         android:background="@android:color/white"
         android:onClick="openFullPlaceInfo"
         android:src="@drawable/more_info"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/place_image"
         app:layout_constraintTop_toBottomOf="@+id/path_btn" />
@@ -88,10 +84,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginTop="4dp"
-        android:layout_marginBottom="5dp"
-        android:src="@drawable/add_to_favour"
         android:background="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        android:src="@drawable/add_to_favour"
         app:layout_constraintEnd_toStartOf="@+id/visited_btn"
         app:layout_constraintStart_toEndOf="@+id/place_image"
         app:layout_constraintTop_toBottomOf="@+id/place_name" />
@@ -100,13 +94,11 @@
         android:id="@+id/place_name"
         android:layout_width="201dp"
         android:layout_height="67dp"
-        android:layout_marginTop="123dp"
+        android:layout_marginTop="72dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="4dp"
         android:text="@string/default_place_name"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/path_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/place_image"
@@ -125,5 +117,35 @@
         app:layout_constraintEnd_toEndOf="@+id/place_name"
         app:layout_constraintStart_toStartOf="@+id/place_image"
         app:layout_constraintTop_toBottomOf="@+id/place_image" />
+
+    <TextView
+        android:id="@+id/score_text"
+        android:layout_width="60dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="62dp"
+        android:layout_marginBottom="12dp"
+        android:text="@string/score_text"
+        app:layout_constraintBottom_toTopOf="@+id/place_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="33dp"
+        android:layout_height="27dp"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="37dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/place_name"
+        app:layout_constraintEnd_toStartOf="@+id/score_text"
+        app:layout_constraintStart_toEndOf="@+id/back_btn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
+        android:src="@drawable/star_filled" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

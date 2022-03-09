@@ -42,5 +42,6 @@
     <string name="edit_profile_str">Редактировать профиль</string>
     <string name="exit_account_str">Выйти</string>
     <string name="categoriesHeader">Категории</string>
+    <string name="score_text">TextView</string>
 
 </resources>
