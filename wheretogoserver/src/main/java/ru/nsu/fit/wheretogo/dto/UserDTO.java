@@ -29,8 +29,6 @@ public class UserDTO {
     private String username;
 
     private Instant createdAt;
-    private String avatarLink;
-    private String avatarThumbnailLink;
     
     public static UserDTO getFromEntity(User user) {
         if (user == null) {
