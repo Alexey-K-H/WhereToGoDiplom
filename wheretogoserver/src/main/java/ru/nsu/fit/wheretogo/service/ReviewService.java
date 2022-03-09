@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
-import ru.nsu.fit.wheretogo.dto.ReviewDto;
+import ru.nsu.fit.wheretogo.dto.ReviewDTO;
 import ru.nsu.fit.wheretogo.dto.UserDto;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.Review;
@@ -25,36 +25,36 @@ public class ReviewService {
     private ReviewRepository reviewRepository;
 
     @Transactional
-    public Review addReview(ReviewDto reviewDto) {
+    public Review addReview(ReviewDTO reviewDto) {
         return reviewRepository.save(Review.getFromDto(reviewDto));
     }
 
     @Transactional
-    public void deleteReview(ReviewDto reviewDto) {
+    public void deleteReview(ReviewDTO reviewDto) {
         reviewRepository.delete(Review.getFromDto(reviewDto));
     }
 
-    public PagedListDTO<ReviewDto> getByUser(UserDto userDto, int page, int size) {
+    public PagedListDTO<ReviewDTO> getByUser(UserDto userDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Review> reviews = reviewRepository.findByAuthor(User.getFromDTO(userDto), pageRequest);
-        List<ReviewDto> userReviewDtos = reviews.toList()
+        List<ReviewDTO> userReviewDtos = reviews.toList()
                 .stream()
-                .map(ReviewDto::getFromEntity)
+                .map(ReviewDTO::getFromEntity)
                 .collect(toList());
-        return new PagedListDTO<ReviewDto>()
+        return new PagedListDTO<ReviewDTO>()
                 .setList(userReviewDtos)
                 .setPageNum(page)
                 .setTotalPages(reviews.getTotalPages());
     }
 
-    public PagedListDTO<ReviewDto> getByPlace(PlaceDescriptionDTO placeDto, int page, int size) {
+    public PagedListDTO<ReviewDTO> getByPlace(PlaceDescriptionDTO placeDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Review> reviews = reviewRepository.findByPlace(Place.getFromDTO(placeDto), pageRequest);
-        List<ReviewDto> placeReviewDtos = reviews.toList()
+        List<ReviewDTO> placeReviewDtos = reviews.toList()
                 .stream()
-                .map(ReviewDto::getFromEntity)
+                .map(ReviewDTO::getFromEntity)
                 .collect(toList());
-        return new PagedListDTO<ReviewDto>()
+        return new PagedListDTO<ReviewDTO>()
                 .setList(placeReviewDtos)
                 .setPageNum(page)
                 .setTotalPages(reviews.getTotalPages());

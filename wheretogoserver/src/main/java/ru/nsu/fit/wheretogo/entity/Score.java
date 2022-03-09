@@ -4,19 +4,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import ru.nsu.fit.wheretogo.dto.ReviewDTO;
+import ru.nsu.fit.wheretogo.dto.ScoreDTO;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Entity
-@Table(name = "review")
+@Table(name = "score")
 @Getter
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-public class Review {
-
+public class Score {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -25,30 +23,22 @@ public class Review {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User author;
-    
+
     @ManyToOne
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
-    
+
     @Column(name = "score")
     private Integer score;
 
-    @Column(name = "text")
-    private String text;
-
-    @Column(name = "written_at")
-    private Instant writtenAt;
-    
-    public static Review getFromDto(ReviewDTO dto) {
-        if (dto == null) {
+    public static Score getFromDto(ScoreDTO dto){
+        if(dto == null){
             return null;
         }
-        return new Review()
+        return new Score()
                 .setId(dto.getId())
                 .setAuthor(User.getFromDTO(dto.getAuthor()))
                 .setPlace(Place.getFromDTO(dto.getPlace()))
-                .setScore(dto.getScore())
-                .setText(dto.getText())
-                .setWrittenAt(dto.getWrittenAt());
+                .setScore(dto.getScore());
     }
 }

@@ -17,7 +17,7 @@ import java.time.Instant;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewDto extends BaseDTO {
+public class ReviewDTO extends BaseDTO {
 
     private Long id;
     private UserDto author;
@@ -29,11 +29,11 @@ public class ReviewDto extends BaseDTO {
     private PlaceDescriptionDTO place;
     private Instant writtenAt;
     
-    public static ReviewDto getFromEntity(Review review) {
+    public static ReviewDTO getFromEntity(Review review) {
         if (review == null) {
             return null;
         }
-        return new ReviewDto()
+        return new ReviewDTO()
                 .setId(review.getId())
                 .setAuthor(UserDto.getFromEntity(review.getAuthor()))
                 .setPlace(PlaceDescriptionDTO.getFromEntity(review.getPlace()))
