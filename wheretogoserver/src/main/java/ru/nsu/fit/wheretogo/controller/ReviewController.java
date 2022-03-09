@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.ReviewDTO;
-import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.service.ReviewService;
 
 import java.time.Instant;
@@ -46,7 +46,7 @@ public class ReviewController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ) {
-        return new ResponseEntity<>(service.getByUser(new UserDto().setId(userId), page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(service.getByUser(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
     }
 
 }

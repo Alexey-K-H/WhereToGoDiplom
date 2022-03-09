@@ -41,6 +41,6 @@ public class ScoreController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ) {
-        return new ResponseEntity<>(service.getByUser(new UserDto().setId(userId), page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(service.getByUser(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
     }
 }

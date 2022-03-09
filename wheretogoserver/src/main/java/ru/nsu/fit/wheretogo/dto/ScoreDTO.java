@@ -18,7 +18,7 @@ import javax.validation.constraints.Min;
 public class ScoreDTO extends BaseDTO{
 
     private Long id;
-    private UserDto author;
+    private UserDTO author;
 
     @Min(value = 1, message = "Minimum score for a place is 1.")
     @Max(value = 5, message = "Maximum score for a place is 5.")
@@ -32,7 +32,7 @@ public class ScoreDTO extends BaseDTO{
         }
         return new ScoreDTO()
                 .setId(score.getId())
-                .setAuthor(UserDto.getFromEntity(score.getAuthor()))
+                .setAuthor(UserDTO.getFromEntity(score.getAuthor()))
                 .setPlace(PlaceDescriptionDTO.getFromEntity(score.getPlace()))
                 .setScore(score.getScore());
     }

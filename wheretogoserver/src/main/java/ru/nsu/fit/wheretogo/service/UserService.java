@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
-import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.exception.EmailAlreadyRegistered;
@@ -13,7 +13,6 @@ import ru.nsu.fit.wheretogo.exception.UsernameAlreadyRegistered;
 import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
-import javax.validation.ValidationException;
 import java.time.Instant;
 import java.util.List;
 
@@ -24,19 +23,19 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserDto createUser(String email, String username, String password) throws EmailAlreadyRegistered, UsernameAlreadyRegistered {
+    public UserDTO createUser(String email, String username, String password) throws EmailAlreadyRegistered, UsernameAlreadyRegistered {
         checkEmailIsFree(email);
         checkUsernameIsFree(username);
         User user = userRepository.save(new User(email, passwordEncoder.encode(password), username, Instant.now()));
-        return UserDto.getFromEntity(user);
+        return UserDTO.getFromEntity(user);
     }
 
     @Transactional
-    public UserDto setCurrentUsername(String username) throws UsernameAlreadyRegistered {
+    public UserDTO setCurrentUsername(String username) throws UsernameAlreadyRegistered {
         User user = userRepository.findByEmail(SecurityContextHelper.email()).get();
         checkUsernameIsFree(username);
         user.setUsername(username);
-        return UserDto.getFromEntity(user);
+        return UserDTO.getFromEntity(user);
     }
 
     @Transactional
@@ -48,15 +47,15 @@ public class UserService {
     }
 
     //TODO:Добавили поиск не только сущности но и DTO объекта
-    public UserDto getCurrentUserDto() {
-        return UserDto.getFromEntity(userRepository.findByEmail(SecurityContextHelper.email()).orElse(null));
+    public UserDTO getCurrentUserDto() {
+        return UserDTO.getFromEntity(userRepository.findByEmail(SecurityContextHelper.email()).orElse(null));
     }
 
     public User getCurrentUser() {
         return userRepository.findByEmail(SecurityContextHelper.email()).orElse(null);
     }
-    public UserDto getUser(Long userId) {
-        return UserDto.getFromEntity(userRepository.findById(userId).orElse(null));
+    public UserDTO getUser(Long userId) {
+        return UserDTO.getFromEntity(userRepository.findById(userId).orElse(null));
     }
 
     private void checkUsernameIsFree(String username) throws UsernameAlreadyRegistered {

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.exception.EmailAlreadyRegistered;
 import ru.nsu.fit.wheretogo.exception.UsernameAlreadyRegistered;
 import ru.nsu.fit.wheretogo.service.UserService;
@@ -17,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public UserDto register(
+    public UserDTO register(
             @RequestParam(name = "email") String email,
             @RequestParam(name = "username") String username,
             @RequestParam(name = "password") String password) throws EmailAlreadyRegistered, UsernameAlreadyRegistered {
@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/username")
-    public UserDto setUsername(@RequestParam(name = "username") String username) throws UsernameAlreadyRegistered {
+    public UserDTO setUsername(@RequestParam(name = "username") String username) throws UsernameAlreadyRegistered {
         return userService.setCurrentUsername(username);
     }
 
@@ -40,20 +40,20 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserDto> getCurrentUser() {
+    public ResponseEntity<UserDTO> getCurrentUser() {
         return checkIfFound(userService.getCurrentUserDto());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable(name = "id") Long userId) {
-        UserDto user = userService.getUser(userId);
+    public ResponseEntity<UserDTO> getUser(@PathVariable(name = "id") Long userId) {
+        UserDTO user = userService.getUser(userId);
         if (user != null) {
             user.setEmail(null).setCreatedAt(null);
         }
         return checkIfFound(user);
     }
 
-    private ResponseEntity<UserDto> checkIfFound(UserDto userDto) {
+    private ResponseEntity<UserDTO> checkIfFound(UserDTO userDto) {
         return userDto != null ?
                 ResponseEntity.ok(userDto) :
                 new ResponseEntity<>(HttpStatus.NOT_FOUND);

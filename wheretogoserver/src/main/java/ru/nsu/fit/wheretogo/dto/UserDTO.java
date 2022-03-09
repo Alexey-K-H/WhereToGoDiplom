@@ -9,8 +9,6 @@ import lombok.experimental.Accessors;
 import java.time.Instant;
 import ru.nsu.fit.wheretogo.entity.User;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -19,7 +17,7 @@ import javax.validation.constraints.Size;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class UserDTO {
     @NotNull
     private Long id;
 
@@ -34,11 +32,11 @@ public class UserDto {
     private String avatarLink;
     private String avatarThumbnailLink;
     
-    public static UserDto getFromEntity(User user) {
+    public static UserDTO getFromEntity(User user) {
         if (user == null) {
             return null;
         }
-        return new UserDto()
+        return new UserDTO()
                 .setId(user.getId())
                 .setEmail(user.getEmail())
                 .setUsername(user.getUsername())

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.ReviewDTO;
-import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.Review;
 import ru.nsu.fit.wheretogo.entity.User;
@@ -34,7 +34,7 @@ public class ReviewService {
         reviewRepository.delete(Review.getFromDto(reviewDto));
     }
 
-    public PagedListDTO<ReviewDTO> getByUser(UserDto userDto, int page, int size) {
+    public PagedListDTO<ReviewDTO> getByUser(UserDTO userDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Review> reviews = reviewRepository.findByAuthor(User.getFromDTO(userDto), pageRequest);
         List<ReviewDTO> userReviewDtos = reviews.toList()

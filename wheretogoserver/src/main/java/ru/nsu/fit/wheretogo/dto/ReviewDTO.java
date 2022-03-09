@@ -20,7 +20,7 @@ import java.time.Instant;
 public class ReviewDTO extends BaseDTO {
 
     private Long id;
-    private UserDto author;
+    private UserDTO author;
     @Size(max = 500, message = "Place review must be up to 500 characters.")
     private String text;
     @Min(value = 1, message = "Minimum score for a place is 1.")
@@ -35,7 +35,7 @@ public class ReviewDTO extends BaseDTO {
         }
         return new ReviewDTO()
                 .setId(review.getId())
-                .setAuthor(UserDto.getFromEntity(review.getAuthor()))
+                .setAuthor(UserDTO.getFromEntity(review.getAuthor()))
                 .setPlace(PlaceDescriptionDTO.getFromEntity(review.getPlace()))
                 .setScore(review.getScore())
                 .setText(review.getText())

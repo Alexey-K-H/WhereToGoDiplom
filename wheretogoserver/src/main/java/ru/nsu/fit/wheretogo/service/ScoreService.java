@@ -31,7 +31,7 @@ public class ScoreService {
         scoreRepository.delete(Score.getFromDto(scoreDTO));
     }
 
-    public PagedListDTO<ScoreDTO> getByUser(UserDto userDto, int page, int size) {
+    public PagedListDTO<ScoreDTO> getByUser(UserDTO userDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Score> scores = scoreRepository.findByAuthor(User.getFromDTO(userDto), pageRequest);
         List<ScoreDTO> userScoresDtos = scores.toList()

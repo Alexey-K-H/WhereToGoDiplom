@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.List;
 
 import lombok.experimental.Accessors;
-import ru.nsu.fit.wheretogo.dto.UserDto;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 
 @Entity
 @Table(name = "users")
@@ -57,7 +57,7 @@ public class User {
         this.createdAt = createdAt;;
     }
 
-    public static User getFromDTO(UserDto dto) {
+    public static User getFromDTO(UserDTO dto) {
         if (dto == null) {
             return null;
         }
