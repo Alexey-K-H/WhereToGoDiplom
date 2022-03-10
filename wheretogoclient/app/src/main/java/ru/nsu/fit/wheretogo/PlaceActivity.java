@@ -21,11 +21,19 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.maps.model.LatLng;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
+import ru.nsu.fit.wheretogo.model.ServiceGenerator;
+import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.service.ScoreService;
+import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
 
 public class PlaceActivity extends AppCompatActivity {
 
+    private Long placeId;
     private String placeTitle;
     private String placeDescription;
     private String thumbnailLink;
@@ -44,6 +52,7 @@ public class PlaceActivity extends AppCompatActivity {
         Bundle arguments = getIntent().getExtras();
         if(arguments != null){
             //Берем информацию о местах
+            placeId = Long.parseLong(getIntent().getStringExtra("id"));
             placeTitle = getIntent().getStringExtra("title");
             placeDescription = getIntent().getStringExtra("desc");
             thumbnailLink = getIntent().getStringExtra("link");
@@ -60,8 +69,37 @@ public class PlaceActivity extends AppCompatActivity {
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
-                Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
-                        Toast.LENGTH_LONG).show();
+
+                Call<Score> call = ServiceGenerator.createService(ScoreService.class)
+                        .setScore(AuthorizationHelper.getUserProfile().getId(),
+                                placeId,
+                                (int)v);
+
+                call.enqueue(new Callback<Score>() {
+                    @Override
+                    public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
+                        if(response.code() == 200 && response.body()!= null){
+                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
+                                    Toast.LENGTH_LONG).show();
+
+                            ratingBar.setRating(response.body().getScore());
+                        }else if(response.code() == 400){
+
+                        }
+                        else {
+                            Toast.makeText(PlaceActivity.this, R.string.unexpectedErrorMsg,
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
+
+                    }
+                });
+
+
+
             }
         });
     }

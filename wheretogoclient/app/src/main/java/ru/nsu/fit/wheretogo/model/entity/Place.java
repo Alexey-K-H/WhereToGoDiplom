@@ -11,7 +11,7 @@ import java.util.List;
 public class Place {
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Long id;
     @SerializedName("name")
     @Expose
     private String name;
@@ -37,7 +37,7 @@ public class Place {
     @Expose
     private List<Object> picturesLinks;
 
-    public Place(Integer id, String name, String description,
+    public Place(Long id, String name, String description,
                  Coords coords, Double averageScore, String thumbnailLink,
                  String uploadedAt, List<Category> categories,
                  List<Object> picturesLinks) {
@@ -52,11 +52,11 @@ public class Place {
         this.picturesLinks = picturesLinks;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

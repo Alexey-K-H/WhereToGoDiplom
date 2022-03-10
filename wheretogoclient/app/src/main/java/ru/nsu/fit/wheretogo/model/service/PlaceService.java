@@ -13,7 +13,7 @@ import ru.nsu.fit.wheretogo.model.entity.Place;
 
 public interface PlaceService {
     @GET("/place/{id}")
-    Call<Place> getPlace(@Path("id") Integer id);
+    Call<Place> getPlace(@Path("id") Long id);
 
     @GET("/place/favourite")
     Call<List<Place>> getFavouritePlaces();
@@ -23,10 +23,10 @@ public interface PlaceService {
 
     @FormUrlEncoded
     @POST("/place/favourite")
-    Call<Place> addFavoritePlace(@Field("placeId") Integer placeId);
+    Call<Place> addFavoritePlace(@Field("placeId") Long placeId);
 
     @FormUrlEncoded
     @POST("/place/visited")
-    Call<Place> addVisitedPlace(@Field("placeId") Integer placeId);
+    Call<Place> addVisitedPlace(@Field("placeId") Long placeId);
 
 }

@@ -13,14 +13,14 @@ import java.io.Serializable;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 
 public class ClusterMarker implements Serializable, ClusterItem {
-    private int id;
+    private Long id;
     private LatLng position;
     private String title;
     private String snippet;
     private Bitmap iconPicture;
     private Place place;
 
-    public ClusterMarker(int id, LatLng position, String title, String snippet, Bitmap iconPicture, Place place) {
+    public ClusterMarker(Long id, LatLng position, String title, String snippet, Bitmap iconPicture, Place place) {
         this.id = id;
         this.position = position;
         this.title = title;
@@ -38,11 +38,11 @@ public class ClusterMarker implements Serializable, ClusterItem {
         return position;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -60,9 +60,14 @@ import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.entity.User;
 import ru.nsu.fit.wheretogo.model.service.CategoryService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
+import ru.nsu.fit.wheretogo.model.service.ScoreService;
+import ru.nsu.fit.wheretogo.model.service.UserService;
+import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 
@@ -435,20 +440,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageView placeImage = view.findViewById(R.id.place_image);
         placeImage.setImageBitmap(item.getIconPicture());
 
+        Context context = this;
+
         PlaceService placeService = ServiceGenerator.createService(PlaceService.class);
         Call<Place> placeCall = placeService.getPlace(item.getId());
         placeCall.enqueue(new Callback<Place>() {
             @Override
             public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
                 TextView placeDescription = view.findViewById(R.id.place_description);
-                assert response.body() != null;
-                String descriptionText = response.body().getDescription();
-                descriptionText = descriptionText.substring(0, 1).toUpperCase()
-                        + descriptionText.substring(1);
-                placeDescription.setText(descriptionText);
+                if(response.isSuccessful() && response.body() != null){
+                    String descriptionText = response.body().getDescription();
+                    descriptionText = descriptionText.substring(0, 1).toUpperCase()
+                            + descriptionText.substring(1);
+                    placeDescription.setText(descriptionText);
 
-                selectedPlace.getPlace().setDescription(descriptionText);
-                selectedPlace.setId(item.getId());
+                    selectedPlace.getPlace().setDescription(descriptionText);
+                    selectedPlace.setId(item.getId());
+                }
+                else {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+
             }
 
             @Override
@@ -456,6 +469,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+//        ScoreService scoreService = ServiceGenerator.createService(ScoreService.class);
+//        Call<Score> scoreCall = scoreService.getUserPlaceScore(
+//                AuthorizationHelper.getUserProfile().getId(),
+//                item.getId());
+//        scoreCall.enqueue(new Callback<Score>() {
+//            @Override
+//            public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
+//
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
+//
+//            }
+//        });
     }
 
     public void openFavourites(View view) {
@@ -477,6 +506,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void openFullPlaceInfo(View view){
         Intent intent = new Intent(this, PlaceActivity.class);
 
+        intent.putExtra("id", selectedPlace.getId().toString());
         intent.putExtra("title", selectedPlace.getTitle());
         intent.putExtra("desc", selectedPlace.getPlace().getDescription());
         intent.putExtra("link", selectedPlace.getPlace().getThumbnailLink());
@@ -491,7 +521,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         call.enqueue(new Callback<Place>() {
             @Override
             public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
-                if (response.isSuccessful()) {
+                if (response.code() == 200) {
                     Toast.makeText(context, "Added",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
@@ -515,7 +545,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         call.enqueue(new Callback<Place>() {
             @Override
             public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
-                if (response.isSuccessful()) {
+                if (response.code() == 200) {
                     Toast.makeText(context, "Added",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
