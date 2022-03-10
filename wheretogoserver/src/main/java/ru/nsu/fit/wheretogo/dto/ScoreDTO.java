@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import ru.nsu.fit.wheretogo.entity.Score;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -17,23 +17,20 @@ import javax.validation.constraints.Min;
 @NoArgsConstructor
 public class ScoreDTO extends BaseDTO{
 
-    private Long id;
-    private UserDTO author;
+    private Long author;
+    private Long place;
 
     @Min(value = 1, message = "Minimum score for a place is 1.")
     @Max(value = 5, message = "Maximum score for a place is 5.")
     private Integer score;
-
-    private PlaceDescriptionDTO place;
 
     public static ScoreDTO getFromEntity(Score score){
         if(score == null){
             return null;
         }
         return new ScoreDTO()
-                .setId(score.getId())
-                .setAuthor(UserDTO.getFromEntity(score.getAuthor()))
-                .setPlace(PlaceDescriptionDTO.getFromEntity(score.getPlace()))
+                .setAuthor(score.getAuthor())
+                .setPlace(score.getPlace())
                 .setScore(score.getScore());
     }
 }

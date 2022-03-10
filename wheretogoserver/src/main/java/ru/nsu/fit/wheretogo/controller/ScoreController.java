@@ -12,17 +12,20 @@ import ru.nsu.fit.wheretogo.service.ScoreService;
 public class ScoreController {
 
     @Autowired
-    private ScoreService service;
+    private ScoreService scoreService;
 
-    @PostMapping()
-    public ResponseEntity<String> addScore(@RequestBody ScoreDTO scoreDTO) {
-        service.addScore(scoreDTO);
-        return ResponseEntity.ok("OK");
+    @PutMapping()
+    public ScoreDTO addScore(
+            @RequestParam(name = "user_id") Long userId,
+            @RequestParam(name = "place_id") Long placeId,
+            @RequestParam(name = "score") Integer value
+    ) {
+        return scoreService.createScore(userId, placeId, value);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteScore(@PathVariable(name = "id") Long id) {
-        service.deleteScore(new ScoreDTO().setId(id));
+        scoreService.deleteScore(new ScoreDTO().setAuthor(id));
         return new ResponseEntity<>("Deleted", HttpStatus.NO_CONTENT);
     }
 
@@ -32,7 +35,7 @@ public class ScoreController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ) {
-        return new ResponseEntity<>(service.getByPlace(new PlaceDescriptionDTO().setId(placeId), page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(scoreService.getByPlace(new PlaceDescriptionDTO().setId(placeId), page, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/user")
@@ -41,6 +44,19 @@ public class ScoreController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ) {
-        return new ResponseEntity<>(service.getByUser(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(scoreService.getByUser(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
     }
+
+    @GetMapping("/{user_id}/{place_id}")
+    public ResponseEntity<ScoreDTO> getUserPlaceSore(
+            @PathVariable(name = "user_id") Long userId,
+            @PathVariable(name = "place_id") Long placeId){
+        ScoreDTO dto = scoreService.getByUserPlace(userId, placeId);
+        if(dto != null){
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
 }

@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.entity;
+package ru.nsu.fit.wheretogo.entity.score;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,23 +10,20 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "score")
+@IdClass(ScoreId.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
 public class Score {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+    @Column(name = "user_id")
+    private Long author;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User author;
+    @Id
+    @Column(name = "place_id")
+    private Long place;
 
-    @ManyToOne
-    @JoinColumn(name = "place_id", nullable = false)
-    private Place place;
 
     @Column(name = "score")
     private Integer score;
@@ -36,9 +33,8 @@ public class Score {
             return null;
         }
         return new Score()
-                .setId(dto.getId())
-                .setAuthor(User.getFromDTO(dto.getAuthor()))
-                .setPlace(Place.getFromDTO(dto.getPlace()))
+                .setAuthor(dto.getAuthor())
+                .setPlace(dto.getPlace())
                 .setScore(dto.getScore());
     }
 }

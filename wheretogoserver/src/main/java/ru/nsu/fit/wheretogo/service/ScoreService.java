@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.*;
 import ru.nsu.fit.wheretogo.entity.Place;
-import ru.nsu.fit.wheretogo.entity.Score;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.repository.ScoreRepository;
 
@@ -22,8 +22,9 @@ public class ScoreService {
     private ScoreRepository scoreRepository;
 
     @Transactional
-    public Score addScore(ScoreDTO scoreDTO) {
-        return scoreRepository.save(Score.getFromDto(scoreDTO));
+    public ScoreDTO createScore(Long userId, Long placeId, Integer value) {
+        Score score = scoreRepository.save(new Score().setAuthor(userId).setPlace(placeId).setScore(value));
+        return ScoreDTO.getFromEntity(score);
     }
 
     @Transactional
@@ -31,9 +32,17 @@ public class ScoreService {
         scoreRepository.delete(Score.getFromDto(scoreDTO));
     }
 
+    @Transactional
+    public ScoreDTO getByUserPlace(Long userId, Long placeId){
+        if(userId == null || placeId == null){
+            return null;
+        }
+        return ScoreDTO.getFromEntity(scoreRepository.findByAuthorAndPlace(userId, placeId));
+    }
+
     public PagedListDTO<ScoreDTO> getByUser(UserDTO userDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Score> scores = scoreRepository.findByAuthor(User.getFromDTO(userDto), pageRequest);
+        Page<Score> scores = scoreRepository.findByAuthor(User.getFromDTO(userDto).getId(), pageRequest);
         List<ScoreDTO> userScoresDtos = scores.toList()
                 .stream()
                 .map(ScoreDTO::getFromEntity)
@@ -46,7 +55,7 @@ public class ScoreService {
 
     public PagedListDTO<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Score> scores = scoreRepository.findByPlace(Place.getFromDTO(placeDto), pageRequest);
+        Page<Score> scores = scoreRepository.findByPlace(Place.getFromDTO(placeDto).getId(), pageRequest);
         List<ScoreDTO> userScoresDtos = scores.toList()
                 .stream()
                 .map(ScoreDTO::getFromEntity)
