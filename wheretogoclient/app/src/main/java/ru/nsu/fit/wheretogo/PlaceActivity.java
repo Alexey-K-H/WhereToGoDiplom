@@ -3,7 +3,6 @@ package ru.nsu.fit.wheretogo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,12 +18,10 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.google.android.gms.maps.model.LatLng;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.Score;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
@@ -65,42 +62,57 @@ public class PlaceActivity extends AppCompatActivity {
         fillPlaceFields(placeFullDescView);
 
         //Полоска рейтинга места
-        RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+        RatingBar ratingBar = findViewById(R.id.ratingBar);
+
+        //Загружаем из БД рейтинг пользователя данного места, если он есть
+        Call<Score> call = ServiceGenerator.createService(ScoreService.class)
+                .getUserPlaceScore(AuthorizationHelper.getUserProfile().getId(), placeId);
+
+        call.enqueue(new Callback<Score>() {
             @Override
-            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+            public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
+                if(response.code() == 200 && response.body() != null){
+                    Long userMark = response.body().getScore();
+                    ratingBar.setRating((float)userMark);
+                }
+            }
 
-                Call<Score> call = ServiceGenerator.createService(ScoreService.class)
-                        .setScore(AuthorizationHelper.getUserProfile().getId(),
-                                placeId,
-                                (int)v);
-
-                call.enqueue(new Callback<Score>() {
-                    @Override
-                    public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
-                        if(response.code() == 200 && response.body()!= null){
-                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
-                                    Toast.LENGTH_LONG).show();
-
-                            ratingBar.setRating(response.body().getScore());
-                        }else if(response.code() == 400){
-
-                        }
-                        else {
-                            Toast.makeText(PlaceActivity.this, R.string.unexpectedErrorMsg,
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
-
-                    }
-                });
-
-
+            @Override
+            public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
 
             }
+        });
+
+
+        ratingBar.setOnRatingBarChangeListener((ratingBar1, v, b) -> {
+
+            Call<Score> call1 = ServiceGenerator.createService(ScoreService.class)
+                    .setScore(AuthorizationHelper.getUserProfile().getId(),
+                            placeId,
+                            (int)v);
+
+            call1.enqueue(new Callback<Score>() {
+                @Override
+                public void onResponse(@NonNull Call<Score> call1, @NonNull Response<Score> response) {
+                    if(response.code() == 200 && response.body()!= null){
+//                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
+//                                    Toast.LENGTH_LONG).show();
+
+                        ratingBar1.setRating(response.body().getScore());
+                    }else if(response.code() == 400){
+
+                    }
+                    else {
+                        Toast.makeText(PlaceActivity.this, R.string.unexpectedErrorMsg,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Score> call1, @NonNull Throwable t) {
+
+                }
+            });
         });
     }
 

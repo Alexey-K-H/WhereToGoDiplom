@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -470,21 +471,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-//        ScoreService scoreService = ServiceGenerator.createService(ScoreService.class);
-//        Call<Score> scoreCall = scoreService.getUserPlaceScore(
-//                AuthorizationHelper.getUserProfile().getId(),
-//                item.getId());
-//        scoreCall.enqueue(new Callback<Score>() {
-//            @Override
-//            public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
-//
-//            }
-//
-//            @Override
-//            public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
-//
-//            }
-//        });
+        RatingBar placeScore = view.findViewById(R.id.ratingBar_short_info);
+        ScoreService scoreService = ServiceGenerator.createService(ScoreService.class);
+        Call<Score> scoreCall = scoreService.getUserPlaceScore(
+                AuthorizationHelper.getUserProfile().getId(),
+                item.getId());
+        scoreCall.enqueue(new Callback<Score>() {
+            @Override
+            public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
+                if(response.code() == 200 && response.body() != null){
+                    Long userMark = response.body().getScore();
+                    placeScore.setRating((float)userMark);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
+
+            }
+        });
+
+        placeScore.setOnRatingBarChangeListener((ratingBar, v, b) -> {
+
+            Call<Score> call = ServiceGenerator.createService(ScoreService.class)
+                    .setScore(AuthorizationHelper.getUserProfile().getId(),
+                            selectedPlace.getId(),
+                            (int)v);
+
+            call.enqueue(new Callback<Score>() {
+                @Override
+                public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
+                    if(response.code() == 200 && response.body()!= null){
+                        ratingBar.setRating(response.body().getScore());
+                    }else if(response.code() == 400){
+
+                    }
+                    else {
+                        Toast.makeText(context, R.string.unexpectedErrorMsg,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
+
+                }
+            });
+        });
     }
 
     public void openFavourites(View view) {
