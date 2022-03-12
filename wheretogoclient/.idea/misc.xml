@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/custom_star.xml" value="0.286" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/favour_button.xml" value="0.2165" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/visited_button.xml" value="0.249" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_account_settings.xml" value="0.2814814814814815" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_favourites.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_for_you.xml" value="0.36666666666666664" />

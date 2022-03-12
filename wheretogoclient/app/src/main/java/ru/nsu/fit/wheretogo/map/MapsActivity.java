@@ -428,8 +428,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             openFullPlaceInfo(view);
         });
 
-        bottomSheetView.findViewById(R.id.favour_btn).setOnClickListener(this::addFavoritePlace);
         bottomSheetView.findViewById(R.id.visited_btn).setOnClickListener(this::addVisitedPlace);
+
+        //Кнопка добавления места в избранные
+        ImageButton liked = bottomSheetView.findViewById(R.id.favour_btn);
+        liked.setOnClickListener(view -> {
+            //TODO:добавить проверку наличия места в бд для конкретного юзера, чтобы менять состояние кнопки при загрузке
+            //TODO:добавить метод удаления места из данной категории при повторном нажатии на уже активную конпку
+            liked.setActivated(true);
+            addFavoritePlace(view);
+        });
+
+        //Кнопка добавления места в посещенное
+        ImageButton visited = bottomSheetView.findViewById(R.id.visited_btn);
+        visited.setOnClickListener(view -> {
+            //TODO:добавить проверку наличия места в бд для конкретного юзера, чтобы менять состояние кнопки при загрузке
+            //TODO:добавить метод удаления места из данной категории при повторном нажатии на уже активную конпку
+            visited.setActivated(true);
+            addVisitedPlace(view);
+        });
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
