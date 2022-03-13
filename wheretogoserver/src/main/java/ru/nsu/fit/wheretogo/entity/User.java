@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.util.List;
 
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 
@@ -51,7 +53,8 @@ public class User {
     )
     private List<Place> favouritePlaces;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Score> userScores;
 
 

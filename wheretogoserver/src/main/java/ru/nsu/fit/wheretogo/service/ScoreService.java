@@ -25,7 +25,7 @@ public class ScoreService {
     @Transactional
     public ScoreDTO createScore(Long userId, Long placeId, Integer value) {
         Score score = scoreRepository.save(new Score()
-                .setId(new ScoreId().setAuthor(userId).setPlace(placeId))
+                .setId(new ScoreId().setUser(userId).setPlace(placeId))
                 .setUser(new User().setId(userId))
                 .setPlace(new Place().setId(placeId))
                 .setScore(value));

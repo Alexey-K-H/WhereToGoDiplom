@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.ScoreDTO;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
@@ -20,12 +22,14 @@ public class Score {
     @EmbeddedId
     ScoreId id;
 
-    @ManyToOne
-    @MapsId("author")
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @MapsId("user")
     @JoinColumn(name = "user_id")
     User user;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @MapsId("place")
     @JoinColumn(name = "place_id")
     Place place;
@@ -38,7 +42,7 @@ public class Score {
             return null;
         }
         return new Score()
-                .setId(new ScoreId().setAuthor(dto.getAuthor()).setPlace(dto.getPlace()))
+                .setId(new ScoreId().setUser(dto.getAuthor()).setPlace(dto.getPlace()))
                 .setUser(new User().setId(dto.getAuthor()))
                 .setPlace(new Place().setId(dto.getPlace()))
                 .setScore(dto.getScore());

@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
@@ -61,7 +63,8 @@ public class Place {
     @OneToMany(mappedBy = "place")
     private List<PlacePicture> picturesLinks;
 
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Score> placeScores;
 
     public static Place getFromDTO(PlaceDescriptionDTO dto) {

@@ -16,13 +16,13 @@ import java.io.Serializable;
 public class ScoreId implements Serializable {
 
     @Column(name = "user_id")
-    private Long author;
+    private Long user;
 
     @Column(name = "place_id")
     private Long place;
 
     public ScoreId(Long userId, Long placeId){
-        this.author = userId;
+        this.user = userId;
         this.place = placeId;
     }
 
