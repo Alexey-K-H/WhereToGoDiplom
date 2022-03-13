@@ -23,9 +23,11 @@ public class ScoreController {
         return scoreService.createScore(userId, placeId, value);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteScore(@PathVariable(name = "id") Long id) {
-        scoreService.deleteScore(new ScoreDTO().setAuthor(id));
+    @DeleteMapping("/{user_id}/{place_id}")
+    public ResponseEntity<String> deleteUserScore(
+            @PathVariable(name = "user_id") Long userId,
+            @PathVariable(name = "place_id") Long placeId) {
+        scoreService.deleteScore(new ScoreDTO().setAuthor(userId).setPlace(placeId));
         return new ResponseEntity<>("Deleted", HttpStatus.NO_CONTENT);
     }
 
