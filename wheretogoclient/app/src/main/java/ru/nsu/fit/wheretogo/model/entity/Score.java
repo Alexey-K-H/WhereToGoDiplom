@@ -4,9 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Score {
-    @SerializedName("id")
-    @Expose
-    private Long id;
 
     @SerializedName("author")
     @Expose
@@ -20,19 +17,10 @@ public class Score {
     @Expose
     private Long score;
 
-    public Score(Long id, Long userId, Long placeId, Long score) {
-        this.id = id;
+    public Score(Long userId, Long placeId, Long score) {
         this.userId = userId;
         this.placeId = placeId;
         this.score = score;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getUserId() {
