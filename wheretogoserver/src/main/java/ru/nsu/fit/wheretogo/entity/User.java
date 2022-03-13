@@ -8,6 +8,7 @@ import java.util.List;
 
 import lombok.experimental.Accessors;
 import ru.nsu.fit.wheretogo.dto.UserDTO;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 
 @Entity
 @Table(name = "users")
@@ -49,6 +50,10 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "place_id")
     )
     private List<Place> favouritePlaces;
+
+    @OneToMany(mappedBy = "user")
+    private List<Score> userScores;
+
 
     public User(String email, String password, String username, Instant createdAt) {
         this.email = email;

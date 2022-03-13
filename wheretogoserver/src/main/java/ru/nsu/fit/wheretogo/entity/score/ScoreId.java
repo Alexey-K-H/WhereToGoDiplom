@@ -1,48 +1,30 @@
 package ru.nsu.fit.wheretogo.entity.score;
 
 
-import java.io.Serializable;
-import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import java.io.Serializable;
+
+@Embeddable
+@Getter
+@Setter
+@Accessors(chain = true)
 public class ScoreId implements Serializable {
+
+    @Column(name = "user_id")
     private Long author;
+
+    @Column(name = "place_id")
     private Long place;
 
-    public ScoreId(Long id, Long userId, Long placeId){
+    public ScoreId(Long userId, Long placeId){
         this.author = userId;
         this.place = placeId;
     }
 
     public ScoreId(){}
-
-    @Override
-    public boolean equals(Object obj) {
-        if(!(obj instanceof ScoreId s)){
-            return false;
-        }
-        return Objects.equals(author, s.author)
-                && Objects.equals(place, s.place);
-    }
-
-
-    public Long getAuthor() {
-        return author;
-    }
-
-    public Long getPlace() {
-        return place;
-    }
-
-    public void setAuthor(Long author) {
-        this.author = author;
-    }
-
-    public void setPlace(Long place) {
-        this.place = place;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getAuthor(), getPlace());
-    }
 }

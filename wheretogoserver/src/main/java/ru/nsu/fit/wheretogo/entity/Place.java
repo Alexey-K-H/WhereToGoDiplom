@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -59,6 +60,9 @@ public class Place {
 
     @OneToMany(mappedBy = "place")
     private List<PlacePicture> picturesLinks;
+
+    @OneToMany(mappedBy = "place")
+    private List<Score> placeScores;
 
     public static Place getFromDTO(PlaceDescriptionDTO dto) {
         List<Category> categories = new ArrayList<>();

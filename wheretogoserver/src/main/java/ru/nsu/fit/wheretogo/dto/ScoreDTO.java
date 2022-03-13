@@ -29,8 +29,8 @@ public class ScoreDTO extends BaseDTO{
             return null;
         }
         return new ScoreDTO()
-                .setAuthor(score.getAuthor())
-                .setPlace(score.getPlace())
+                .setAuthor(score.getUser().getId())
+                .setPlace(score.getPlace().getId())
                 .setScore(score.getScore());
     }
 }
