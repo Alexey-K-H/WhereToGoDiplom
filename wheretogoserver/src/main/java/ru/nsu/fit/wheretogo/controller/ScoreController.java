@@ -46,7 +46,7 @@ public class ScoreController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ) {
-        return new ResponseEntity<>(scoreService.getByUser(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(scoreService.getByUserId(new UserDTO().setId(userId), page, pageSize), HttpStatus.OK);
     }
 
     @GetMapping("/{user_id}/{place_id}")

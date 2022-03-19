@@ -46,7 +46,7 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public PagedListDTO<ScoreDTO> getByUser(UserDTO userDto, int page, int size) {
+    public PagedListDTO<ScoreDTO> getByUserId(UserDTO userDto, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Score> scores = scoreRepository.findByUserId(User.getFromDTO(userDto).getId(), pageRequest);
         List<ScoreDTO> userScoresDtos = scores.toList()
@@ -58,6 +58,17 @@ public class ScoreService {
                 .setPageNum(page)
                 .setTotalPages(scores.getTotalPages());
     }
+
+    @Transactional(readOnly = true)
+    public List<ScoreDTO> getScoreDtoListByUserId(Long userId){
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<Score> scores = scoreRepository.findByUserId(userId, pageRequest);
+        return scores.toList()
+                .stream()
+                .map(ScoreDTO::getFromEntity)
+                .collect(toList());
+    }
+
 
     @Transactional(readOnly = true)
     public PagedListDTO<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto, int page, int size) {

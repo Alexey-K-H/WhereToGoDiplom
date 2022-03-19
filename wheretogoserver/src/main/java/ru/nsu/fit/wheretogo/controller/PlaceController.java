@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
+import ru.nsu.fit.wheretogo.dto.ScoreDTO;
+import ru.nsu.fit.wheretogo.recommenders.contentbased.ContentBasedFilter;
 import ru.nsu.fit.wheretogo.service.PlacePicturesService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
+import ru.nsu.fit.wheretogo.service.ScoreService;
 import ru.nsu.fit.wheretogo.service.UserService;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceSortBy;
@@ -26,6 +30,13 @@ public class PlaceController {
     private final PlaceService service;
     private final PlacePicturesService picturesService;
     private final UserService userService;//нужен для работы с посещенными и понравившимися
+
+    //Нужен для работы с получением оценок для рекомендательных пакетов
+    private final ScoreService scoreService;
+
+    //Построитель рекомендации на основе контента
+    @Autowired
+    ContentBasedFilter contentBasedFilter;
 
     @PostMapping
     public ResponseEntity<String> savePlace(@RequestBody @Valid PlaceDescriptionDTO place) {
@@ -136,5 +147,40 @@ public class PlaceController {
                 )
         );
         return new ResponseEntity<>(placeList, HttpStatus.OK);
+    }
+
+    //Запрос на получение рекомендаций по принципу контент-ориентированного подхода
+    @GetMapping("/recommend/content")
+    public ResponseEntity<List<PlaceBriefDTO>> getContentRecommendations(
+            @RequestParam(name = "user_id") Long userId
+    ){
+        //TODO:описать метод, который возвоаращет список рекомендаовнных мест, которые будут отправлены клиенту
+        //Получаем все оценки текущего пользователя в виде списка
+        List<ScoreDTO> scoreDTOList = scoreService.getScoreDtoListByUserId(userId);
+
+        //Инициализация спсика мест для рекомендаций
+        List<PlaceBriefDTO> placeRecommendListCB = null;
+
+        //Вызываем метод фильтратора на основе контента
+        placeRecommendListCB  = contentBasedFilter.recommend(userId);
+
+        return new ResponseEntity<>(placeRecommendListCB, HttpStatus.OK);
+    }
+
+    //Запрос на получение рекомендаций на основе посещенных мест
+    @GetMapping("/recommend/visited")
+    public ResponseEntity<List<PlaceBriefDTO>> getVisitedRecommendations(
+            @RequestParam(name = "user_id") Long userId
+    ){
+        //TODO:описать метод, который будет искать места близкие к тем, которые пользователь посетил
+
+
+        //Иницифализация списка мест для рекомендаций
+        List<PlaceBriefDTO> placeRecommendListGPS = null;
+
+        //Вызываем метод поиска ближайших мест к тем, которые пользователь посетил
+
+
+        return new ResponseEntity<>(placeRecommendListGPS, HttpStatus.OK);
     }
 }
