@@ -11,7 +11,6 @@ import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.ScoreDTO;
-import ru.nsu.fit.wheretogo.recommenders.contentbased.ContentBasedFilter;
 import ru.nsu.fit.wheretogo.service.PlacePicturesService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.ScoreService;
@@ -34,9 +33,9 @@ public class PlaceController {
     //Нужен для работы с получением оценок для рекомендательных пакетов
     private final ScoreService scoreService;
 
-    //Построитель рекомендации на основе контента
-    @Autowired
-    ContentBasedFilter contentBasedFilter;
+//    //Построитель рекомендации на основе контента
+//    @Autowired
+//    ContentBasedFilter contentBasedFilter;
 
     @PostMapping
     public ResponseEntity<String> savePlace(@RequestBody @Valid PlaceDescriptionDTO place) {
@@ -149,38 +148,54 @@ public class PlaceController {
         return new ResponseEntity<>(placeList, HttpStatus.OK);
     }
 
-    //Запрос на получение рекомендаций по принципу контент-ориентированного подхода
-    @GetMapping("/recommend/content")
-    public ResponseEntity<List<PlaceBriefDTO>> getContentRecommendations(
-            @RequestParam(name = "user_id") Long userId
+//    //Запрос на получение рекомендаций по принципу контент-ориентированного подхода
+//    @GetMapping("/recommend/content")
+//    public ResponseEntity<List<PlaceBriefDTO>> getContentRecommendations(
+//            @RequestParam(name = "user_id") Long userId
+//    ){
+//        //TODO:описать метод, который возвоаращет список рекомендаовнных мест, которые будут отправлены клиенту
+//        //Получаем все оценки текущего пользователя в виде списка
+//        List<ScoreDTO> scoreDTOList = scoreService.getScoreDtoListByUserId(userId);
+//
+//        //Инициализация спсика мест для рекомендаций
+//        List<PlaceBriefDTO> placeRecommendListCB = null;
+//
+//        //Вызываем метод фильтратора на основе контента
+//        placeRecommendListCB  = contentBasedFilter.recommend(userId);
+//
+//        return new ResponseEntity<>(placeRecommendListCB, HttpStatus.OK);
+//    }
+
+//    //Запрос на получение рекомендаций на основе посещенных мест
+//    @GetMapping("/recommend/visited")
+//    public ResponseEntity<List<PlaceBriefDTO>> getVisitedRecommendations(
+//            @RequestParam(name = "user_id") Long userId
+//    ){
+//        //TODO:описать метод, который будет искать места близкие к тем, которые пользователь посетил
+//
+//
+//        //Иницифализация списка мест для рекомендаций
+//        List<PlaceBriefDTO> placeRecommendListGPS = null;
+//
+//        //Вызываем метод поиска ближайших мест к тем, которые пользователь посетил
+//
+//
+//        return new ResponseEntity<>(placeRecommendListGPS, HttpStatus.OK);
+//    }
+
+    //Запрос на получение ближаших мест к определнной точке на карте, заданной своими координатами
+    @GetMapping("/nearest")
+    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getNearestPlaces(
+            @RequestParam(name = "_my_lat") Double myLat,
+            @RequestParam(name = "_my_lon") Double myLon,
+            @RequestParam(name = "_start_dist") Double startDist,
+            @RequestParam(name = "_max_dist") Double maxDist,
+            @RequestParam(name = "_limit") Integer limit,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
-        //TODO:описать метод, который возвоаращет список рекомендаовнных мест, которые будут отправлены клиенту
-        //Получаем все оценки текущего пользователя в виде списка
-        List<ScoreDTO> scoreDTOList = scoreService.getScoreDtoListByUserId(userId);
-
-        //Инициализация спсика мест для рекомендаций
-        List<PlaceBriefDTO> placeRecommendListCB = null;
-
-        //Вызываем метод фильтратора на основе контента
-        placeRecommendListCB  = contentBasedFilter.recommend(userId);
-
-        return new ResponseEntity<>(placeRecommendListCB, HttpStatus.OK);
-    }
-
-    //Запрос на получение рекомендаций на основе посещенных мест
-    @GetMapping("/recommend/visited")
-    public ResponseEntity<List<PlaceBriefDTO>> getVisitedRecommendations(
-            @RequestParam(name = "user_id") Long userId
-    ){
-        //TODO:описать метод, который будет искать места близкие к тем, которые пользователь посетил
-
-
-        //Иницифализация списка мест для рекомендаций
-        List<PlaceBriefDTO> placeRecommendListGPS = null;
-
-        //Вызываем метод поиска ближайших мест к тем, которые пользователь посетил
-
-
-        return new ResponseEntity<>(placeRecommendListGPS, HttpStatus.OK);
+        return new ResponseEntity<>(
+                service.getNearestPlacesToPoint(myLat, myLon, startDist, maxDist, limit, page, pageSize),
+                HttpStatus.OK);
     }
 }

@@ -1,6 +1,8 @@
 package ru.nsu.fit.wheretogo.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
@@ -19,6 +21,8 @@ import javax.transaction.Transactional;
 import javax.validation.ValidationException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +57,30 @@ public class PlaceService {
             return null;
         }
         return PlaceDescriptionDTO.getFromEntity(repository.findById(id).orElse(null));
+    }
+
+    //Получение списка ближайших мест к определенной точке на карте
+    //заданной координатами (myLat, myLon)
+    @Transactional
+    public PagedListDTO<PlaceBriefDTO> getNearestPlacesToPoint(
+            double myLat,
+            double myLon,
+            double startDist,
+            double maxDist,
+            int limit,
+            int page,
+            int size
+    ){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Place> places = repository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit, pageRequest);
+        List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
+                .stream()
+                .map(PlaceBriefDTO::getFromEntity)
+                .collect(toList());
+        return new PagedListDTO<PlaceBriefDTO>()
+                .setList(nearestPlaceDtos)
+                .setPageNum(page)
+                .setTotalPages(places.getTotalPages());
     }
 
     //criteriabuilder - интерфейс, который юзается для построения запросов
