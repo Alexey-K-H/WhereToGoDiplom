@@ -6,7 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.nsu.fit.wheretogo.common.Coords;
+import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
+
+import java.util.List;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     boolean existsByNameOrDescriptionOrCoords(String name, String description, Coords coords);
@@ -23,4 +26,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             @Param("_limit") Integer limit,
             Pageable pageable
     );
+
+    //TODO:добавить две функции для поиска ближайших по ктаегориям, а также по поесещнным
+
 }
