@@ -236,6 +236,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Отправляет запрос на получение мест,
         // там же происходит вызов отображения маркеров при получении ответа
+        //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат
         sendPlacesRequest();
     }
 
@@ -246,12 +247,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
 
-        Call<PlaceList> placeCall = placeService.getPlaceList(
+        Call<PlaceList> placeCall = placeService.getNearestPlacesByCategory(
+                defaultLocation.latitude,
+                defaultLocation.longitude,
+                1.0,
+                2.0,
+                5,
                 categories.entrySet().stream()
                         .filter(entry -> entry.getValue().chosen)
                         .map(Map.Entry::getKey)
                         .collect(Collectors.toList()),
                 1, 0);
+
+//        Call<PlaceList> placeCall = placeService.getPlaceList(
+//                categories.entrySet().stream()
+//                        .filter(entry -> entry.getValue().chosen)
+//                        .map(Map.Entry::getKey)
+//                        .collect(Collectors.toList()),
+//                1, 0);
 
         placeCall.enqueue(new Callback<PlaceList>() {
             @Override
@@ -266,7 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             @Override
-            public void onFailure(@NonNull Call<PlaceList> call, Throwable t) {
+            public void onFailure(@NonNull Call<PlaceList> call, @NonNull Throwable t) {
                 System.out.println(t.getMessage());
             }
         });
