@@ -6,18 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.nsu.fit.wheretogo.common.Coords;
-import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
-
-import java.util.List;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     boolean existsByNameOrDescriptionOrCoords(String name, String description, Coords coords);
 
 //    Процедура поиска ближайших мест к конкретной точке на карте
-//    Используется как для поиска ближайших мест от пользователя, так и для поиска мест,
-//    расопложенных недлаеко от мест, посещенных пользователем в процессе использования приложения
-    @Query(value = "call FindNearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit); -- #pageable", nativeQuery = true)
+    @Query(value = "call FindNearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit); -- #pageable",
+            nativeQuery = true)
     public Page<Place> findNearestPlaces(
             @Param("_my_lat") Double lat,
             @Param("_my_lon") Double lon,
@@ -27,6 +23,29 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             Pageable pageable
     );
 
-    //TODO:добавить две функции для поиска ближайших по ктаегориям, а также по поесещнным
+    //Процедура поиска ближайших мест по конкретной точке с учетом категорий
+    @Query(value = "call FindNearestByCategory(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids); -- #pageable",
+            nativeQuery = true)
+    public Page<Place> findNearestByCategory(
+            @Param("_my_lat") Double lat,
+            @Param("_my_lon") Double lon,
+            @Param("_START_dist") Double startDist,
+            @Param("_max_dist") Double maxDist,
+            @Param("_limit") Integer limit,
+            @Param("_ids") String categoryIds,
+            Pageable pageable
+    );
 
+    //Процедура поиска блмажйших мест по конкретной точке с учетом посещений пользователя
+    @Query(value = "call FindNearestByVisited(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids); -- #pageable",
+            nativeQuery = true)
+    public Page<Place> findNearestByVisited(
+            @Param("_my_lat") Double lat,
+            @Param("_my_lon") Double lon,
+            @Param("_START_dist") Double startDist,
+            @Param("_max_dist") Double maxDist,
+            @Param("_limit") Integer limit,
+            @Param("_ids") String visitedIds,
+            Pageable pageable
+    );
 }

@@ -21,6 +21,7 @@ import ru.nsu.fit.wheretogo.utils.SortDirection;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/place")
@@ -184,18 +185,28 @@ public class PlaceController {
 //    }
 
     //Запрос на получение ближаших мест к определнной точке на карте, заданной своими координатами
-    @GetMapping("/nearest")
+    @GetMapping("/nearest/category")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getNearestPlaces(
             @RequestParam(name = "_my_lat") Double myLat,
             @RequestParam(name = "_my_lon") Double myLon,
             @RequestParam(name = "_start_dist") Double startDist,
             @RequestParam(name = "_max_dist") Double maxDist,
             @RequestParam(name = "_limit") Integer limit,
+            @RequestParam(name = "category", required = false) List<Integer> categoryId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
+        String categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
         return new ResponseEntity<>(
-                service.getNearestPlacesToPoint(myLat, myLon, startDist, maxDist, limit, page, pageSize),
+                service.getNearestPlacesByCategory(
+                        myLat,
+                        myLon,
+                        startDist,
+                        maxDist,
+                        limit,
+                        categoryIds,
+                        page,
+                        pageSize),
                 HttpStatus.OK);
     }
 }

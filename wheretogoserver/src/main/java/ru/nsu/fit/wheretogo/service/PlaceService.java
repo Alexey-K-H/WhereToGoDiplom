@@ -83,6 +83,40 @@ public class PlaceService {
                 .setTotalPages(places.getTotalPages());
     }
 
+    //Получение списка ближайших мест к определенной точке на карте с учтом выбранных категорий
+    @Transactional
+    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByCategory(
+            double myLat,
+            double myLon,
+            double startDist,
+            double maxDist,
+            int limit,
+            String categoryIds,
+            int page,
+            int size
+    ){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Place> places = repository.findNearestByCategory(
+                myLat,
+                myLon,
+                startDist,
+                maxDist,
+                limit,
+                categoryIds,
+                pageRequest
+        );
+        List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
+                .stream()
+                .map(PlaceBriefDTO::getFromEntity)
+                .collect(toList());
+        return new PagedListDTO<PlaceBriefDTO>()
+                .setList(nearestPlaceDtos)
+                .setPageNum(page)
+                .setTotalPages(places.getTotalPages());
+    }
+
+    //Получение списка ближайших мест к определенной точке на карте с учетом посещенных мест
+
     //criteriabuilder - интерфейс, который юзается для построения запросов
 //Predicate встроенный функциональный интерфейс, добавленный в Java SE 8 в пакет java.util.function.
 //Принимает на вход значение, проверяет состояние и возвращает boolean значение в качестве результата.
@@ -107,7 +141,7 @@ public class PlaceService {
                     .map(categoryId -> criteriaBuilder.equal(categoryJoin.get("id"), categoryId))
                     .toArray(Predicate[]::new));
             //TODO:Проверка для случая, когда фильтры пустые (наверное, уточни у Ильи)
-            if (parameters.categoryIds().contains(Integer.MAX_VALUE)) {
+           if  (parameters.categoryIds().contains(Integer.MAX_VALUE)) {
                 criteriaPredicate = criteriaBuilder.or(criteriaPredicate, categoryJoin.isNull());
             }
             predicates.add(criteriaPredicate);
