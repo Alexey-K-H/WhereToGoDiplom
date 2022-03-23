@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
+import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
 import ru.nsu.fit.wheretogo.utils.SortDirection;
 
@@ -19,8 +21,10 @@ import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -29,16 +33,17 @@ import static java.util.stream.Collectors.toList;
 public class PlaceService {
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;////EntityManager это интерфейс, который описывает API для всех основных операций над Enitity, получение данных и других сущностей JPA. По сути главный API для работы с JPA
-    private final PlaceRepository repository;
+    private final PlaceRepository placeRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public void savePlace(PlaceDescriptionDTO place) {
         validatePlace(place);
-        repository.save(Place.getFromDTO(place));
+        placeRepository.save(Place.getFromDTO(place));
     }
 
     private void validatePlace(PlaceDescriptionDTO place) {
-        if (repository.existsByNameOrDescriptionOrCoords(place.getName(), place.getDescription(), place.getCoords())) {
+        if (placeRepository.existsByNameOrDescriptionOrCoords(place.getName(), place.getDescription(), place.getCoords())) {
             throw new ValidationException("Place with such name, description or coords is already exist");
         }
     }
@@ -48,7 +53,7 @@ public class PlaceService {
         if (place == null || place.getId() == null) {
             return;
         }
-        repository.deleteById(place.getId());
+        placeRepository.deleteById(place.getId());
     }
 
     @Transactional
@@ -56,7 +61,7 @@ public class PlaceService {
         if (id == null) {
             return null;
         }
-        return PlaceDescriptionDTO.getFromEntity(repository.findById(id).orElse(null));
+        return PlaceDescriptionDTO.getFromEntity(placeRepository.findById(id).orElse(null));
     }
 
     //Получение списка ближайших мест к определенной точке на карте
@@ -72,7 +77,7 @@ public class PlaceService {
             int size
     ){
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Place> places = repository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit, pageRequest);
+        Page<Place> places = placeRepository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit, pageRequest);
         List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
                 .stream()
                 .map(PlaceBriefDTO::getFromEntity)
@@ -96,7 +101,7 @@ public class PlaceService {
             int size
     ){
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Place> places = repository.findNearestByCategory(
+        Page<Place> places = placeRepository.findNearestByCategory(
                 myLat,
                 myLon,
                 startDist,
@@ -115,7 +120,72 @@ public class PlaceService {
                 .setTotalPages(places.getTotalPages());
     }
 
-    //Получение списка ближайших мест к определенной точке на карте с учетом посещенных мест
+    @Transactional
+    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
+            Long userId,
+            int page,
+            int size
+    ){
+        //Ищем пользователя по его id/email в базе данных и берем список посещенных им мест
+        List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
+                PlaceBriefDTO::getFromEntity).toList();
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        //Создаем список из id посещенных мест (мест, исключенных из поиска)
+        List<Long> isolatorIds = new ArrayList<>();
+        for(PlaceBriefDTO place : visitedPlaces){
+            isolatorIds.add(place.getId());
+        }
+
+        //Формируем из списка строку id посещенных мест, чтобы передать их в качестве исключенных кандидатов при поиске ближайших
+        String isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        //Формируем список рекомендаций, который будет отправлен в конечном итоге
+        List<PlaceBriefDTO> recommendations = new ArrayList<>();
+        int totalPages = 0;
+
+        //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
+        //функции поиска ближайших мест к этим местам
+        for(PlaceBriefDTO place : visitedPlaces){
+            //Извлекаем координаты посещенного места
+            Coords placeCoords = place.getCoords();
+
+            //Отправляем запрос на поиск ближайших мест к данному посещенному
+            Page<Place> currentVisitedPlaces = placeRepository.findNearestByVisited(
+                    placeCoords.getLatitude().doubleValue(),
+                    placeCoords.getLongitude().doubleValue(),
+                    1.0,
+                    5.0,
+                    2,
+                    isolators,
+                    pageRequest
+            );
+
+            //Обновляем число полученных страниц для финального списка
+            totalPages += currentVisitedPlaces.getTotalPages();
+
+            //Конвертируем страницу в список
+            List<PlaceBriefDTO> currentPlaceRecommendations = currentVisitedPlaces.toList()
+                    .stream()
+                    .map(PlaceBriefDTO::getFromEntity).toList();
+
+            //Добавляем полученный список к результирующему
+            recommendations.addAll(currentPlaceRecommendations);
+
+            //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
+            for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
+                isolatorIds.add(recPlace.getId());
+            }
+            //Оновляем строку-параметров с дополнительными
+            isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+        }
+
+        return new PagedListDTO<PlaceBriefDTO>()
+                .setList(recommendations)
+                .setPageNum(page)
+                .setTotalPages(totalPages);
+    }
 
     //criteriabuilder - интерфейс, который юзается для построения запросов
 //Predicate встроенный функциональный интерфейс, добавленный в Java SE 8 в пакет java.util.function.

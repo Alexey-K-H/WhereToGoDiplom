@@ -1,7 +1,6 @@
 package ru.nsu.fit.wheretogo.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
-import ru.nsu.fit.wheretogo.dto.ScoreDTO;
 import ru.nsu.fit.wheretogo.service.PlacePicturesService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.ScoreService;
@@ -185,6 +183,7 @@ public class PlaceController {
 //    }
 
     //Запрос на получение ближаших мест к определнной точке на карте, заданной своими координатами
+    //(1-ая часть контент-ориентированной рекомендательной системы)
     @GetMapping("/nearest/category")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getNearestPlaces(
             @RequestParam(name = "_my_lat") Double myLat,
@@ -205,6 +204,22 @@ public class PlaceController {
                         maxDist,
                         limit,
                         categoryIds,
+                        page,
+                        pageSize),
+                HttpStatus.OK);
+    }
+
+    //Запрос на получение рекомендаций с учетом посещенных мест
+    //(2-ая часть контент-ориентированной рекомендательной системы)
+    @GetMapping("/recommend/visited")
+    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getVisitedRecommendations(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+    ){
+        return new ResponseEntity<>(
+                service.getNearestPlacesByVisited(
+                        userId,
                         page,
                         pageSize),
                 HttpStatus.OK);
