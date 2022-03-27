@@ -91,7 +91,7 @@
         app:srcCompat="@drawable/your_pref_recomm" />
 
     <ImageButton
-        android:id="@+id/imageButton8"
+        android:id="@+id/by_scored_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/imageView5"
@@ -107,7 +107,7 @@
         app:srcCompat="@drawable/btn_by_prefs" />
 
     <ImageButton
-        android:id="@+id/imageButton9"
+        android:id="@+id/by_others_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/imageView2"
@@ -123,7 +123,7 @@
         app:srcCompat="@drawable/btn_by_users" />
 
     <ImageButton
-        android:id="@+id/imageButton10"
+        android:id="@+id/by_visited_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignEnd="@+id/imageView4"
