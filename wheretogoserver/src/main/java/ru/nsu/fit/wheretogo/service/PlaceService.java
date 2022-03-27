@@ -120,6 +120,7 @@ public class PlaceService {
                 .setTotalPages(places.getTotalPages());
     }
 
+    //Получение списка блжиашйих мест к тем, которые пользователь посетил
     @Transactional
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
             Long userId,
