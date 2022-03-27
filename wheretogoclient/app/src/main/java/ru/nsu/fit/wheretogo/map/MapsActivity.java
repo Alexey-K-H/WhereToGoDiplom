@@ -1,10 +1,12 @@
 package ru.nsu.fit.wheretogo.map;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -233,13 +235,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
-
-        // Отправляет запрос на получение мест,
-        // там же происходит вызов отображения маркеров при получении ответа
-        //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат
-        sendPlacesRequest();
     }
 
+    // Отправляет запрос на получение мест,
+    // там же происходит вызов отображения маркеров при получении ответа
+    //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void sendPlacesRequest() {
         PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
@@ -247,9 +247,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
 
+        System.out.println(lastKnownLocation);
+
         Call<PlaceList> placeCall = placeService.getNearestPlacesByCategory(
-                defaultLocation.latitude,
-                defaultLocation.longitude,
+                lastKnownLocation.getLatitude(),
+                lastKnownLocation.getLongitude(),
                 1.0,
                 2.0,
                 5,
@@ -288,6 +290,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void getDeviceLocation() {
         /*
          * Get the best and most recent location of the device, which may be null in rare
@@ -304,6 +307,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(lastKnownLocation.getLatitude(),
                                             lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                            sendPlacesRequest();
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.");
