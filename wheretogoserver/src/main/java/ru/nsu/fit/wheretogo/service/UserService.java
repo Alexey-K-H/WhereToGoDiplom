@@ -15,6 +15,7 @@ import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -85,6 +86,40 @@ public class UserService {
         ).toList();
     }
 
+    @Transactional(readOnly = true)
+    public boolean findVisitedById(Long placeId){
+        List<PlaceBriefDTO> userVisitedPlaces =  userRepository.findByEmail(SecurityContextHelper.email())
+                .orElseThrow()
+                .getVisitedPlaces()
+                .stream().
+                map(PlaceBriefDTO::getFromEntity).
+                toList();
+
+        for(PlaceBriefDTO place : userVisitedPlaces){
+            if(Objects.equals(place.getId(), placeId)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean findFavouriteById(Long placeId){
+        List<PlaceBriefDTO> userFavouritePlaces =  userRepository.findByEmail(SecurityContextHelper.email())
+                .orElseThrow()
+                .getFavouritePlaces()
+                .stream().
+                map(PlaceBriefDTO::getFromEntity).
+                toList();
+
+        for(PlaceBriefDTO place : userFavouritePlaces){
+            if(Objects.equals(place.getId(), placeId)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Transactional
     public void addFavourite(Long placeId) {
         if (placeId == null) {
@@ -107,5 +142,26 @@ public class UserService {
         userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
                 currentUser -> currentUser.getVisitedPlaces().add(place)
         );
+    }
+
+    @Transactional
+    public void deleteVisited(Long placeId){
+        if(placeId == null){
+            return;
+        }
+
+        userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                currentUser -> currentUser.getVisitedPlaces().removeIf(place -> Objects.equals(place.getId(), placeId)));
+
+    }
+
+    @Transactional
+    public void deleteFavourite(Long placeId){
+        if(placeId == null){
+            return;
+        }
+
+        userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                currentUser -> currentUser.getFavouritePlaces().removeIf(place -> Objects.equals(place.getId(), placeId)));
     }
 }

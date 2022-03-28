@@ -83,25 +83,25 @@ public class PlaceController {
     }
 
     //TODO:Запросы для работы с посещенными, избранными
-    @PostMapping("/favourite")
+    @PostMapping("/favourite/{id}")
     public ResponseEntity<String> addFavourite(
-            @RequestParam(name = "placeId") Long placeId
+            @PathVariable(name = "id") Long placeId
     ) {
         try {
             userService.addFavourite(placeId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Added");
         } catch (Exception exception) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PostMapping("/visited")
+    @PostMapping("/visited/{id}")
     public ResponseEntity<String> addVisited(
-            @RequestParam(name = "placeId") Long placeId
+            @PathVariable(name = "id") Long placeId
     ) {
         try {
             userService.addVisited(placeId);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Added");
         } catch (Exception exception) {
             return ResponseEntity.badRequest().build();
         }
@@ -121,6 +121,47 @@ public class PlaceController {
         try {
             return ResponseEntity.ok(userService.getVisited());
         } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/visited/{id}")
+    public ResponseEntity<Boolean> existVisitedById(@PathVariable(name = "id") Long id){
+        try {
+            return ResponseEntity.ok(userService.findVisitedById(id));
+        }catch (Exception exception){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @GetMapping("/favourite/{id}")
+    public ResponseEntity<Boolean> existFavouriteById(@PathVariable(name = "id") Long id){
+        try{
+            return ResponseEntity.ok(userService.findFavouriteById(id));
+        }catch (Exception exception){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/visited/{id}")
+    public ResponseEntity<String> deleteVisitedById(@PathVariable(name = "id") Long id){
+        try {
+            userService.deleteVisited(id);
+            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        }
+        catch (Exception exception){
+            exception.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/favourite/{id}")
+    public ResponseEntity<String> deleteFavouriteById(@PathVariable(name = "id") Long id) {
+        try{
+            userService.deleteFavourite(id);
+            return new ResponseEntity<>("Deleted", HttpStatus.OK);
+        }
+        catch (Exception exception){
             return ResponseEntity.badRequest().build();
         }
     }
