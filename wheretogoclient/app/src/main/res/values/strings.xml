@@ -43,5 +43,6 @@
     <string name="exit_account_str">Выйти</string>
     <string name="categoriesHeader">Категории</string>
     <string name="score_text">Ваша оценка</string>
+    <string name="visited_recommend_title">Рекомендации на основе посещенных вами мест</string>
 
 </resources>

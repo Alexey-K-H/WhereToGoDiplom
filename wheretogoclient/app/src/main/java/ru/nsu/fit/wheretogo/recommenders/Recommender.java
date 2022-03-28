@@ -17,7 +17,7 @@ import ru.nsu.fit.wheretogo.util.PictureLoader;
 public abstract class Recommender extends AppCompatActivity {
     private RecyclerView recyclerView;
 
-    private void initView(List<Place> places) {
+    protected void initView(List<Place> places) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
