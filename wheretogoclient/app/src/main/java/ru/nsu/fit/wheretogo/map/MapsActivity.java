@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -475,6 +476,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageView placeImage = view.findViewById(R.id.place_image);
         placeImage.setImageBitmap(item.getIconPicture());
 
+        ImageButton visited = view.findViewById(R.id.visited_btn);
+        ImageButton favourite = view.findViewById(R.id.favour_btn);
+
         Context context = this;
 
         PlaceService placeService = ServiceGenerator.createService(PlaceService.class);
@@ -501,6 +505,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+
+            }
+        });
+
+        //Проверка отображения значков избранного и посещенного
+        Call<Boolean> visitedCheckCall = placeService.findVisitedById(item.getPlace().getId());
+        visitedCheckCall.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    if(response.body()){
+                        visited.setImageResource(R.drawable.add_to_visited);
+                    }
+                    else {
+                        visited.setImageResource(R.drawable.unknown);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+            }
+        });
+
+        Call<Boolean> favouriteCheckCall = placeService.findFavouriteById(item.getPlace().getId());
+        favouriteCheckCall.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    if(response.body()){
+                        favourite.setImageResource(R.drawable.add_to_favour);
+                    }
+                    else {
+                        favourite.setImageResource(R.drawable.add_to_favour_not_active);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
 
             }
         });
@@ -582,16 +627,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void addFavoritePlace(View view) {
-        Call<Place> call = ServiceGenerator.createService(PlaceService.class)
+        Call<String> call = ServiceGenerator.createService(PlaceService.class)
                 .addFavoritePlace(selectedPlace.getId());
         Context context = this;
-        call.enqueue(new Callback<Place>() {
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.code() == 200) {
-                    Toast.makeText(context, "Added",
+                    ImageButton favour = view.findViewById(R.id.favour_btn);
+                    favour.setImageResource(R.drawable.add_to_favour);
+                    Toast.makeText(context, "Добавлено в избранное",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
+                    //Вызываем метод удаления места
+                    deleteFavouritePlace(selectedPlace.getId());
+                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
+                    //и делаем ее неактивной
+                    ImageButton favour = view.findViewById(R.id.favour_btn);
+                    favour.setImageResource(R.drawable.add_to_favour_not_active);
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
@@ -599,23 +652,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             @Override
-            public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
 
             }
         });
     }
 
     private void addVisitedPlace(View view) {
-        Call<Place> call = ServiceGenerator.createService(PlaceService.class)
+        Call<String> call = ServiceGenerator.createService(PlaceService.class)
                 .addVisitedPlace(selectedPlace.getId());
         Context context = this;
-        call.enqueue(new Callback<Place>() {
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.code() == 200) {
-                    Toast.makeText(context, "Added",
+                    ImageButton visited = view.findViewById(R.id.visited_btn);
+                    visited.setImageResource(R.drawable.add_to_visited);
+                    Toast.makeText(context, "Добавлено в посещенное",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
+                    //Вызываем метод удаления места
+                    deleteVisitedPlace(selectedPlace.getId());
+                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
+                    //и делаем ее неактивной
+                    ImageButton visited = view.findViewById(R.id.visited_btn);
+                    visited.setImageResource(R.drawable.unknown);
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
@@ -623,7 +684,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             @Override
-            public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    private void deleteVisitedPlace(Long placeId){
+        Call<String> call = ServiceGenerator.createService(PlaceService.class)
+                .deleteVisited(placeId);
+        Context context = this;
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if(response.code() == 200){
+                    Toast.makeText(context, "Удалено из посещенного",
+                            Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    private void deleteFavouritePlace(Long placeId){
+        Call<String> call = ServiceGenerator.createService(PlaceService.class)
+                .deleteFavourite(placeId);
+        Context context = this;
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if(response.code() == 200){
+                    Toast.makeText(context, "Удалено из избранного",
+                            Toast.LENGTH_SHORT).show();
+                }else {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
 
             }
         });

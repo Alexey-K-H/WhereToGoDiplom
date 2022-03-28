@@ -1,5 +1,8 @@
 package ru.nsu.fit.wheretogo.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,9 +29,13 @@ public class ServiceGenerator {
                 )).build();
     });
 
+    private static final Gson gson = new GsonBuilder()
+            .setLenient()
+            .create();
+
     private static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(httpClient.build())
             .build();
 
