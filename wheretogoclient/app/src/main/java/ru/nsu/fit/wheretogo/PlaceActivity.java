@@ -95,8 +95,8 @@ public class PlaceActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(@NonNull Call<Score> call1, @NonNull Response<Score> response) {
                     if(response.code() == 200 && response.body()!= null){
-//                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
-//                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
+                                    Toast.LENGTH_LONG).show();
 
                         ratingBar1.setRating(response.body().getScore());
                     }else if(response.code() == 400){

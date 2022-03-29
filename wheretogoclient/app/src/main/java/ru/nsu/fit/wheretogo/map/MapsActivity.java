@@ -1,13 +1,10 @@
 package ru.nsu.fit.wheretogo.map;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -240,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Отправляет запрос на получение мест,
     // там же происходит вызов отображения маркеров при получении ответа
-    //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат
+    //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат(решили не использовать при открытии экрана)
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void sendPlacesRequest() {
         PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
@@ -248,26 +245,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
 
-        System.out.println(lastKnownLocation);
-
-        Call<PlaceList> placeCall = placeService.getNearestPlacesByCategory(
-                lastKnownLocation.getLatitude(),
-                lastKnownLocation.getLongitude(),
-                1.0,
-                2.0,
-                5,
-                categories.entrySet().stream()
-                        .filter(entry -> entry.getValue().chosen)
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList()),
-                1, 0);
-
-//        Call<PlaceList> placeCall = placeService.getPlaceList(
+//        Call<PlaceList> placeCall = placeService.getNearestPlacesByCategory(
+//                lastKnownLocation.getLatitude(),
+//                lastKnownLocation.getLongitude(),
+//                1.0,
+//                2.0,
+//                5,
 //                categories.entrySet().stream()
 //                        .filter(entry -> entry.getValue().chosen)
 //                        .map(Map.Entry::getKey)
 //                        .collect(Collectors.toList()),
 //                1, 0);
+
+        Call<PlaceList> placeCall = placeService.getPlaceList(
+                categories.entrySet().stream()
+                        .filter(entry -> entry.getValue().chosen)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList()),
+                1, 0);
 
         placeCall.enqueue(new Callback<PlaceList>() {
             @Override
@@ -451,8 +446,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Кнопка добавления места в избранные
         ImageButton liked = bottomSheetView.findViewById(R.id.favour_btn);
         liked.setOnClickListener(view -> {
-            //TODO:добавить проверку наличия места в бд для конкретного юзера, чтобы менять состояние кнопки при загрузке
-            //TODO:добавить метод удаления места из данной категории при повторном нажатии на уже активную конпку
             liked.setActivated(true);
             addFavoritePlace(view);
         });
@@ -460,8 +453,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Кнопка добавления места в посещенное
         ImageButton visited = bottomSheetView.findViewById(R.id.visited_btn);
         visited.setOnClickListener(view -> {
-            //TODO:добавить проверку наличия места в бд для конкретного юзера, чтобы менять состояние кнопки при загрузке
-            //TODO:добавить метод удаления места из данной категории при повторном нажатии на уже активную конпку
             visited.setActivated(true);
             addVisitedPlace(view);
         });
