@@ -15,41 +15,30 @@ import ru.nsu.fit.wheretogo.recommenders.VisitedRecommender;
 
 public class ForYouActivity extends AppCompatActivity {
 
-    ImageButton back;
     ImageButton recommendByVisitedBtn;
     ImageButton recommendByScoredBtn;
     ImageButton recommendByOthersBtn;
+    ImageButton recommendByGPSBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_for_you);
 
-        //Buttons init
-        back = (ImageButton) findViewById(R.id.back_recomm);
-
         recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
         recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
-
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
-
-        //Buttons listeners
-        back.setOnClickListener(this::closeRecommender);
+        recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
         recommendByVisitedBtn.setOnClickListener(this::openVisitedRecommender);
         recommendByScoredBtn.setOnClickListener(this::openScoredRecommender);
-
-
     }
 
-    private void openMap(View view){
+    @Override
+    public void onBackPressed() {
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
-    }
-
-    private void closeRecommender(View view){
-        finish();
-        openMap(view);
     }
 
     public void openVisitedRecommender(View view){
