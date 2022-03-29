@@ -9,8 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.map.MapsActivity;
-import ru.nsu.fit.wheretogo.recommenders.ScoredRecommender;
-import ru.nsu.fit.wheretogo.recommenders.VisitedRecommender;
+import ru.nsu.fit.wheretogo.model.ShowMapMode;
 
 
 public class ForYouActivity extends AppCompatActivity {
@@ -30,8 +29,8 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
         recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
+        recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
         recommendByVisitedBtn.setOnClickListener(this::openVisitedRecommender);
-        recommendByScoredBtn.setOnClickListener(this::openScoredRecommender);
     }
 
     @Override
@@ -41,14 +40,26 @@ public class ForYouActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void openNearestRecommender(View view){
+        finish();
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
+        startActivity(intent);
+    }
+
     public void openVisitedRecommender(View view){
-        Intent intent = new Intent(this, VisitedRecommender.class);
+        finish();
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
         startActivity(intent);
     }
 
     public void openScoredRecommender(View view){
-        Intent intent = new Intent(this, ScoredRecommender.class);
-        startActivity(intent);
+
+    }
+
+    public void openUsersRecommender(View view){
+
     }
 
 }

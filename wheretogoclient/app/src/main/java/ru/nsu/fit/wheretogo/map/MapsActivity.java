@@ -59,6 +59,7 @@ import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
+import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
@@ -110,6 +111,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SlidingPaneLayout mapSlidingPane;
     private LinearLayout filtersLayout;
 
+    //map show mode
+    private ShowMapMode showMapMode;
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +125,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+        }
+
+        //Утсанавливаем режим отображения мест
+        Bundle extras = getIntent().getExtras();
+        if(extras == null){
+            showMapMode =  ShowMapMode.ALL;
+        }else{
+            int mode = extras.getInt("show_map_mode");
+            switch (mode){
+                case 0:
+                    showMapMode = ShowMapMode.ALL;
+                    break;
+                case 1:
+                    showMapMode = ShowMapMode.NEAREST;
+                    break;
+                case 2:
+                    showMapMode = ShowMapMode.RECOMMENDED_VISITED;
+                    break;
+                case 3:
+                    showMapMode = ShowMapMode.RECOMMENDED_SCORED;
+                    break;
+                case 4:
+                    showMapMode = ShowMapMode.RECOMMENDED_USERS;
+                    break;
+            }
         }
 
         // Retrieve the content view that renders the map.
@@ -245,24 +274,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
 
-//        Call<PlaceList> placeCall = placeService.getNearestPlacesByCategory(
-//                lastKnownLocation.getLatitude(),
-//                lastKnownLocation.getLongitude(),
-//                1.0,
-//                2.0,
-//                5,
-//                categories.entrySet().stream()
-//                        .filter(entry -> entry.getValue().chosen)
-//                        .map(Map.Entry::getKey)
-//                        .collect(Collectors.toList()),
-//                1, 0);
-
-        Call<PlaceList> placeCall = placeService.getPlaceList(
-                categories.entrySet().stream()
-                        .filter(entry -> entry.getValue().chosen)
-                        .map(Map.Entry::getKey)
-                        .collect(Collectors.toList()),
-                1, 0);
+        //В зависимости от режима отображения будет загружен тот или иной список мест
+        Call<PlaceList> placeCall;
+        switch (showMapMode) {
+            case NEAREST:
+                placeCall = placeService.getNearestPlacesByCategory(
+                        lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude(),
+                        1.0,
+                        2.0,
+                        5,
+                        categories.entrySet().stream()
+                                .filter(entry -> entry.getValue().chosen)
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toList()),
+                        1, 0);
+                break;
+            case RECOMMENDED_VISITED:
+                placeCall = placeService.getRecommendByVisited(
+                        AuthorizationHelper.getUserProfile().getId(),
+                        1,
+                        0
+                );
+                break;
+            default:
+                placeCall = placeService.getPlaceList(
+                        categories.entrySet().stream()
+                                .filter(entry -> entry.getValue().chosen)
+                                .map(Map.Entry::getKey)
+                                .collect(Collectors.toList()),
+                        1, 0);
+                break;
+        }
 
         placeCall.enqueue(new Callback<PlaceList>() {
             @Override
@@ -811,4 +854,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(showMapMode != ShowMapMode.ALL){
+            Intent intent = new Intent(this, ForYouActivity.class);
+            startActivity(intent);
+        }
+    }
 }
