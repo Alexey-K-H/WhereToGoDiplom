@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,9 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -63,12 +67,11 @@ import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
-import ru.nsu.fit.wheretogo.model.entity.User;
 import ru.nsu.fit.wheretogo.model.service.CategoryService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
-import ru.nsu.fit.wheretogo.model.service.UserService;
+import ru.nsu.fit.wheretogo.model.service.StayPointService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
@@ -80,6 +83,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
+
+    private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
+    private final HandlerThread locationUpdateThread = new HandlerThread("RequestLocation");
+
+    //Заглшуки для фиксирования stay-point-ов
+    private long timeCounter = 0;
 
     //Default location (Novosibirsk Rechnoy Vokzal)
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
@@ -129,11 +139,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Утсанавливаем режим отображения мест
         Bundle extras = getIntent().getExtras();
-        if(extras == null){
-            showMapMode =  ShowMapMode.ALL;
-        }else{
+        if (extras == null) {
+            showMapMode = ShowMapMode.ALL;
+        } else {
             int mode = extras.getInt("show_map_mode");
-            switch (mode){
+            switch (mode) {
                 case 0:
                     showMapMode = ShowMapMode.ALL;
                     break;
@@ -182,6 +192,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //Configure updates of location
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(2 * 1000);//2 seconds
+
+        locationCallback = new LocationCallback() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                //Получаем текущее метосположение пользователя
+                if (locationResult != null) {
+                    //Сравниваем его с предыдущим местоположением
+                    double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
+                    //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
+                    if(distance <= 200.00){
+                        System.out.println("inside 200 meters area");
+                        timeCounter += 2;
+                    }
+                    else {
+                        //Сбрасываем счетчик
+                        timeCounter = 0;
+                    }
+
+                    //Обновляем местоположение
+                    lastKnownLocation = locationResult.getLastLocation();
+
+                    //Если счетчик переполнился, то мы нашли stay-point
+                    if(timeCounter == 10){
+                        System.out.println("New stay-point candidate!");
+                        timeCounter = 0;
+
+                        //Добавляем его в базу данных
+                        Call<String> call = ServiceGenerator.createService(StayPointService.class)
+                                .addStayPoint(
+                                        lastKnownLocation.getLatitude(),
+                                        lastKnownLocation.getLongitude());
+
+                        call.enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                                System.out.println("Add new stay-point");
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+                            }
+                        });
+
+                    }
+
+                    System.out.println("NEW LOCATION:("
+                            + lastKnownLocation.getLatitude() + ","
+                            + lastKnownLocation.getLongitude() + ")");
+
+//                    map.moveCamera(CameraUpdateFactory.newLatLng(
+//                            new LatLng(lastKnownLocation.getLatitude(),
+//                                    lastKnownLocation.getLongitude())));
+
+
+                }
+            }
+        };
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -375,6 +449,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
+            //Set loop to update location
+            locationUpdateThread.start();
+            fusedLocationProviderClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    locationUpdateThread.getLooper());
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -639,6 +719,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void openRecommenders(View view){
+        locationUpdateThread.quit();
         finish();
         Intent intent = new Intent(this, ForYouActivity.class);
         startActivity(intent);
@@ -857,6 +938,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        locationUpdateThread.quit();
         if(showMapMode != ShowMapMode.ALL){
             Intent intent = new Intent(this, ForYouActivity.class);
             startActivity(intent);
