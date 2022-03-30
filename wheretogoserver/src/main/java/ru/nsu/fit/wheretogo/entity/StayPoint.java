@@ -26,12 +26,18 @@ public class StayPoint {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "latitude", column = @Column(name = "latitude", nullable = false)),
-            @AttributeOverride(name = "longitude", column = @Column(name = "longitude", nullable = false))
-    })
-    private Coords coords;
+//    @Embedded
+//    @AttributeOverrides({
+//            @AttributeOverride(name = "latitude", column = @Column(name = "latitude", nullable = false)),
+//            @AttributeOverride(name = "longitude", column = @Column(name = "longitude", nullable = false))
+//    })
+//    private Coords coords;
+
+    @Column(name = "latitude", nullable = false)
+    private double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private double longitude;
 
     @Column(name = "uploaded_at", nullable = false)
     private Instant uploadedAt;
@@ -47,7 +53,8 @@ public class StayPoint {
         }
         return new StayPoint()
                 .setId(dto.getId())
-                .setCoords(dto.getCoords())
+                .setLatitude(dto.getLatitude())
+                .setLongitude(dto.getLongitude())
                 .setUser(new User().setId(dto.getUserId()));
     }
 

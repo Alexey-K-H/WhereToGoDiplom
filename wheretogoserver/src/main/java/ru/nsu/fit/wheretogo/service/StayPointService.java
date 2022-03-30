@@ -27,18 +27,57 @@ public class StayPointService {
 
     @Transactional
     public void addStoryPoint(double lat, double lon){
-        Coords coords = new Coords();
-        coords.setLatitude(new BigDecimal(lat));
-        coords.setLongitude(new BigDecimal(lon));
+
         StayPoint stayPoint = new StayPoint()
                 .setUser(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow())
-                .setCoords(coords);
+                .setLatitude(lat)
+                .setLongitude(lon);
 
-        userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
-                currentUser -> currentUser.getStayPoints().add(stayPoint)
-        );
+        //Проверяем, есть ли данный stay-point уже в базе данных
+        //Берем список всех stay-point-ов пользователя
+        List<StayPoint> userStayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints();
+        boolean exist = false;
+        double eps = 0.001;//нужно для сравнения вещественных чисел
 
-        stayPointRepository.save(stayPoint);
+        for(StayPoint userStayPoint : userStayPoints){
+            if (Math.abs(userStayPoint.getLatitude() - lat) < eps && Math.abs(userStayPoint.getLongitude() - lon) < eps) {
+                exist = true;
+                break;
+            }
+        }
+
+        if(exist){
+            //Обнволяем дату загрузки
+            //Удаляем старую запись
+            userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                    currentUser -> currentUser.getStayPoints().removeIf(
+                            currStayPoint -> currStayPoint.getLatitude() == lat && currStayPoint.getLongitude() == lon)
+            );
+
+            //Добавляем новую
+            userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                    currentUser -> currentUser.getStayPoints().add(stayPoint)
+            );
+
+            stayPointRepository.setNewPointTimeStamp(Instant.now());
+
+        }else {
+            userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
+                    currentUser -> currentUser.getStayPoints().add(stayPoint)
+            );
+
+            stayPointRepository.save(stayPoint);
+        }
+
+        //Проверяем число stay-point-ов в базе данных
+        //Если их стало больше 5(тетосвое значение), то удаялем самый старый
+
+        if(stayPointRepository.countByUserId(
+                userRepository.findByEmail(SecurityContextHelper.email())
+                        .orElseThrow()
+                        .getId()) > 5){
+            deleteOldStoryPoint();
+        }
     }
 
     @Transactional

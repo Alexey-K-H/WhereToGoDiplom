@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
@@ -20,7 +19,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.*;
-import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -215,13 +213,11 @@ public class PlaceService {
             //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
             //функции поиска ближайших мест к этим местам
             for(StayPointDTO stayPoint : stayPoints){
-                //Извлекаем координаты stay-point-а
-                Coords stayPointCoords = stayPoint.getCoords();
 
                 //Отправляем запрос на поиск ближайших мест к данному stay-point-у
                 Page<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
-                        stayPointCoords.getLatitude().doubleValue(),
-                        stayPointCoords.getLongitude().doubleValue(),
+                        stayPoint.getLatitude(),
+                        stayPoint.getLongitude(),
                         1.0,
                         5.0,
                         2,
@@ -254,13 +250,10 @@ public class PlaceService {
             //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
             //функции поиска ближайших мест к этим местам
             for(StayPointDTO stayPoint : stayPoints){
-                //Извлекаем координаты посещенного места
-                Coords stayPointCoords = stayPoint.getCoords();
-
                 //Отправляем запрос на поиск ближайших мест к данному посещенному
                 Page<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
-                        stayPointCoords.getLatitude().doubleValue(),
-                        stayPointCoords.getLongitude().doubleValue(),
+                        stayPoint.getLatitude(),
+                        stayPoint.getLongitude(),
                         1.0,
                         5.0,
                         2,
