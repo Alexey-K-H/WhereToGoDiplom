@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.*;
+import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
@@ -121,73 +122,73 @@ public class PlaceService {
                 .setTotalPages(places.getTotalPages());
     }
 
-    //Получение списка блжиашйих мест к тем, которые пользователь посетил
-    @Transactional
-    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
-            Long userId,
-            int page,
-            int size
-    ){
-        //Ищем пользователя по его id/email в базе данных и берем список посещенных им мест
-        List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
-                PlaceBriefDTO::getFromEntity).toList();
-
-        PageRequest pageRequest = PageRequest.of(page, size);
-
-        //Создаем список из id посещенных мест (мест, исключенных из поиска)
-        List<Long> isolatorIds = new ArrayList<>();
-        for(PlaceBriefDTO place : visitedPlaces){
-            isolatorIds.add(place.getId());
-        }
-
-        //Формируем из списка строку id посещенных мест, чтобы передать их в качестве исключенных кандидатов при поиске ближайших
-        String isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-
-        //Формируем список рекомендаций, который будет отправлен в конечном итоге
-        List<PlaceBriefDTO> recommendations = new ArrayList<>();
-        int totalPages = 0;
-
-        //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
-        //функции поиска ближайших мест к этим местам
-        for(PlaceBriefDTO place : visitedPlaces){
-            //Извлекаем координаты посещенного места
-            Coords placeCoords = place.getCoords();
-
-            //Отправляем запрос на поиск ближайших мест к данному посещенному
-            Page<Place> currentVisitedPlaces = placeRepository.findNearestByVisited(
-                    placeCoords.getLatitude().doubleValue(),
-                    placeCoords.getLongitude().doubleValue(),
-                    1.0,
-                    5.0,
-                    2,
-                    isolators,
-                    pageRequest
-            );
-
-            //Обновляем число полученных страниц для финального списка
-            totalPages += currentVisitedPlaces.getTotalPages();
-
-            //Конвертируем страницу в список
-            List<PlaceBriefDTO> currentPlaceRecommendations = currentVisitedPlaces.toList()
-                    .stream()
-                    .map(PlaceBriefDTO::getFromEntity).toList();
-
-            //Добавляем полученный список к результирующему
-            recommendations.addAll(currentPlaceRecommendations);
-
-            //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
-            for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
-                isolatorIds.add(recPlace.getId());
-            }
-            //Оновляем строку-параметров с дополнительными
-            isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-        }
-
-        return new PagedListDTO<PlaceBriefDTO>()
-                .setList(recommendations)
-                .setPageNum(page)
-                .setTotalPages(totalPages);
-    }
+//    //Получение списка блжиашйих мест к тем, которые пользователь посетил
+//    @Transactional
+//    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
+//            Long userId,
+//            int page,
+//            int size
+//    ){
+//        //Ищем пользователя по его id/email в базе данных и берем список посещенных им мест
+//        List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
+//                PlaceBriefDTO::getFromEntity).toList();
+//
+//        PageRequest pageRequest = PageRequest.of(page, size);
+//
+//        //Создаем список из id посещенных мест (мест, исключенных из поиска)
+//        List<Long> isolatorIds = new ArrayList<>();
+//        for(PlaceBriefDTO place : visitedPlaces){
+//            isolatorIds.add(place.getId());
+//        }
+//
+//        //Формируем из списка строку id посещенных мест, чтобы передать их в качестве исключенных кандидатов при поиске ближайших
+//        String isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+//
+//        //Формируем список рекомендаций, который будет отправлен в конечном итоге
+//        List<PlaceBriefDTO> recommendations = new ArrayList<>();
+//        int totalPages = 0;
+//
+//        //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
+//        //функции поиска ближайших мест к этим местам
+//        for(PlaceBriefDTO place : visitedPlaces){
+//            //Извлекаем координаты посещенного места
+//            Coords placeCoords = place.getCoords();
+//
+//            //Отправляем запрос на поиск ближайших мест к данному посещенному
+//            Page<Place> currentVisitedPlaces = placeRepository.findNearestByVisited(
+//                    placeCoords.getLatitude().doubleValue(),
+//                    placeCoords.getLongitude().doubleValue(),
+//                    1.0,
+//                    5.0,
+//                    2,
+//                    isolators,
+//                    pageRequest
+//            );
+//
+//            //Обновляем число полученных страниц для финального списка
+//            totalPages += currentVisitedPlaces.getTotalPages();
+//
+//            //Конвертируем страницу в список
+//            List<PlaceBriefDTO> currentPlaceRecommendations = currentVisitedPlaces.toList()
+//                    .stream()
+//                    .map(PlaceBriefDTO::getFromEntity).toList();
+//
+//            //Добавляем полученный список к результирующему
+//            recommendations.addAll(currentPlaceRecommendations);
+//
+//            //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
+//            for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
+//                isolatorIds.add(recPlace.getId());
+//            }
+//            //Оновляем строку-параметров с дополнительными
+//            isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+//        }
+//
+//        return new PagedListDTO<PlaceBriefDTO>()
+//                .setList(recommendations)
+//                .setPageNum(page)
+//                .setTotalPages(totalPages);
+//    }
 
     @Transactional
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByStayPoints(
@@ -198,58 +199,93 @@ public class PlaceService {
         //Ищем пользователя по его id/email в базе данных и берем его stay-point-ы
         List<StayPointDTO> stayPoints = userRepository.findById(userId).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity).toList();
-
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        //Создаем список из id посещенных мест (мест, исключенных из поиска)
+        //Создаем список из id посещенных мест (мест, исключенных из поиска), если они есть
         List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
-        List<Long> isolatorsVisited = new ArrayList<>();
-        for(PlaceBriefDTO place : visitedPlaces){
-            isolatorsVisited.add(place.getId());
-        }
 
-        //Формируем из списка строку id посещенных мест, чтобы передать их в качестве исключенных кандидатов при поиске ближайших
-        String isolators = isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String isolators;
 
         //Формируем список рекомендаций, который будет отправлен в конечном итоге
         List<PlaceBriefDTO> recommendations = new ArrayList<>();
         int totalPages = 0;
 
-        //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
-        //функции поиска ближайших мест к этим местам
-        for(StayPointDTO stayPoint : stayPoints){
-            //Извлекаем координаты посещенного места
-            Coords stayPointCoords = stayPoint.getCoords();
+        if(visitedPlaces.isEmpty()){
+            //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
+            //функции поиска ближайших мест к этим местам
+            for(StayPointDTO stayPoint : stayPoints){
+                //Извлекаем координаты stay-point-а
+                Coords stayPointCoords = stayPoint.getCoords();
 
-            //Отправляем запрос на поиск ближайших мест к данному посещенному
-            Page<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
-                    stayPointCoords.getLatitude().doubleValue(),
-                    stayPointCoords.getLongitude().doubleValue(),
-                    1.0,
-                    5.0,
-                    2,
-                    isolators,
-                    pageRequest
-            );
+                //Отправляем запрос на поиск ближайших мест к данному stay-point-у
+                Page<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
+                        stayPointCoords.getLatitude().doubleValue(),
+                        stayPointCoords.getLongitude().doubleValue(),
+                        1.0,
+                        5.0,
+                        2,
+                        pageRequest
+                );
 
-            //Обновляем число полученных страниц для финального списка
-            totalPages += currentStayPointPlaces.getTotalPages();
+                //Обновляем число полученных страниц для финального списка
+                totalPages += currentStayPointPlaces.getTotalPages();
 
-            //Конвертируем страницу в список
-            List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces.toList()
-                    .stream()
-                    .map(PlaceBriefDTO::getFromEntity).toList();
+                //Конвертируем страницу в список
+                List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces.toList()
+                        .stream()
+                        .map(PlaceBriefDTO::getFromEntity).toList();
 
-            //Добавляем полученный список к результирующему
-            recommendations.addAll(currentPlaceRecommendations);
+                //Добавляем полученный список к результирующему
+                recommendations.addAll(currentPlaceRecommendations);
 
-            //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
-            for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
-                isolatorsVisited.add(recPlace.getId());
+                //Убираем дубликаты из списка мест
+                recommendations = recommendations.stream().distinct().collect(toList());
             }
-            //Оновляем строку-параметров с дополнительными
+        }else {
+            List<Long> isolatorsVisited = new ArrayList<>();
+            for(PlaceBriefDTO place : visitedPlaces){
+                isolatorsVisited.add(place.getId());
+            }
+
+            //Формируем из списка строку id посещенных мест, чтобы передать их в качестве исключенных кандидатов при поиске ближайших
             isolators = isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+            //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
+            //функции поиска ближайших мест к этим местам
+            for(StayPointDTO stayPoint : stayPoints){
+                //Извлекаем координаты посещенного места
+                Coords stayPointCoords = stayPoint.getCoords();
+
+                //Отправляем запрос на поиск ближайших мест к данному посещенному
+                Page<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
+                        stayPointCoords.getLatitude().doubleValue(),
+                        stayPointCoords.getLongitude().doubleValue(),
+                        1.0,
+                        5.0,
+                        2,
+                        isolators,
+                        pageRequest
+                );
+
+                //Обновляем число полученных страниц для финального списка
+                totalPages += currentStayPointPlaces.getTotalPages();
+
+                //Конвертируем страницу в список
+                List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces.toList()
+                        .stream()
+                        .map(PlaceBriefDTO::getFromEntity).toList();
+
+                //Добавляем полученный список к результирующему
+                recommendations.addAll(currentPlaceRecommendations);
+
+                //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
+                for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
+                    isolatorsVisited.add(recPlace.getId());
+                }
+                //Оновляем строку-параметров с дополнительными
+                isolators = isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
+            }
         }
 
         return new PagedListDTO<PlaceBriefDTO>()
