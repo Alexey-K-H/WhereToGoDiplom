@@ -265,4 +265,20 @@ public class PlaceController {
                         pageSize),
                 HttpStatus.OK);
     }
+
+    //Запрос на получение рекомендаций с учетом stay-point-ов
+    //(2.1-ая часть контент-ориентирвоанной рекомендательной системы)
+    @GetMapping("/recommend/stay_points")
+    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getStayPointRecommendations(
+            @RequestParam(name = "userId") Long userId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+    ){
+        return new ResponseEntity<>(
+                service.getNearestPlacesByStayPoints(
+                        userId,
+                        page,
+                        pageSize),
+                HttpStatus.OK);
+    }
 }
