@@ -6,9 +6,10 @@ import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CBFRecommender {
-    private static final int TOP_RECOMMENDATIONS = 10;
+    private static final int TOP_RECOMMENDATIONS = 5;
 
     public CBFRecommender(){}
 
@@ -31,27 +32,35 @@ public class CBFRecommender {
             Page<Place> notVisitedPlacesPage)
     {
         //Места с их коэффициентами значимости для рекмоендаций
-        Map<Double, PlaceBriefDTO> placeCoefficients = new TreeMap<>(Collections.reverseOrder());
-
+        Map<PlaceBriefDTO, Double> placeCoefficients = new HashMap<>();
         for(Place notVisitedPlace : notVisitedPlacesPage){
             //Для каждого из них строим itemVector
             Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(notVisitedPlace, categoryList);
             //Вычисляем для места коэффициент значимости и заносим в карту коэффициентов
-            System.out.println("Add Coeff:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
+            System.out.println("Add coefficient:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
             placeCoefficients.put(
-                    CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList),
-                    PlaceBriefDTO.getFromEntity(notVisitedPlace)
+                    PlaceBriefDTO.getFromEntity(notVisitedPlace),
+                    CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList)
             );
         }
 
-        Iterator<Map.Entry<Double, PlaceBriefDTO>> i = placeCoefficients.entrySet().iterator();
+        Map<PlaceBriefDTO, Double> sortedCoefficients = placeCoefficients.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new
+                ));
+
+        Iterator<Map.Entry<PlaceBriefDTO, Double>> i = sortedCoefficients.entrySet().iterator();
         int topCount = TOP_RECOMMENDATIONS;
 
         List<PlaceBriefDTO> topPlaces = new ArrayList<>();
         //Формируем список из первого топа рекомендаций
         while (i.hasNext() && topCount > 0){
-            Map.Entry<Double, PlaceBriefDTO> entry = (Map.Entry<Double, PlaceBriefDTO>)i.next();
-            topPlaces.add(entry.getValue());
+            Map.Entry<PlaceBriefDTO, Double> entry = i.next();
+            topPlaces.add(entry.getKey());
             topCount--;
         }
         return topPlaces;
