@@ -48,4 +48,13 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             @Param("_ids") String visitedIds,
             Pageable pageable
     );
+
+    //Поиск мест, не посещенных пользователем
+    //Необходимо для составления рекомендаций на основе контента
+    @Query(value = "select * from place where id not in (select place_id from user_visited_places where user_id = :_user_id); -- #pageable",
+            nativeQuery = true)
+    public Page<Place> findNotVisitedByUser(
+            @Param("_user_id") Long userId,
+            Pageable pageable
+    );
 }

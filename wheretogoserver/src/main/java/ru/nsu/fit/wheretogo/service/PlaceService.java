@@ -10,6 +10,11 @@ import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
+import ru.nsu.fit.wheretogo.entity.User;
+import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
+import ru.nsu.fit.wheretogo.recommenders.cbf.ItemVectorBuilder;
+import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
+import ru.nsu.fit.wheretogo.repository.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
@@ -21,9 +26,7 @@ import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.*;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -35,6 +38,7 @@ public class PlaceService {
     private EntityManagerFactory entityManagerFactory;////EntityManager это интерфейс, который описывает API для всех основных операций над Enitity, получение данных и других сущностей JPA. По сути главный API для работы с JPA
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     public void savePlace(PlaceDescriptionDTO place) {
@@ -285,6 +289,33 @@ public class PlaceService {
                 .setList(recommendations)
                 .setPageNum(page)
                 .setTotalPages(totalPages);
+    }
+
+    @Transactional
+    public PagedListDTO<PlaceBriefDTO> getContentBasedRecommendations(
+            Long userId,
+            int page,
+            int size
+    ){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        //Находим пользователя в базе данных
+        User user = userRepository.findById(userId).orElseThrow();
+
+        //Берем список категорий мест в базе данных
+        List<Category> categoryList = categoryRepository.findAll();
+
+        //Строим вектор пользователя
+        Map<Category, Double> userVector = UserVectorBuilder.getUserVector(user, categoryList);
+
+        //Берем список мест, не посещенных данным пользователем
+        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(userId, pageRequest);
+
+        List<PlaceBriefDTO> recommendations = CBFRecommender.getRecommendations(categoryList, userVector, notVisitedPlacesPage);
+
+        return new PagedListDTO<PlaceBriefDTO>()
+                .setList(recommendations)
+                .setPageNum(page)
+                .setTotalPages(notVisitedPlacesPage.getTotalPages());
     }
 
     //criteriabuilder - интерфейс, который юзается для построения запросов
