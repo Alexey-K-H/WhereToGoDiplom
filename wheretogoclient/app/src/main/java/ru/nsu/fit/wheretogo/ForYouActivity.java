@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -31,6 +32,7 @@ public class ForYouActivity extends AppCompatActivity {
 
         recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
         recommendByVisitedBtn.setOnClickListener(this::openVisitedRecommender);
+        recommendByScoredBtn.setOnClickListener(this::openScoredRecommender);
     }
 
     @Override
@@ -55,7 +57,10 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openScoredRecommender(View view){
-
+        finish();
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
+        startActivity(intent);
     }
 
     public void openUsersRecommender(View view){

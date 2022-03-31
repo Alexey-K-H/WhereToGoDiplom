@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.HandlerThread;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -205,6 +206,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //Получаем текущее метосположение пользователя
                 if (locationResult != null) {
                     //Сравниваем его с предыдущим местоположением
+                    if(lastKnownLocation == null){
+                        lastKnownLocation = locationResult.getLastLocation();
+                    }
                     double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
                     //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
                     if(distance <= 200.00){
@@ -221,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     //Если счетчик переполнился, то мы нашли stay-point
                     if(timeCounter == 10){
-                        System.out.println("New stay-point candidate!");
+//                        System.out.println("New stay-point candidate!");
                         timeCounter = 0;
 
                         //Добавляем его в базу данных
@@ -233,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         call.enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                                System.out.println("Add new stay-point");
+//                                System.out.println("Add new stay-point");
                             }
 
                             @Override
@@ -244,9 +248,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
 
-                    System.out.println("NEW LOCATION:("
-                            + lastKnownLocation.getLatitude() + ","
-                            + lastKnownLocation.getLongitude() + ")");
+//                    System.out.println("NEW LOCATION:("
+//                            + lastKnownLocation.getLatitude() + ","
+//                            + lastKnownLocation.getLongitude() + ")");
 
 //                    map.moveCamera(CameraUpdateFactory.newLatLng(
 //                            new LatLng(lastKnownLocation.getLatitude(),
@@ -290,7 +294,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         super.onSaveInstanceState(outState);
     }
-
 
     /**
      * Manipulates the map when it's available.
@@ -371,6 +374,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         0
                 );
                 break;
+            case RECOMMENDED_SCORED:
+                placeCall = placeService.getRecommendByScores(
+                      AuthorizationHelper.getUserProfile().getId(),
+                      1,
+                      0
+                );
+                break;
             default:
                 placeCall = placeService.getPlaceList(
                         categories.entrySet().stream()
@@ -421,6 +431,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     new LatLng(lastKnownLocation.getLatitude(),
                                             lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             sendPlacesRequest();
+                            locationUpdateThread.start();
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.");
@@ -450,7 +461,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
             //Set loop to update location
-            locationUpdateThread.start();
+//            locationUpdateThread.start();
             fusedLocationProviderClient.requestLocationUpdates(
                     locationRequest,
                     locationCallback,
