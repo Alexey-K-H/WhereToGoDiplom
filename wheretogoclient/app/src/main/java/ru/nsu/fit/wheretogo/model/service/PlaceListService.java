@@ -27,7 +27,7 @@ public interface PlaceListService {
             @Query("page") int page
     );
 
-    @GET("/place/recommend/visited")
+    @GET("/place/recommend/stay_points")
     Call<PlaceList> getRecommendByVisited(
             @Query("userId") Long userId,
             @Query("per_page") int per_page,
@@ -41,4 +41,9 @@ public interface PlaceListService {
             @Query("page") int page
     );
 
+    @GET("/place/recommend/collaborative_filter")
+    Call<PlaceList> getRecommendByUsers(
+            @Query("per_page") int per_page,
+            @Query("page") int page
+    );
 }

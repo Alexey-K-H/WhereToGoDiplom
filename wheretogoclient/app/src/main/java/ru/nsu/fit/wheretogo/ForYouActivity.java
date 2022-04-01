@@ -33,6 +33,7 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
         recommendByVisitedBtn.setOnClickListener(this::openVisitedRecommender);
         recommendByScoredBtn.setOnClickListener(this::openScoredRecommender);
+        recommendByOthersBtn.setOnClickListener(this::openUsersRecommender);
     }
 
     @Override
@@ -64,7 +65,9 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openUsersRecommender(View view){
-
+        finish();
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
+        startActivity(intent);
     }
-
 }

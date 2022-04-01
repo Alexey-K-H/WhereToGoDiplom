@@ -381,6 +381,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                       0
                 );
                 break;
+            case RECOMMENDED_USERS:
+                placeCall = placeService.getRecommendByUsers(
+                        1,
+                        0
+                );
+                break;
             default:
                 placeCall = placeService.getPlaceList(
                         categories.entrySet().stream()
