@@ -282,7 +282,7 @@ public class PlaceController {
                 HttpStatus.OK);
     }
 
-    //Запрос на получение рекомедайи на основе личных оценок пользователя
+    //Запрос на получение рекомедаций на основе личных оценок пользователя
     //3-я (заключительная) часть контент-ориентированной рекомендательной системы
     @GetMapping("/recommend/content_based")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getContentBasedRecommendations(
@@ -296,5 +296,21 @@ public class PlaceController {
                         page,
                         pageSize),
                 HttpStatus.OK);
+    }
+
+    //Запрос на получение рекомендаций на основе предпочтений других пользователей
+    //(Вторая рекомендательная система)
+    @GetMapping("/recommend/collaborative_filter")
+    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getCollaborativeFilteringRecommendations(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+    ){
+        return new ResponseEntity<>(
+                service.getCollaborativeRecommendations(
+                        page,
+                        pageSize
+                ),
+                HttpStatus.OK
+        );
     }
 }

@@ -11,13 +11,17 @@ import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.ItemVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
+import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOne;
 import ru.nsu.fit.wheretogo.repository.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
+import ru.nsu.fit.wheretogo.repository.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
+import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 import ru.nsu.fit.wheretogo.utils.SortDirection;
 
 import javax.persistence.EntityManager;
@@ -36,9 +40,12 @@ import static java.util.stream.Collectors.toList;
 public class PlaceService {
     @PersistenceUnit
     private EntityManagerFactory entityManagerFactory;////EntityManager это интерфейс, который описывает API для всех основных операций над Enitity, получение данных и других сущностей JPA. По сути главный API для работы с JPA
+
+    //набор репозиториев для работы с местами
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ScoreRepository scoreRepository;
 
     @Transactional
     public void savePlace(PlaceDescriptionDTO place) {
@@ -311,6 +318,49 @@ public class PlaceService {
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(userId, pageRequest);
 
         List<PlaceBriefDTO> recommendations = CBFRecommender.getRecommendations(categoryList, userVector, notVisitedPlacesPage);
+
+        return new PagedListDTO<PlaceBriefDTO>()
+                .setList(recommendations)
+                .setPageNum(page)
+                .setTotalPages(notVisitedPlacesPage.getTotalPages());
+    }
+
+    @Transactional
+    public PagedListDTO<PlaceBriefDTO> getCollaborativeRecommendations(
+            int page,
+            int size
+    ){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        User user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
+
+        //Берем список всех мест, которые пользователь не посетил
+        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
+        List<Place> placeList = notVisitedPlacesPage.stream().toList();
+
+        //Входные данные: пользователи и набор их оценок
+        Map<User, HashMap<Place, Double>> data = new HashMap<>();
+
+        //Берем из БД все оценки, которые можно найти
+        List<Score> scoreList = scoreRepository.findAll();
+
+        //Заполняем входные данные для рекомендательной системы
+        for(Score score : scoreList){
+            if(data.containsKey(score.getUser())){
+                if(!data.get(score.getUser()).containsKey(score.getPlace())){
+                    data.get(score.getUser()).put(score.getPlace(), (double)score.getScore());
+                }
+            }else {
+                HashMap<Place, Double>  userRating = new HashMap<>();
+                userRating.put(score.getPlace(), (double)score.getScore());
+                data.put(score.getUser(), userRating);
+            }
+        }
+
+        //Запуск алгоритма составления предсказаний
+        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
+
+        //Предсказания конкретного пользователя
+        List<PlaceBriefDTO> recommendations = (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList();
 
         return new PagedListDTO<PlaceBriefDTO>()
                 .setList(recommendations)
