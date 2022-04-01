@@ -6,11 +6,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.nsu.fit.wheretogo.map.MapsActivity;
+import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
+import ru.nsu.fit.wheretogo.model.service.ScoreService;
+import ru.nsu.fit.wheretogo.model.service.StayPointService;
+import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
 
 public class ForYouActivity extends AppCompatActivity {
@@ -30,10 +38,51 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
         recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
+        //Выполняем проврку наличия в базе данных информации об оценках и stay-point-ах
+        Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
+        checkStayPoints.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if(response.code() == 200 && response.body() != null){
+                    if(response.body()){
+                        System.out.println("true stay points");
+                        recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
+                    }else {
+                        blockRecommendButton(recommendByVisitedBtn);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+            }
+        });
+
+
+        Call<Boolean> checkScores = ServiceGenerator.createService(ScoreService.class).isUserHasScores(AuthorizationHelper.getUserProfile().getId());
+        checkScores.enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if(response.code() == 200 && response.body() != null){
+                    if(response.body()){
+                        System.out.println("true scores");
+                        recommendByScoredBtn.setOnClickListener(ForYouActivity.this::openScoredRecommender);
+                        recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
+                    }else {
+                        blockRecommendButton(recommendByOthersBtn);
+                        blockRecommendButton(recommendByScoredBtn);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+            }
+        });
+
         recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
-        recommendByVisitedBtn.setOnClickListener(this::openVisitedRecommender);
-        recommendByScoredBtn.setOnClickListener(this::openScoredRecommender);
-        recommendByOthersBtn.setOnClickListener(this::openUsersRecommender);
     }
 
     @Override
@@ -70,4 +119,11 @@ public class ForYouActivity extends AppCompatActivity {
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
         startActivity(intent);
     }
+
+    //Блокирует кнопку вызова рекомендации в случае, если не хватает данных
+    private void blockRecommendButton(ImageButton imageButton){
+        imageButton.setClickable(false);
+        imageButton.setImageResource(R.drawable.not_available_recommend);
+    }
+
 }

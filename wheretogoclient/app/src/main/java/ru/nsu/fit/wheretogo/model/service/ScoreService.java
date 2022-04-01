@@ -19,4 +19,8 @@ public interface ScoreService {
             @Query("score") Integer value
     );
 
+    @GET("/score/exist_any/{user_id}")
+    Call<Boolean> isUserHasScores(
+            @Path("user_id") Long userId
+    );
 }
