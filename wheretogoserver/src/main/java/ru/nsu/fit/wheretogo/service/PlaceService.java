@@ -221,10 +221,7 @@ public class PlaceService {
         int totalPages = 0;
 
         if(visitedPlaces.isEmpty()){
-            //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
-            //функции поиска ближайших мест к этим местам
             for(StayPointDTO stayPoint : stayPoints){
-
                 //Отправляем запрос на поиск ближайших мест к данному stay-point-у
                 Page<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
                         stayPoint.getLatitude(),
@@ -250,6 +247,8 @@ public class PlaceService {
                 recommendations = recommendations.stream().distinct().collect(toList());
             }
         }else {
+            //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
+            //функции поиска ближайших мест к этим местам
             List<Long> isolatorsVisited = new ArrayList<>();
             for(PlaceBriefDTO place : visitedPlaces){
                 isolatorsVisited.add(place.getId());

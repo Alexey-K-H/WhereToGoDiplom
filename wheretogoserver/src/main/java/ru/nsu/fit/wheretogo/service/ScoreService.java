@@ -83,4 +83,9 @@ public class ScoreService {
                 .setPageNum(page)
                 .setTotalPages(scores.getTotalPages());
     }
+
+    @Transactional(readOnly = true)
+    public boolean ifUserHasScores(Long userId){
+        return scoreRepository.existsByUserId(userId);
+    }
 }

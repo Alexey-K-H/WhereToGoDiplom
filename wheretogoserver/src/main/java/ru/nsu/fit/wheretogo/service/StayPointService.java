@@ -101,4 +101,9 @@ public class StayPointService {
         ).toList();
     }
 
+    @Transactional(readOnly = true)
+    public boolean ifUserHasStayPoints(){
+        return stayPointRepository.existsByUserId(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId());
+    }
+
 }

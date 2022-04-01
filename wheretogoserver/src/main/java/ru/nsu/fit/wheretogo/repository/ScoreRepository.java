@@ -3,16 +3,14 @@ package ru.nsu.fit.wheretogo.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.score.Score;
-import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.entity.score.ScoreId;
 
 public interface ScoreRepository extends JpaRepository<Score, ScoreId> {
     //Получить все оценки конкретного пользователя
     public Page<Score> findByUserId(Long author, Pageable pageable);
+
+    public boolean existsByUserId(Long userId);
 
     //Получить все оценки конкретного места
     public Page<Score> findByPlaceId(Long place, Pageable pageable);

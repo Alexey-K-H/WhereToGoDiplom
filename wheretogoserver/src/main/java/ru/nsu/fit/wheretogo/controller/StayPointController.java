@@ -40,4 +40,9 @@ public class StayPointController {
     public ResponseEntity<List<StayPointDTO>> getByUser(){
         return new ResponseEntity<>(stayPointService.getByUser(), HttpStatus.OK);
     }
+
+    @GetMapping("/exist_any")
+    public ResponseEntity<Boolean> isUserHasStayPoints(){
+        return new ResponseEntity<>(stayPointService.ifUserHasStayPoints(), HttpStatus.OK);
+    }
 }

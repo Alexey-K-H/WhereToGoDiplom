@@ -27,4 +27,6 @@ public interface StayPointRepository extends JpaRepository<StayPoint, Integer> {
     public void setNewPointTimeStamp(
             @Param("_new_time") Instant instant
     );
+
+    public boolean existsByUserId(Long userId);
 }

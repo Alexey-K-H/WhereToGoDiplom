@@ -61,4 +61,10 @@ public class ScoreController {
         }
     }
 
+    @GetMapping("/exist_any/{user_id}")
+    public ResponseEntity<Boolean> isUserHasScores(
+            @PathVariable(name = "user_id") Long userId
+    ){
+        return new ResponseEntity<>(scoreService.ifUserHasScores(userId), HttpStatus.OK);
+    }
 }
