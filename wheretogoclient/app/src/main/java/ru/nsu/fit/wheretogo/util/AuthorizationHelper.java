@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.User;
 import ru.nsu.fit.wheretogo.model.service.UserService;

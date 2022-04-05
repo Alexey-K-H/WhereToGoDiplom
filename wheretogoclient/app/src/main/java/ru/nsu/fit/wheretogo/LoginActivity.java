@@ -1,16 +1,23 @@
 package ru.nsu.fit.wheretogo;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.time.Instant;
+import java.util.Date;
+
 import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText loginEmailText;
@@ -23,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
         loginEmailText = findViewById(R.id.loginEmailText);
         loginPasswordText = findViewById(R.id.loginPasswordText);
     }
-
     public void login(View view) {
         String email = loginEmailText.getText().toString();
         String password = loginPasswordText.getText().toString();
@@ -38,7 +44,10 @@ public class LoginActivity extends AppCompatActivity {
         AuthorizationHelper.login(
                 email,
                 password,
-                successResponse -> openMap(),
+                successResponse -> {
+                    saveAuthData(AuthorizationHelper.getEmail(), AuthorizationHelper.getPassword());
+                    openMap();
+                },
                 failResponse -> showNotification(getString(R.string.wrongCredentialsMsg)),
                 () -> showNotification(getString(R.string.unexpectedErrorMsg))
         );
@@ -52,5 +61,18 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showNotification(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    }
+
+    private void saveAuthData(String email, String password){
+//        SharedPreferences sharedPreferences = getSharedPreferences("AUTH_DATA", MODE_PRIVATE);
+
+        SharedPreferences sharedPreferences = new ObscuredSharedPreferences(
+                this, this.getSharedPreferences("AUTH_DATA", MODE_PRIVATE)
+        );
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.apply();
     }
 }

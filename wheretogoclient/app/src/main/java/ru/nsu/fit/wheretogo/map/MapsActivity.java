@@ -212,7 +212,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
                     //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
                     if(distance <= 200.00){
-                        System.out.println("inside 200 meters area");
+//                        System.out.println("inside 200 meters area");
                         timeCounter += 2;
                     }
                     else {
