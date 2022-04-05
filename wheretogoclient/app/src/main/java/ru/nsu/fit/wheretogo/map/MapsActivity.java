@@ -79,6 +79,7 @@ import ru.nsu.fit.wheretogo.util.PictureLoader;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final int HALF_OUR_SEC = 1800;
 
     private Map<Integer, CategoryNameChosen> categories;
 
@@ -224,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lastKnownLocation = locationResult.getLastLocation();
 
                     //Если счетчик переполнился, то мы нашли stay-point
-                    if(timeCounter == 10){
+                    if(timeCounter == HALF_OUR_SEC){
 //                        System.out.println("New stay-point candidate!");
                         timeCounter = 0;
 
