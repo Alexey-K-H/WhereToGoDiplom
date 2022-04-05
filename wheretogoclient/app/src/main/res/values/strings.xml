@@ -26,6 +26,7 @@
     <string name="usernameAlreadyRegisteredMsg">Пользователь с таким именем уже существует</string>
     <string name="emailAlreadyRegisteredMsg">Пользователь с такой почтой уже существует</string>
     <string name="wrongCredentialsMsg">Неверная почта или пароль</string>
+    <string name="authErrorLoginAgain">Ошибка авторизации. Войдите в систему заново.</string>
     <string name="wrongEmailFormatMsg">Неверный формат адреса электронной почты</string>
     <string name="emptyEmailMsg">Введите адрес электронной почты</string>
     <string name="emptyUsernameMsg">Введите имя пользователя</string>
