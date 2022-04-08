@@ -19,10 +19,10 @@ public interface UserService {
     Call<User> setUsername(@Query("username") String username);
 
     @POST("/user/password")
-    Call<Object> setPassword(@Query("password") String password);
+    Call<Void> setPassword(@Query("password") String password);
 
     @POST("/user/logout")
-    Call<Object> logout();
+    Call<Void> logout();
 
     @GET("/user")
     Call<User> getCurrentUser();

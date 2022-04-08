@@ -1,14 +1,16 @@
 package ru.nsu.fit.wheretogo.map;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.HandlerThread;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,15 +32,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -69,10 +69,10 @@ import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
 import ru.nsu.fit.wheretogo.model.service.CategoryService;
+import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
-import ru.nsu.fit.wheretogo.model.service.StayPointService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
@@ -86,16 +86,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
-    private final HandlerThread locationUpdateThread = new HandlerThread("RequestLocation");
-
-    //Заглшуки для фиксирования stay-point-ов
-    private long timeCounter = 0;
+//    private LocationRequest locationRequest;
+//    private LocationCallback locationCallback;
+//    private final HandlerThread locationUpdateThread = new HandlerThread("RequestLocation");
+//
+//    //Заглшуки для фиксирования stay-point-ов
+//    private long timeCounter = 0;
 
     //Default location (Novosibirsk Rechnoy Vokzal)
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
-    private static final int DEFAULT_ZOOM = 15;
+    private static final int DEFAULT_ZOOM = 13;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
@@ -126,7 +126,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //map show mode
     private ShowMapMode showMapMode;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,72 +194,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        //Configure updates of location
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(2 * 1000);//2 seconds
-
-        locationCallback = new LocationCallback() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                //Получаем текущее метосположение пользователя
-                if (locationResult != null) {
-                    //Сравниваем его с предыдущим местоположением
-                    if(lastKnownLocation == null){
-                        lastKnownLocation = locationResult.getLastLocation();
-                    }
-                    double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
-                    //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
-                    if(distance <= 200.00){
+//        //Configure updates of location
+//        locationRequest = LocationRequest.create();
+//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+//        locationRequest.setInterval(2 * 1000);//2 seconds
+//
+//        locationCallback = new LocationCallback() {
+//            @RequiresApi(api = Build.VERSION_CODES.O)
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                //Получаем текущее метосположение пользователя
+//                if (locationResult != null) {
+//                    //Сравниваем его с предыдущим местоположением
+//                    if(lastKnownLocation == null){
+//                        lastKnownLocation = locationResult.getLastLocation();
+//                    }
+//                    double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
+//                    //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
+//                    if(distance <= 200.00){
 //                        System.out.println("inside 200 meters area");
-                        timeCounter += 2;
-                    }
-                    else {
-                        //Сбрасываем счетчик
-                        timeCounter = 0;
-                    }
-
-                    //Обновляем местоположение
-                    lastKnownLocation = locationResult.getLastLocation();
-
-                    //Если счетчик переполнился, то мы нашли stay-point
-                    if(timeCounter == HALF_OUR_SEC){
-//                        System.out.println("New stay-point candidate!");
-                        timeCounter = 0;
-
-                        //Добавляем его в базу данных
-                        Call<String> call = ServiceGenerator.createService(StayPointService.class)
-                                .addStayPoint(
-                                        lastKnownLocation.getLatitude(),
-                                        lastKnownLocation.getLongitude());
-
-                        call.enqueue(new Callback<String>() {
-                            @Override
-                            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-//                                System.out.println("Add new stay-point");
-                            }
-
-                            @Override
-                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
-                            }
-                        });
-
-                    }
-
-//                    System.out.println("NEW LOCATION:("
-//                            + lastKnownLocation.getLatitude() + ","
-//                            + lastKnownLocation.getLongitude() + ")");
-
-//                    map.moveCamera(CameraUpdateFactory.newLatLng(
-//                            new LatLng(lastKnownLocation.getLatitude(),
-//                                    lastKnownLocation.getLongitude())));
-
-
-                }
-            }
-        };
+//                        timeCounter += 2;
+//                    }
+//                    else {
+//                        //Сбрасываем счетчик
+//                        timeCounter = 0;
+//                    }
+//
+//                    //Обновляем местоположение
+//                    lastKnownLocation = locationResult.getLastLocation();
+//
+//                    //Если счетчик переполнился, то мы нашли stay-point
+//                    if(timeCounter == HALF_OUR_SEC){
+////                        System.out.println("New stay-point candidate!");
+//                        timeCounter = 0;
+//
+//                        //Добавляем его в базу данных
+//                        Call<String> call = ServiceGenerator.createService(StayPointService.class)
+//                                .addStayPoint(
+//                                        lastKnownLocation.getLatitude(),
+//                                        lastKnownLocation.getLongitude());
+//
+//                        call.enqueue(new Callback<String>() {
+//                            @Override
+//                            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+////                                System.out.println("Add new stay-point");
+//                            }
+//
+//                            @Override
+//                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+//
+//                            }
+//                        });
+//
+//                    }
+//
+////                    System.out.println("NEW LOCATION:("
+////                            + lastKnownLocation.getLatitude() + ","
+////                            + lastKnownLocation.getLongitude() + ")");
+//
+////                    map.moveCamera(CameraUpdateFactory.newLatLng(
+////                            new LatLng(lastKnownLocation.getLatitude(),
+////                                    lastKnownLocation.getLongitude())));
+//
+//
+//                }
+//            }
+//        };
 
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -281,6 +280,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         favoritesButton.setOnClickListener(this::openFavourites);
         visitedButton.setOnClickListener(this::openVisited);
         filters.setOnClickListener(this::openFilters);
+
+        if(showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST){
+            filters.setEnabled(false);
+        }
     }
 
 
@@ -300,11 +303,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * Manipulates the map when it's available.
      * This callback is triggered when the map is ready to be used.
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         this.map = map;
+
+        try{
+            this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(), R.raw.map_without_labels_style));
+            Log.d(TAG, "Load configuration file successfully");
+        }catch (Exception e){
+            Log.e(TAG, "Cannot load JSON file to configure map");
+        }
 
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
@@ -345,7 +354,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Отправляет запрос на получение мест,
     // там же происходит вызов отображения маркеров при получении ответа
     //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат(решили не использовать при открытии экрана)
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void sendPlacesRequest() {
         PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
         if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
@@ -416,11 +424,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
-
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void getDeviceLocation() {
         /*
          * Get the best and most recent location of the device, which may be null in rare
@@ -438,7 +444,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     new LatLng(lastKnownLocation.getLatitude(),
                                             lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
                             sendPlacesRequest();
-                            locationUpdateThread.start();
+//                            locationUpdateThread.start();
+
+//                            //TODO:решить, должен ли сервис работать постоянно на фоне
+//                            if(!isServiceRunning()){
+//                                System.out.println("Run Background service");
+//                                Intent serviceIntent = new Intent(this, LocationTrackerService.class);
+////                                startForegroundService(serviceIntent);
+//                                startService(serviceIntent);
+//                            }
+
+
                         }
                     } else {
                         Log.d(TAG, "Current location is null. Using defaults.");
@@ -469,10 +485,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             locationPermissionGranted = true;
             //Set loop to update location
 //            locationUpdateThread.start();
-            fusedLocationProviderClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    locationUpdateThread.getLooper());
+//            fusedLocationProviderClient.requestLocationUpdates(
+//                    locationRequest,
+//                    locationCallback,
+//                    locationUpdateThread.getLooper());
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -737,13 +753,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void openRecommenders(View view){
-        locationUpdateThread.quit();
+//        locationUpdateThread.quit();
         finish();
         Intent intent = new Intent(this, ForYouActivity.class);
         startActivity(intent);
     }
 
     private void openUserPrefs(View view){
+        finish();
         Intent intent = new Intent(this, AccountActivity.class);
         startActivity(intent);
     }
@@ -874,7 +891,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public void openFilters(View view) {
         filtersLayout.removeAllViews();
         getCategories(() -> {
@@ -908,7 +924,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         CategoryService categoryService = ServiceGenerator.createService(CategoryService.class);
         categoryService.getCategories().enqueue(new Callback<List<Category>>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(@NonNull Call<List<Category>> call,
                                    @NonNull Response<List<Category>> response) {
@@ -956,10 +971,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        locationUpdateThread.quit();
+
         if(showMapMode != ShowMapMode.ALL){
-            Intent intent = new Intent(this, ForYouActivity.class);
-            startActivity(intent);
+            //Close recommender map and open recommenders
+            finish();
         }
+    }
+
+    private boolean isServiceRunning(){
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
+            if(LocationTrackerService.class.getName().equals(service.service.getClassName())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    protected void onStop() {
+//        Toast.makeText(this.getApplicationContext(), "Where To Go: Запись истории перемещений включена. Чтобы отключить, закройте свернутое приложение.",
+//                Toast.LENGTH_LONG).show();
+        Log.d(TAG, "Stop activity map");
+        super.onStop();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+//        Intent serviceIntent = new Intent(this, LocationTrackerService.class);
+//        stopService(serviceIntent);
+//        Toast.makeText(this.getApplicationContext(), "Запись истории перемещений отключена. Она включится при следующем запуске.",
+//                Toast.LENGTH_LONG).show();
+        Log.d(TAG, "Destroy activity map");
+        super.onDestroy();
     }
 }

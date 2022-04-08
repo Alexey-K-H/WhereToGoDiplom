@@ -1,13 +1,10 @@
 package ru.nsu.fit.wheretogo;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
@@ -31,7 +28,7 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
-        registerNameText = findViewById(R.id.registerNameText);
+        registerNameText = findViewById(R.id.curr_pwd);
         registerEmailText = findViewById(R.id.registerEmailText);
         registerPasswordText = findViewById(R.id.registerPasswordText);
     }

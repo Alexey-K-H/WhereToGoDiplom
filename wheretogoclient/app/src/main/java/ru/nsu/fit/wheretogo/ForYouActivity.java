@@ -3,6 +3,7 @@ package ru.nsu.fit.wheretogo;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -22,6 +23,7 @@ import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
 
 public class ForYouActivity extends AppCompatActivity {
+    private static final String TAG = ForYouActivity.class.getSimpleName();
 
     ImageButton recommendByVisitedBtn;
     ImageButton recommendByScoredBtn;
@@ -45,7 +47,7 @@ public class ForYouActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if(response.code() == 200 && response.body() != null){
                     if(response.body()){
-                        System.out.println("true stay points");
+                        Log.d(TAG, "Find some stay-points");
                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
                     }else {
                         blockRecommendButton(recommendByVisitedBtn);
@@ -66,7 +68,7 @@ public class ForYouActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if(response.code() == 200 && response.body() != null){
                     if(response.body()){
-                        System.out.println("true scores");
+                        Log.d(TAG, "Find some scores of user");
                         recommendByScoredBtn.setOnClickListener(ForYouActivity.this::openScoredRecommender);
                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
                     }else {
@@ -87,34 +89,29 @@ public class ForYouActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 
     public void openNearestRecommender(View view){
-        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
         startActivity(intent);
     }
 
     public void openVisitedRecommender(View view){
-        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
         startActivity(intent);
     }
 
     public void openScoredRecommender(View view){
-        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
         startActivity(intent);
     }
 
     public void openUsersRecommender(View view){
-        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
         startActivity(intent);

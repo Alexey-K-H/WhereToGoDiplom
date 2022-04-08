@@ -9,7 +9,7 @@
     tools:context=".RegistrationActivity">
 
     <EditText
-        android:id="@+id/registerNameText"
+        android:id="@+id/curr_pwd"
         android:layout_width="350dp"
         android:layout_height="70dp"
         android:layout_marginStart="30dp"
@@ -96,7 +96,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registerNameText"
+        app:layout_constraintTop_toBottomOf="@+id/curr_pwd"
         tools:ignore="RtlSymmetry" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Where To Go</string>
+    <string name="app_name">WhereToGo</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="option_get_place">Get place</string>
     <string name="default_info_title">Default Location</string>
@@ -45,5 +45,9 @@
     <string name="categoriesHeader">Категории</string>
     <string name="score_text">Ваша оценка</string>
     <string name="visited_recommend_title">Рекомендации на основе посещенных вами мест</string>
+    <string name="location_history_explain">Получите доступ ко всем возможностям приложения, разрешив вести запись ваших перемещений. Это позволит нам сформировать для вас персональные рекомендации мест, где вы можете провести досуг.</string>
+    <string name="old_pwd_str">Старый пароль</string>
+    <string name="new_pwd_str">Новый пароль</string>
+    <string name="username_str">Имя пользователя</string>
 
 </resources>

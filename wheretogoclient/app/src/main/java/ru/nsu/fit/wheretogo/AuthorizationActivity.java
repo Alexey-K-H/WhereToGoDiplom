@@ -70,5 +70,4 @@ public class AuthorizationActivity extends AppCompatActivity {
     private void showNotification(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
-
 }

@@ -3,12 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.241" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/custom_star.xml" value="0.286" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/favour_button.xml" value="0.2165" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/drawable/visited_button.xml" value="0.249" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_account_settings.xml" value="0.2814814814814815" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_authorization.xml" value="0.23645833333333333" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_change_pwd.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_edit_account.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_favourites.xml" value="0.23645833333333333" />
-        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_for_you.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_for_you.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_login.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_main.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_map.xml" value="0.36666666666666664" />
@@ -18,9 +22,12 @@
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_open_screen.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_recommend_visited.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_registration.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_visited.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/activity_visited.xml" value="0.5" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/custom_info_contents.xml" value="0.3489583333333333" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/history_location_manager.xml" value="0.3489583333333333" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/place_info_bottom_sheet.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/layout/single_favourite_item.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Alexey/DIPLOM/DIPLOM/client/WhereToGoDiplom/wheretogoclient/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.241" />
         <entry key="..\:/Users/Alexey/IdeaProjects/wheretogo/frontend/app/src/main/res/layout/activity_maps.xml" value="0.23645833333333333" />
         <entry key="..\:/Users/il_ya/IdeaProjects/wheretogo/frontend/app/src/main/res/layout/activity_login.xml" value="0.20520833333333333" />
         <entry key="..\:/Users/il_ya/IdeaProjects/wheretogo/frontend/app/src/main/res/layout/activity_registration.xml" value="0.20520833333333333" />
