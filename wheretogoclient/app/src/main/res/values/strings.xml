@@ -48,6 +48,6 @@
     <string name="location_history_explain">Получите доступ ко всем возможностям приложения, разрешив вести запись ваших перемещений. Это позволит нам сформировать для вас персональные рекомендации мест, где вы можете провести досуг.</string>
     <string name="old_pwd_str">Старый пароль</string>
     <string name="new_pwd_str">Новый пароль</string>
-    <string name="username_str">Имя пользователя</string>
+    <string name="username_str">Изменить имя пользователя</string>
 
 </resources>

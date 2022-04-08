@@ -7,7 +7,7 @@
     tools:context=".FavouritesActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/name_label"
         android:layout_width="0dp"
         android:layout_height="49dp"
         android:layout_marginStart="16dp"

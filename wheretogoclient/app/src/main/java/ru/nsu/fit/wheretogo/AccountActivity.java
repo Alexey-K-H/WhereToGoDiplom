@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -25,6 +26,7 @@ public class AccountActivity extends AppCompatActivity {
     ImageButton locationHistoryBtn;
     ImageButton logoutBtn;
     ImageButton editProfileBtn;
+    TextView nameLabel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +40,9 @@ public class AccountActivity extends AppCompatActivity {
         locationHistoryBtn.setOnClickListener(this::openLocationHistoryManager);
         editProfileBtn.setOnClickListener(this::openAccountEditor);
         logoutBtn.setOnClickListener(this::logout);
+
+        nameLabel = (TextView) findViewById(R.id.name_label);
+        nameLabel.setText(AuthorizationHelper.getUserProfile().getUsername());
     }
 
     public void openLocationHistoryManager(View view){
