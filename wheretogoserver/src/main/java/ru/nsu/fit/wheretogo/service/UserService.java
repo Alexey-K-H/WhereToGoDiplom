@@ -44,7 +44,7 @@ public class UserService {
         userRepository
                 .findByEmail(SecurityContextHelper.email()).get()
                 .setPassword(passwordEncoder.encode(password));
-        SecurityContextHelper.setNotAuthenticated();
+//        SecurityContextHelper.setNotAuthenticated();
     }
 
     //TODO:Добавили поиск не только сущности но и DTO объекта
