@@ -19,16 +19,16 @@ import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
 import ru.nsu.fit.wheretogo.model.service.StayPointService;
+import ru.nsu.fit.wheretogo.model.service.UserService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
 
 public class ForYouActivity extends AppCompatActivity {
     private static final String TAG = ForYouActivity.class.getSimpleName();
 
-    ImageButton recommendByVisitedBtn;
-    ImageButton recommendByScoredBtn;
-    ImageButton recommendByOthersBtn;
-    ImageButton recommendByGPSBtn;
+    private ImageButton recommendByVisitedBtn;
+    private ImageButton recommendByScoredBtn;
+    private ImageButton recommendByOthersBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,9 +38,9 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
         recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
-        recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
+        ImageButton recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
-        //Выполняем проврку наличия в базе данных информации об оценках и stay-point-ах
+        //Выполняем проврку наличия в базе данных информации об оценках, stay-point-ах, посещенных и избранных
         Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
         checkStayPoints.enqueue(new Callback<Boolean>() {
             @Override
@@ -50,7 +50,26 @@ public class ForYouActivity extends AppCompatActivity {
                         Log.d(TAG, "Find some stay-points");
                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
                     }else {
-                        blockRecommendButton(recommendByVisitedBtn);
+                        Call<Boolean> checkVisited = ServiceGenerator.createService(UserService.class).isUserHasVisited();
+                        checkVisited.enqueue(new Callback<Boolean>() {
+                            @Override
+                            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                                if(response.code() == 200 && response.body() != null){
+                                    if(response.body()){
+                                        Log.d(TAG, "Find some visited places");
+                                        recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
+                                    }
+                                    else {
+                                        blockRecommendButton(recommendByVisitedBtn);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -72,8 +91,26 @@ public class ForYouActivity extends AppCompatActivity {
                         recommendByScoredBtn.setOnClickListener(ForYouActivity.this::openScoredRecommender);
                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
                     }else {
-                        blockRecommendButton(recommendByOthersBtn);
                         blockRecommendButton(recommendByScoredBtn);
+                        Call<Boolean> checkFavourites = ServiceGenerator.createService(UserService.class).isUserHasFavourites();
+                        checkFavourites.enqueue(new Callback<Boolean>() {
+                            @Override
+                            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                                if(response.code() == 200 && response.body() != null){
+                                    if(response.body()){
+                                        Log.d(TAG, "Find some favourites places");
+                                        recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
+                                    }else {
+                                        blockRecommendButton(recommendByOthersBtn);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -89,29 +126,35 @@ public class ForYouActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("show_map_mode", ShowMapMode.ALL.ordinal());
         startActivity(intent);
     }
 
     public void openNearestRecommender(View view){
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
         startActivity(intent);
     }
 
     public void openVisitedRecommender(View view){
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
         startActivity(intent);
     }
 
     public void openScoredRecommender(View view){
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
         startActivity(intent);
     }
 
     public void openUsersRecommender(View view){
+        finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
         startActivity(intent);

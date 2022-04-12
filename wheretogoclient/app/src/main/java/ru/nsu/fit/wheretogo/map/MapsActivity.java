@@ -194,73 +194,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-//        //Configure updates of location
-//        locationRequest = LocationRequest.create();
-//        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//        locationRequest.setInterval(2 * 1000);//2 seconds
-//
-//        locationCallback = new LocationCallback() {
-//            @RequiresApi(api = Build.VERSION_CODES.O)
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                //Получаем текущее метосположение пользователя
-//                if (locationResult != null) {
-//                    //Сравниваем его с предыдущим местоположением
-//                    if(lastKnownLocation == null){
-//                        lastKnownLocation = locationResult.getLastLocation();
-//                    }
-//                    double distance = locationResult.getLastLocation().distanceTo(lastKnownLocation);
-//                    //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
-//                    if(distance <= 200.00){
-//                        System.out.println("inside 200 meters area");
-//                        timeCounter += 2;
-//                    }
-//                    else {
-//                        //Сбрасываем счетчик
-//                        timeCounter = 0;
-//                    }
-//
-//                    //Обновляем местоположение
-//                    lastKnownLocation = locationResult.getLastLocation();
-//
-//                    //Если счетчик переполнился, то мы нашли stay-point
-//                    if(timeCounter == HALF_OUR_SEC){
-////                        System.out.println("New stay-point candidate!");
-//                        timeCounter = 0;
-//
-//                        //Добавляем его в базу данных
-//                        Call<String> call = ServiceGenerator.createService(StayPointService.class)
-//                                .addStayPoint(
-//                                        lastKnownLocation.getLatitude(),
-//                                        lastKnownLocation.getLongitude());
-//
-//                        call.enqueue(new Callback<String>() {
-//                            @Override
-//                            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-////                                System.out.println("Add new stay-point");
-//                            }
-//
-//                            @Override
-//                            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-//
-//                            }
-//                        });
-//
-//                    }
-//
-////                    System.out.println("NEW LOCATION:("
-////                            + lastKnownLocation.getLatitude() + ","
-////                            + lastKnownLocation.getLongitude() + ")");
-//
-////                    map.moveCamera(CameraUpdateFactory.newLatLng(
-////                            new LatLng(lastKnownLocation.getLatitude(),
-////                                    lastKnownLocation.getLongitude())));
-//
-//
-//                }
-//            }
-//        };
-
         // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -283,6 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if(showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST){
             filters.setEnabled(false);
+            filters.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -975,17 +909,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(showMapMode != ShowMapMode.ALL){
             //Close recommender map and open recommenders
             finish();
+            Intent intent = new Intent(this, ForYouActivity.class);
+            startActivity(intent);
         }
-    }
-
-    private boolean isServiceRunning(){
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
-            if(LocationTrackerService.class.getName().equals(service.service.getClassName())){
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

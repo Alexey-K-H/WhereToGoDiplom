@@ -29,4 +29,10 @@ public interface UserService {
 
     @GET("/user/{id}")
     Call<User> getUser(@Path("id") Long id);
+
+    @GET("/user/contain/visited")
+    Call<Boolean> isUserHasVisited();
+
+    @GET("/user/contain/favourites")
+    Call<Boolean> isUserHasFavourites();
 }
