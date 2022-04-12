@@ -10,10 +10,6 @@ import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.service.*;
-import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
-import ru.nsu.fit.wheretogo.service.fetch.PlaceSortBy;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
-import ru.nsu.fit.wheretogo.utils.SortDirection;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -160,26 +156,42 @@ public class PlaceController {
         }
     }
 
+//    @GetMapping("/list")
+//    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> searchPlaces(
+//            @RequestParam(name = "name", defaultValue = "") String name,
+//            @RequestParam(name = "category", required = false) List<Integer> categoryId,
+//            @RequestParam(name = "page", defaultValue = "0") Integer page,
+//            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+//            @RequestParam(name = "sortDirection", defaultValue = "NONE") SortDirection sortDirection,
+//            @RequestParam(name = "sortBy", defaultValue = "NAME") PlaceSortBy sortBy
+//            ) {
+//        PagedListDTO<PlaceBriefDTO> placeList = service.getPlaceList(
+//                new PlaceFetchParameters(
+//                        name,
+//                        categoryId,
+//                        page,
+//                        pageSize,
+//                        sortDirection,
+//                        sortBy
+//                )
+//        );
+//        return new ResponseEntity<>(placeList, HttpStatus.OK);
+//    }
+
     @GetMapping("/list")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> searchPlaces(
-            @RequestParam(name = "name", defaultValue = "") String name,
             @RequestParam(name = "category", required = false) List<Integer> categoryId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(name = "sortDirection", defaultValue = "NONE") SortDirection sortDirection,
-            @RequestParam(name = "sortBy", defaultValue = "NAME") PlaceSortBy sortBy
-            ) {
-        PagedListDTO<PlaceBriefDTO> placeList = service.getPlaceList(
-                new PlaceFetchParameters(
-                        name,
-                        categoryId,
+            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
+    ) {
+
+        String categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
+        return new ResponseEntity<>(
+                service.getPlaces(
+                        categoryIds,
                         page,
-                        pageSize,
-                        sortDirection,
-                        sortBy
-                )
-        );
-        return new ResponseEntity<>(placeList, HttpStatus.OK);
+                        pageSize),
+                HttpStatus.OK);
     }
 
     //Запрос на получение ближаших мест к определнной точке на карте, заданной своими координатами

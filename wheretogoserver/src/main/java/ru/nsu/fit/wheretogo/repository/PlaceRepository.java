@@ -11,6 +11,12 @@ import ru.nsu.fit.wheretogo.entity.Place;
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     boolean existsByNameOrDescriptionOrCoords(String name, String description, Coords coords);
 
+    @Query(value = "call GetPlaces(:_ids); -- #pageable", nativeQuery = true)
+    public Page<Place> getPlaces(
+            @Param("_ids") String categoryIds,
+            Pageable pageable
+    );
+
 //    Процедура поиска ближайших мест к конкретной точке на карте
     @Query(value = "call FindNearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit); -- #pageable",
             nativeQuery = true)
