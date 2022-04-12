@@ -9,12 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
-import ru.nsu.fit.wheretogo.service.PlacePicturesService;
-import ru.nsu.fit.wheretogo.service.PlaceService;
-import ru.nsu.fit.wheretogo.service.ScoreService;
-import ru.nsu.fit.wheretogo.service.UserService;
+import ru.nsu.fit.wheretogo.service.*;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceFetchParameters;
 import ru.nsu.fit.wheretogo.service.fetch.PlaceSortBy;
+import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 import ru.nsu.fit.wheretogo.utils.SortDirection;
 
 import javax.validation.Valid;
@@ -29,12 +27,8 @@ public class PlaceController {
     private final PlacePicturesService picturesService;
     private final UserService userService;//нужен для работы с посещенными и понравившимися
 
-    //Нужен для работы с получением оценок для рекомендательных пакетов
+    private final StayPointService stayPointService;
     private final ScoreService scoreService;
-
-//    //Построитель рекомендации на основе контента
-//    @Autowired
-//    ContentBasedFilter contentBasedFilter;
 
     @PostMapping
     public ResponseEntity<String> savePlace(@RequestBody @Valid PlaceDescriptionDTO place) {
@@ -188,41 +182,6 @@ public class PlaceController {
         return new ResponseEntity<>(placeList, HttpStatus.OK);
     }
 
-//    //Запрос на получение рекомендаций по принципу контент-ориентированного подхода
-//    @GetMapping("/recommend/content")
-//    public ResponseEntity<List<PlaceBriefDTO>> getContentRecommendations(
-//            @RequestParam(name = "user_id") Long userId
-//    ){
-//        //TODO:описать метод, который возвоаращет список рекомендаовнных мест, которые будут отправлены клиенту
-//        //Получаем все оценки текущего пользователя в виде списка
-//        List<ScoreDTO> scoreDTOList = scoreService.getScoreDtoListByUserId(userId);
-//
-//        //Инициализация спсика мест для рекомендаций
-//        List<PlaceBriefDTO> placeRecommendListCB = null;
-//
-//        //Вызываем метод фильтратора на основе контента
-//        placeRecommendListCB  = contentBasedFilter.recommend(userId);
-//
-//        return new ResponseEntity<>(placeRecommendListCB, HttpStatus.OK);
-//    }
-
-//    //Запрос на получение рекомендаций на основе посещенных мест
-//    @GetMapping("/recommend/visited")
-//    public ResponseEntity<List<PlaceBriefDTO>> getVisitedRecommendations(
-//            @RequestParam(name = "user_id") Long userId
-//    ){
-//        //TODO:описать метод, который будет искать места близкие к тем, которые пользователь посетил
-//
-//
-//        //Иницифализация списка мест для рекомендаций
-//        List<PlaceBriefDTO> placeRecommendListGPS = null;
-//
-//        //Вызываем метод поиска ближайших мест к тем, которые пользователь посетил
-//
-//
-//        return new ResponseEntity<>(placeRecommendListGPS, HttpStatus.OK);
-//    }
-
     //Запрос на получение ближаших мест к определнной точке на карте, заданной своими координатами
     //(1-ая часть контент-ориентированной рекомендательной системы)
     @GetMapping("/nearest/category")
@@ -250,22 +209,6 @@ public class PlaceController {
                 HttpStatus.OK);
     }
 
-//    //Запрос на получение рекомендаций с учетом посещенных мест
-//    //(2-ая часть контент-ориентированной рекомендательной системы)
-//    @GetMapping("/recommend/visited")
-//    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getVisitedRecommendations(
-//            @RequestParam(name = "userId") Long userId,
-//            @RequestParam(name = "page", defaultValue = "0") Integer page,
-//            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-//    ){
-//        return new ResponseEntity<>(
-//                service.getNearestPlacesByVisited(
-//                        userId,
-//                        page,
-//                        pageSize),
-//                HttpStatus.OK);
-//    }
-
     //Запрос на получение рекомендаций с учетом stay-point-ов
     //(2.1-ая часть контент-ориентирвоанной рекомендательной системы)
     @GetMapping("/recommend/stay_points")
@@ -274,12 +217,23 @@ public class PlaceController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
-        return new ResponseEntity<>(
-                service.getNearestPlacesByStayPoints(
-                        userId,
-                        page,
-                        pageSize),
-                HttpStatus.OK);
+        if(stayPointService.ifUserHasStayPoints()){
+            return new ResponseEntity<>(
+                    service.getNearestPlacesByStayPoints(
+                            userId,
+                            page,
+                            pageSize),
+                    HttpStatus.OK);
+        }else {
+            //Запрос на получение рекомендаций с учетом посещенных мест
+            //(2-ая часть контент-ориентированной рекомендательной системы)
+            return new ResponseEntity<>(
+                    service.getNearestPlacesByVisited(
+                            userId,
+                            page,
+                            pageSize),
+                    HttpStatus.OK);
+        }
     }
 
     //Запрос на получение рекомедаций на основе личных оценок пользователя
@@ -305,12 +259,22 @@ public class PlaceController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
-        return new ResponseEntity<>(
-                service.getCollaborativeRecommendations(
-                        page,
-                        pageSize
-                ),
-                HttpStatus.OK
-        );
+        if(scoreService.ifUserHasScores(userService.getCurrentUserDto().getId())){
+            return new ResponseEntity<>(
+                    service.getCollaborativeRecommendationsByScores(
+                            page,
+                            pageSize
+                    ),
+                    HttpStatus.OK
+            );
+        }else{
+            return new ResponseEntity<>(
+                    service.getCollaborativeRecommendationsByFavourites(
+                            page,
+                            pageSize
+                    ),
+                    HttpStatus.OK
+            );
+        }
     }
 }
