@@ -154,9 +154,9 @@ public class LocationTrackerService extends Service {
                 channelId
         );
 
+        //TODO:Если будет время добавить на уведомление кнопку остановки работы сервиса
         builder.setSmallIcon(R.drawable.add_to_visited);
-        builder.setContentTitle("WhereToGo");
-        builder.setContentText("Запущена запись истории местоположений");
+        builder.setContentText("Запущена запись истории ваших перемещений");
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         builder.setContentIntent(pendingIntent);
         builder.setAutoCancel(false);
