@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
                 password,
                 successResponse -> {
                     saveAuthData(AuthorizationHelper.getEmail(), AuthorizationHelper.getPassword());
-                    openMap();
+                    openLocationHistoryAdvice();
                 },
                 failResponse -> showNotification(getString(R.string.wrongCredentialsMsg)),
                 () -> showNotification(getString(R.string.unexpectedErrorMsg))
@@ -56,6 +56,13 @@ public class LoginActivity extends AppCompatActivity {
     private void openMap() {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
+    private void openLocationHistoryAdvice(){
+        finish();
+        Intent intent = new Intent(this, LocationHistoryActivity.class);
+        intent.putExtra("advice", "location_history");
         startActivity(intent);
     }
 

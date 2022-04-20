@@ -111,7 +111,7 @@ public class AccountActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
         intent.setAction(Constants.TRACKER_SERVICE_STOP);
         startService(intent);
-        Toast.makeText(this, "Запись истории перемещений отключена", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Запись истории перемещений отключена", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Запись истории перемещений отключена");
     }
 }

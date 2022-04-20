@@ -57,7 +57,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         password,
                         loginSuccessResponse -> {
                             saveAuthData(AuthorizationHelper.getEmail(), AuthorizationHelper.getPassword());
-                            openMap();
+                            openLocationHistoryAdvice();
                             },
                         loginFailResponse -> showUnexpectedErrorMessage(),
                         this::showUnexpectedErrorMessage
@@ -87,6 +87,13 @@ public class RegistrationActivity extends AppCompatActivity {
     private void openMap() {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
+    private void openLocationHistoryAdvice(){
+        finish();
+        Intent intent = new Intent(this, LocationHistoryActivity.class);
+        intent.putExtra("advice", "location_history");
         startActivity(intent);
     }
 

@@ -2,7 +2,6 @@ package ru.nsu.fit.wheretogo;
 
 import android.Manifest;
 import android.app.ActivityManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.model.service.location_track.Constants;
 import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 
@@ -25,11 +25,32 @@ public class LocationHistoryActivity extends AppCompatActivity {
     private static final String TAG  = LocationHistoryActivity.class.getSimpleName();
     private ImageButton locationTrackerSwitcher;
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
+    private boolean advise = false;
+    private boolean fromNotification = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history_location_manager);
+
+        ImageButton skipBtn = (ImageButton) findViewById(R.id.skip_btn_history);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            String advice = extras.getString("advice");
+            String from = extras.getString("from");
+            if(advice!= null && advice.equals("location_history")){
+                skipBtn.setOnClickListener(this::skip);
+                advise = true;
+            }
+            if(from != null && from.equals("notification")){
+                Log.d(TAG, "get from Notification");
+                fromNotification = true;
+                skipBtn.setVisibility(View.GONE);
+            }
+        }else {
+            skipBtn.setVisibility(View.GONE);
+        }
 
         locationTrackerSwitcher = (ImageButton) findViewById(R.id.location_history_switcher);
 
@@ -74,6 +95,11 @@ public class LocationHistoryActivity extends AppCompatActivity {
                 );
             }else {
                 startLocationTracker();
+                if(advise){
+                    finish();
+                    Intent intent = new Intent(this, MapsActivity.class);
+                    startActivity(intent);
+                }
             }
         }
     }
@@ -106,6 +132,12 @@ public class LocationHistoryActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    public void skip(View view){
+        finish();
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 
 }

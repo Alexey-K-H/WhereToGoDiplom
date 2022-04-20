@@ -1,6 +1,6 @@
 package ru.nsu.fit.wheretogo.model.service.location_track;
 
-import android.app.Notification;
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,18 +9,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Build;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -53,10 +50,9 @@ public class LocationTrackerService extends Service {
                     mLocation = locationResult.getLastLocation();
                 }
                 double distance = locationResult.getLastLocation().distanceTo(mLocation);
-                //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
-                //TODO:Изменить расстояние на то, которое используется при поиске ближаших мест в процедуре на сервисе
-                if(distance <= 200.00){
-                    Log.d(TAG, "Find point inside 200-meters area");
+                //Если расстояние между ними меньше 2000м, то прибавляем к счетчику время
+                if(distance <= 2000.00){
+                    Log.d(TAG, "Find point inside 2 kilometers area");
                     timeCounter += 2;
                 }
                 else {
@@ -143,7 +139,8 @@ public class LocationTrackerService extends Service {
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent resultIntent = new Intent(this, LocationHistoryActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
+        resultIntent.putExtra("from", "notification");
+        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(
                 getApplicationContext(),
                 0,
                 resultIntent,
@@ -154,7 +151,6 @@ public class LocationTrackerService extends Service {
                 channelId
         );
 
-        //TODO:Если будет время добавить на уведомление кнопку остановки работы сервиса
         builder.setSmallIcon(R.drawable.add_to_visited);
         builder.setContentText("Запущена запись истории ваших перемещений");
         builder.setDefaults(NotificationCompat.DEFAULT_ALL);
