@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -86,13 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // The entry point to the Fused Location Provider.
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-//    private LocationRequest locationRequest;
-//    private LocationCallback locationCallback;
-//    private final HandlerThread locationUpdateThread = new HandlerThread("RequestLocation");
-//
-//    //Заглшуки для фиксирования stay-point-ов
-//    private long timeCounter = 0;
-
     //Default location (Novosibirsk Rechnoy Vokzal)
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
     private static final int DEFAULT_ZOOM = 10;
@@ -129,7 +123,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getCategories(null, null);
 
         // Retrieve location and camera position from saved instance state.
@@ -202,13 +195,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Buttons init
         ImageButton recommenderButton = (ImageButton) findViewById(R.id.for_you_btn);
+
+        if(showMapMode != ShowMapMode.ALL){
+            recommenderButton.setImageResource(R.drawable.back_from_rec_map);
+        }
+
         ImageButton favoritesButton = (ImageButton) findViewById(R.id.favorites_btn);
         ImageButton visitedButton = (ImageButton) findViewById(R.id.visited_btn_map);
         ImageButton filters = (ImageButton) findViewById(R.id.filters_btn);
         ImageButton userPrefs = (ImageButton) findViewById(R.id.user_settings_btn);
 
         //Buttons listeners
-        recommenderButton.setOnClickListener(this::openRecommenders);
+        if(showMapMode != ShowMapMode.ALL){
+            recommenderButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onBackPressed();
+                }
+            });
+        }else{
+            recommenderButton.setOnClickListener(this::openRecommenders);
+        }
+
         userPrefs.setOnClickListener(this::openUserPrefs);
         favoritesButton.setOnClickListener(this::openFavourites);
         visitedButton.setOnClickListener(this::openVisited);
@@ -366,18 +374,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
         try {
-            if (locationPermissionGranted) {
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.getResult();
-                        if (lastKnownLocation != null) {
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(lastKnownLocation.getLatitude(),
-                                            lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                            sendPlacesRequest();
+            if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                Log.d(TAG, "GPS unavailable, set default location");
+                map.moveCamera(CameraUpdateFactory
+                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                map.getUiSettings().setMyLocationButtonEnabled(false);
+                sendPlacesRequest();
+            }else {
+                if (locationPermissionGranted) {
+                    Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                    locationResult.addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            lastKnownLocation = task.getResult();
+                            if (lastKnownLocation != null) {
+                                map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(lastKnownLocation.getLatitude(),
+                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                sendPlacesRequest();
 //                            locationUpdateThread.start();
 
 //                            //TODO:решить, должен ли сервис работать постоянно на фоне
@@ -389,15 +406,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //                            }
 
 
+                            }
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            map.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                            map.getUiSettings().setMyLocationButtonEnabled(false);
                         }
-                    } else {
-                        Log.d(TAG, "Current location is null. Using defaults.");
-                        Log.e(TAG, "Exception: %s", task.getException());
-                        map.moveCamera(CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
-                        map.getUiSettings().setMyLocationButtonEnabled(false);
-                    }
-                });
+                    });
+                }else  {
+                    Log.d(TAG, "No gps access, set default location");
+                    map.moveCamera(CameraUpdateFactory
+                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                    map.getUiSettings().setMyLocationButtonEnabled(false);
+                    sendPlacesRequest();
+                }
             }
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage(), e);
@@ -688,7 +712,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void openRecommenders(View view){
 //        locationUpdateThread.quit();
-        finish();
         Intent intent = new Intent(this, ForYouActivity.class);
         startActivity(intent);
     }

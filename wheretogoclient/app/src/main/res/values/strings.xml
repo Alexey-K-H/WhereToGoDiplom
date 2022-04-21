@@ -16,7 +16,7 @@
     <string name="name_str">Имя</string>
     <string name="RegisterButton">Register button</string>
     <string name="wheretogo_nsk">WhereToGo.NSK</string>
-    <string name="title_additional_info">Интеллектуальный гид по Новосибирску</string>
+    <string name="title_additional_info">Интеллектуальный гид\n по Новосибирску</string>
     <string name="default_place_name">Название места</string>
     <string name="back_button">Назад</string>
     <string name="favourite_text">❤ ️Избранное</string>
@@ -49,5 +49,6 @@
     <string name="old_pwd_str">Старый пароль</string>
     <string name="new_pwd_str">Новый пароль</string>
     <string name="username_str">Изменить имя пользователя</string>
+    <string name="location_history_btn_str">История перемещений</string>
 
 </resources>

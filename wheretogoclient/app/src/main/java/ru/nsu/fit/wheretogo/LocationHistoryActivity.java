@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,7 +27,6 @@ public class LocationHistoryActivity extends AppCompatActivity {
     private ImageButton locationTrackerSwitcher;
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
     private boolean advise = false;
-    private boolean fromNotification = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +45,6 @@ public class LocationHistoryActivity extends AppCompatActivity {
             }
             if(from != null && from.equals("notification")){
                 Log.d(TAG, "get from Notification");
-                fromNotification = true;
                 skipBtn.setVisibility(View.GONE);
             }
         }else {
@@ -81,6 +80,8 @@ public class LocationHistoryActivity extends AppCompatActivity {
     }
 
     public void switchLocationTracker(View view){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+
         if(isServiceRunning()){
             stopLocationTracker();
         }
@@ -93,12 +94,17 @@ public class LocationHistoryActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_CODE_LOCATION_PERMISSION
                 );
-            }else {
-                startLocationTracker();
-                if(advise){
-                    finish();
-                    Intent intent = new Intent(this, MapsActivity.class);
-                    startActivity(intent);
+            }
+            else {
+                if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    Toast.makeText(this, "GPS отключен, запись истории невозможна. Включите GPS в настройках устройтсва", Toast.LENGTH_LONG).show();
+                }else{
+                    startLocationTracker();
+                    if(advise){
+                        finish();
+                        Intent intent = new Intent(this, MapsActivity.class);
+                        startActivity(intent);
+                    }
                 }
             }
         }

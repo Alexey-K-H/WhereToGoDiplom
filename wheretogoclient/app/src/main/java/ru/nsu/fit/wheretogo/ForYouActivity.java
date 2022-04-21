@@ -1,7 +1,9 @@
 package ru.nsu.fit.wheretogo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -121,15 +123,13 @@ public class ForYouActivity extends AppCompatActivity {
             }
         });
 
-        recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
-    }
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            blockRecommendButton(recommendByGPSBtn);
+        }else{
+            recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
+        }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-        Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("show_map_mode", ShowMapMode.ALL.ordinal());
-        startActivity(intent);
     }
 
     public void openNearestRecommender(View view){

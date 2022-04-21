@@ -34,8 +34,7 @@ import ru.nsu.fit.wheretogo.model.service.StayPointService;
 public class LocationTrackerService extends Service {
     private static final String TAG = "LocationTracker";
 
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000 * 2;//2 seconds
-    private static final int HALF_OUR_SEC = 1800;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 15 * 60 * 1000;//15 minutes
     private boolean locationPermissionGranted;
 
     private LocationRequest locationRequest;
@@ -50,22 +49,22 @@ public class LocationTrackerService extends Service {
                     mLocation = locationResult.getLastLocation();
                 }
                 double distance = locationResult.getLastLocation().distanceTo(mLocation);
-                //Если расстояние между ними меньше 2000м, то прибавляем к счетчику время
-                if(distance <= 2000.00){
+                //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
+                if(distance <= 200.00){
                     Log.d(TAG, "Find point inside 2 kilometers area");
-                    timeCounter += 2;
+                    countSameFindings += 1;
                 }
                 else {
                     //Сбрасываем счетчик
-                    timeCounter = 0;
+                    countSameFindings = 0;
                     //Обновляем местоположение
                     mLocation = locationResult.getLastLocation();
                 }
 
-                //Если счетчик переполнился, то мы нашли stay-point
-                if(timeCounter == HALF_OUR_SEC){
+                //Если счетчик дважды увеличился в промежутке 15 мин, то мы нашли stay-point
+                if(countSameFindings == 2){
                     Log.d(TAG, "Find new stay-point candidate");
-                    timeCounter = 0;
+                    countSameFindings = 0;
 
                     //Добавляем его в базу данных
                     Call<String> call = ServiceGenerator.createService(StayPointService.class).addStayPoint(
@@ -89,8 +88,8 @@ public class LocationTrackerService extends Service {
         }
     };
 
-    //Заглшуки для фиксирования stay-point-ов
-    private long timeCounter = 0;
+    //Заглшука для фиксирования stay-point-ов
+    private long countSameFindings = 0;
 
     private Location mLocation;
 
