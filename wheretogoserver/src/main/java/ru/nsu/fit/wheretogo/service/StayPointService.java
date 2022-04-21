@@ -37,7 +37,7 @@ public class StayPointService {
         //Берем список всех stay-point-ов пользователя
         List<StayPoint> userStayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints();
         boolean exist = false;
-        double eps = 0.001;//нужно для сравнения вещественных чисел
+        double eps = 0.000001;//нужно для сравнения вещественных чисел
 
         for(StayPoint userStayPoint : userStayPoints){
             if (Math.abs(userStayPoint.getLatitude() - lat) < eps && Math.abs(userStayPoint.getLongitude() - lon) < eps) {
