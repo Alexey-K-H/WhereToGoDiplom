@@ -61,6 +61,10 @@ public class User {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<StayPoint> stayPoints;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<UserCoefficient> userVector;
+
     public User(String email, String password, String username, Instant createdAt) {
         this.email = email;
         this.password = password;

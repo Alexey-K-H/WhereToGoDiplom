@@ -6,11 +6,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.*;
+import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
+import ru.nsu.fit.wheretogo.entity.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.entity.score.ScoreId;
+import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.ScoreRepository;
+import ru.nsu.fit.wheretogo.repository.UserCoeffRepository;
+import ru.nsu.fit.wheretogo.repository.UserRepository;
+import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import java.util.List;
 
@@ -22,13 +28,51 @@ public class ScoreService {
     @Autowired
     private ScoreRepository scoreRepository;
 
+    @Autowired
+    private UserCoeffRepository userCoeffRepository;
+
+    @Autowired
+    private PlaceRepository placeRepository;
+
     @Transactional
     public ScoreDTO createScore(Long userId, Long placeId, Integer value) {
+        int oldValue = 0;
+        if(scoreRepository.existsByUserIdAndPlaceId(userId, placeId)){
+            Score currScore = scoreRepository.findByUserIdAndPlaceId(userId, placeId);
+            oldValue = currScore.getScore();
+        }
+
         Score score = scoreRepository.save(new Score()
                 .setId(new ScoreId().setUser(userId).setPlace(placeId))
                 .setUser(new User().setId(userId))
                 .setPlace(new Place().setId(placeId))
                 .setScore(value));
+
+        //Берем категории места
+        List<Category> placeCategories = placeRepository.findById(placeId).orElseThrow().getCategories();
+
+        //Проходим по всем катгориям и смотрим где обновить или создать коэффициенты
+        for(Category category : placeCategories){
+            if(userCoeffRepository.existsByCategory(category)){
+                //Обновляем коэффицент
+                if(scoreRepository.existsByUserIdAndPlaceId(userId, placeId)){
+                    double newValue = Math.abs(oldValue - value);
+                    userCoeffRepository.updateCoeff(newValue, category.getId(), userId);
+                }else{
+                    userCoeffRepository.updateCoeff(value.doubleValue(), category.getId(), userId);
+                }
+
+            }else {
+                //Создаем новый коэффициент
+                userCoeffRepository.save(new UserCoefficient()
+                        .setUser(new User().setId(userId))
+                        .setCategory(category)
+                        .setPlacesCount(1L)
+                        .setCoeff(value.doubleValue()));
+            }
+        }
+
+
         return ScoreDTO.getFromEntity(score);
     }
 

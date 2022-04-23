@@ -15,6 +15,8 @@ public interface ScoreRepository extends JpaRepository<Score, ScoreId> {
     //Получить все оценки конкретного места
     public Page<Score> findByPlaceId(Long place, Pageable pageable);
 
+    public boolean existsByUserIdAndPlaceId(Long userId, Long placeId);
+
     //Получить оценку пользователя конкретного места
 //    @Query("select s from Score s where s.author = :user_id and s.place = :place_id")
 //    public Score findUserPlaceScore(@Param("user_id") Long userId, @Param("place_id") Long placeId);

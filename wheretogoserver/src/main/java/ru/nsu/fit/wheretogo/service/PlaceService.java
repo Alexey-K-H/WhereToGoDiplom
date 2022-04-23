@@ -12,14 +12,12 @@ import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
+import ru.nsu.fit.wheretogo.entity.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOne;
-import ru.nsu.fit.wheretogo.repository.CategoryRepository;
-import ru.nsu.fit.wheretogo.repository.PlaceRepository;
-import ru.nsu.fit.wheretogo.repository.ScoreRepository;
-import ru.nsu.fit.wheretogo.repository.UserRepository;
+import ru.nsu.fit.wheretogo.repository.*;
 import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import javax.persistence.EntityManagerFactory;
@@ -42,6 +40,8 @@ public class PlaceService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ScoreRepository scoreRepository;
+
+    private final UserCoeffRepository userCoeffRepository;
 
     @Transactional
     public void savePlace(PlaceDescriptionDTO place) {
@@ -300,14 +300,13 @@ public class PlaceService {
             int size
     ){
         PageRequest pageRequest = PageRequest.of(page, size);
-        //Находим пользователя в базе данных
-        User user = userRepository.findById(userId).orElseThrow();
 
         //Берем список категорий мест в базе данных
         List<Category> categoryList = categoryRepository.findAll();
 
         //Строим вектор пользователя
-        Map<Category, Double> userVector = UserVectorBuilder.getUserVector(user, categoryList);
+        List<UserCoefficient> userCoefficients = userCoeffRepository.getAllByUserId(userId);
+        Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficients, categoryList);
 
         //Берем список мест, не посещенных данным пользователем
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(userId, pageRequest);
