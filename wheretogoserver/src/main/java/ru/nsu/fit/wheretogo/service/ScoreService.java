@@ -15,8 +15,6 @@ import ru.nsu.fit.wheretogo.entity.score.ScoreId;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.UserCoeffRepository;
-import ru.nsu.fit.wheretogo.repository.UserRepository;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import java.util.List;
 
@@ -55,11 +53,11 @@ public class ScoreService {
         for(Category category : placeCategories){
             if(userCoeffRepository.existsByCategory(category)){
                 //Обновляем коэффицент
-                if(scoreRepository.existsByUserIdAndPlaceId(userId, placeId)){
+                if(oldValue != 0){
                     double newValue = Math.abs(oldValue - value);
-                    userCoeffRepository.updateCoeff(newValue, category.getId(), userId);
+                    userCoeffRepository.updateCoeffWitOutInc(newValue, category.getId(), userId);
                 }else{
-                    userCoeffRepository.updateCoeff(value.doubleValue(), category.getId(), userId);
+                    userCoeffRepository.updateCoeffWithInc(value.doubleValue(), category.getId(), userId);
                 }
 
             }else {

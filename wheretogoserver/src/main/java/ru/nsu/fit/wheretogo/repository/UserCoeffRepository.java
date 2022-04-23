@@ -17,11 +17,21 @@ public interface UserCoeffRepository extends JpaRepository<UserCoefficient, Long
     //Существует ли коэффициент для этой ктаегории
     boolean existsByCategory(Category category);
 
-    //Обновление коэффициента
+    //Обновление коэффициента с добавлением нового места
     @Modifying
     @Query(value = "update user_coeff u set u.coeff = ((u.coeff) + (:_new_score/u.count_places))*(u.count_places/(u.count_places+1)), u.count_places = u.count_places + 1 " +
             "where u.category_id = :_category_id and u.user_id = :_user_id", nativeQuery = true)
-    void updateCoeff(
+    void updateCoeffWithInc(
+            @Param("_new_score") Double newScore,
+            @Param("_category_id") Integer categoryId,
+            @Param("_user_id") Long userId
+    );
+
+    //Обновление коэффициента без добавления нового места
+    @Modifying
+    @Query(value = "update user_coeff u set u.coeff = ((u.coeff) + (:_new_score/u.count_places))*(u.count_places/(u.count_places+1))" +
+            "where u.category_id = :_category_id and u.user_id = :_user_id", nativeQuery = true)
+    void updateCoeffWitOutInc(
             @Param("_new_score") Double newScore,
             @Param("_category_id") Integer categoryId,
             @Param("_user_id") Long userId
