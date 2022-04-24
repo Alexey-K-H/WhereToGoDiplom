@@ -457,12 +457,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             locationPermissionGranted = true;
-            //Set loop to update location
-//            locationUpdateThread.start();
-//            fusedLocationProviderClient.requestLocationUpdates(
-//                    locationRequest,
-//                    locationCallback,
-//                    locationUpdateThread.getLooper());
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -541,7 +535,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + place.getLatitude().toString()
                         + place.getLongitude().toString());
                 try {
-                    // асинхронная загрузка иконок
                     PictureLoader.loadPlaceThumbnail(this, place, placeNum,
                             clusterMarkers, clusterManager);
 
