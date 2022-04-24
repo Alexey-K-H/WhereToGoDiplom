@@ -130,12 +130,11 @@ public class PlaceService {
     //Получение списка блжиашйих мест к тем, которые пользователь посетил
     @Transactional
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
-            Long userId,
             int page,
             int size
     ){
         //Ищем пользователя по его id/email в базе данных и берем список посещенных им мест
-        List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
+        List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
 
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -197,17 +196,16 @@ public class PlaceService {
 
     @Transactional
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByStayPoints(
-            Long userId,
             int page,
             int size
     ){
         //Ищем пользователя по его id/email в базе данных и берем его stay-point-ы
-        List<StayPointDTO> stayPoints = userRepository.findById(userId).orElseThrow().getStayPoints().stream().map(
+        List<StayPointDTO> stayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity).toList();
         PageRequest pageRequest = PageRequest.of(page, size);
 
         //Создаем список из id посещенных мест (мест, исключенных из поиска), если они есть
-        List<PlaceBriefDTO> visitedPlaces = userRepository.findById(userId).orElseThrow().getVisitedPlaces().stream().map(
+        List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
 
         String isolators;
@@ -295,7 +293,6 @@ public class PlaceService {
 
     @Transactional
     public PagedListDTO<PlaceBriefDTO> getContentBasedRecommendations(
-            Long userId,
             int page,
             int size
     ){
@@ -305,11 +302,11 @@ public class PlaceService {
         List<Category> categoryList = categoryRepository.findAll();
 
         //Строим вектор пользователя
-        List<UserCoefficient> userCoefficients = userCoeffRepository.getAllByUserId(userId);
+        List<UserCoefficient> userCoefficients = userCoeffRepository.getAllByUserId(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId());
         Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficients, categoryList);
 
         //Берем список мест, не посещенных данным пользователем
-        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(userId, pageRequest);
+        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId(), pageRequest);
 
         List<PlaceBriefDTO> recommendations = CBFRecommender.getRecommendations(categoryList, userVector, notVisitedPlacesPage);
 

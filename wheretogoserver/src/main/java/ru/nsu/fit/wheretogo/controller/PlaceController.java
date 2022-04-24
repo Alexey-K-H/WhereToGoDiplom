@@ -184,8 +184,10 @@ public class PlaceController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-
-        String categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String categoryIds = "";
+        if(categoryId != null){
+            categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
+        }
         return new ResponseEntity<>(
                 service.getPlaces(
                         categoryIds,
@@ -225,14 +227,12 @@ public class PlaceController {
     //(2.1-ая часть контент-ориентирвоанной рекомендательной системы)
     @GetMapping("/recommend/stay_points")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getStayPointRecommendations(
-            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
         if(stayPointService.ifUserHasStayPoints()){
             return new ResponseEntity<>(
                     service.getNearestPlacesByStayPoints(
-                            userId,
                             page,
                             pageSize),
                     HttpStatus.OK);
@@ -241,7 +241,6 @@ public class PlaceController {
             //(2-ая часть контент-ориентированной рекомендательной системы)
             return new ResponseEntity<>(
                     service.getNearestPlacesByVisited(
-                            userId,
                             page,
                             pageSize),
                     HttpStatus.OK);
@@ -252,13 +251,11 @@ public class PlaceController {
     //3-я (заключительная) часть контент-ориентированной рекомендательной системы
     @GetMapping("/recommend/content_based")
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getContentBasedRecommendations(
-            @RequestParam(name = "userId") Long userId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
         return new ResponseEntity<>(
                 service.getContentBasedRecommendations(
-                        userId,
                         page,
                         pageSize),
                 HttpStatus.OK);
