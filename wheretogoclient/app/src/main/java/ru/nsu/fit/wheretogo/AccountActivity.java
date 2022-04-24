@@ -74,6 +74,9 @@ public class AccountActivity extends AppCompatActivity {
                         stopLocationTracker();
                     }
 
+                    Intent intentToMap = new Intent("logout");
+                    sendBroadcast(intentToMap);
+
                     finish();
                     Intent intent = new Intent(this, AuthorizationActivity.class);
                     startActivity(intent);
@@ -85,14 +88,6 @@ public class AccountActivity extends AppCompatActivity {
 
     private void showNotification(String text) {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        finish();
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
     }
 
     private boolean isServiceRunning(){

@@ -29,14 +29,12 @@ public interface PlaceListService {
 
     @GET("/place/recommend/stay_points")
     Call<PlaceList> getRecommendByVisited(
-            @Query("userId") Long userId,
             @Query("per_page") int per_page,
             @Query("page") int page
     );
 
     @GET("/place/recommend/content_based")
     Call<PlaceList> getRecommendByScores(
-            @Query("userId") Long userId,
             @Query("per_page") int per_page,
             @Query("page") int page
     );

@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -213,19 +215,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     onBackPressed();
                 }
             });
+            userPrefs.setVisibility(View.GONE);
         }else{
+            userPrefs.setOnClickListener(this::openUserPrefs);
             recommenderButton.setOnClickListener(this::openRecommenders);
         }
 
-        userPrefs.setOnClickListener(this::openUserPrefs);
         favoritesButton.setOnClickListener(this::openFavourites);
         visitedButton.setOnClickListener(this::openVisited);
-        filters.setOnClickListener(this::openFilters);
 
         if(showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST){
             filters.setEnabled(false);
             filters.setVisibility(View.INVISIBLE);
+        }else{
+            filters.setOnClickListener(this::openFilters);
         }
+
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if(action.equals("logout")){
+                    finish();
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver, new IntentFilter("logout"));
     }
 
 
@@ -291,6 +306,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation();
+
+        sendPlacesRequest();
     }
 
     // Отправляет запрос на получение мест,
@@ -298,6 +315,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат(решили не использовать при открытии экрана)
     private void sendPlacesRequest() {
         PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
+
         if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
@@ -320,14 +338,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case RECOMMENDED_VISITED:
                 placeCall = placeService.getRecommendByVisited(
-                        AuthorizationHelper.getUserProfile().getId(),
                         1,
                         0
                 );
                 break;
             case RECOMMENDED_SCORED:
                 placeCall = placeService.getRecommendByScores(
-                      AuthorizationHelper.getUserProfile().getId(),
                       1,
                       0
                 );
@@ -362,7 +378,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<PlaceList> call, @NonNull Throwable t) {
-                System.out.println(t.getMessage());
+                Log.d(TAG, t.getMessage());
             }
         });
     }
@@ -382,7 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 map.moveCamera(CameraUpdateFactory
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-                sendPlacesRequest();
+//                sendPlacesRequest();
             }else {
                 if (locationPermissionGranted) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
@@ -394,7 +410,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                                sendPlacesRequest();
+//                                sendPlacesRequest();
 //                            locationUpdateThread.start();
 
 //                            //TODO:решить, должен ли сервис работать постоянно на фоне
@@ -420,7 +436,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     map.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                     map.getUiSettings().setMyLocationButtonEnabled(false);
-                    sendPlacesRequest();
+//                    sendPlacesRequest();
                 }
             }
         } catch (SecurityException e) {
@@ -717,7 +733,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void openUserPrefs(View view){
-        finish();
         Intent intent = new Intent(this, AccountActivity.class);
         startActivity(intent);
     }

@@ -41,12 +41,6 @@ public class AuthorizationActivity extends AppCompatActivity {
 //        }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        finish();
-    }
-
     public void openLogin(View view){
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
