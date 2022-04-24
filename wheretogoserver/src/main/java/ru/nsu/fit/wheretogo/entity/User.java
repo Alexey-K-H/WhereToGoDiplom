@@ -11,6 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 
 @Entity
 @Table(name = "users")

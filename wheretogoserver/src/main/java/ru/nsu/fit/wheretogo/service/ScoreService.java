@@ -8,10 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.*;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
-import ru.nsu.fit.wheretogo.entity.UserCoefficient;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.User;
 import ru.nsu.fit.wheretogo.entity.score.ScoreId;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficientId;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.UserCoeffRepository;
@@ -54,7 +55,7 @@ public class ScoreService {
             if(userCoeffRepository.existsByCategory(category)){
                 //Обновляем коэффицент
                 if(oldValue != 0){
-                    double newValue = Math.abs(oldValue - value);
+                    double newValue = value - oldValue;
                     userCoeffRepository.updateCoeffWitOutInc(newValue, category.getId(), userId);
                 }else{
                     userCoeffRepository.updateCoeffWithInc(value.doubleValue(), category.getId(), userId);
@@ -63,6 +64,7 @@ public class ScoreService {
             }else {
                 //Создаем новый коэффициент
                 userCoeffRepository.save(new UserCoefficient()
+                        .setCoefficientId(new UserCoefficientId().setUser(userId).setCategory(category.getId()))
                         .setUser(new User().setId(userId))
                         .setCategory(category)
                         .setPlacesCount(1L)

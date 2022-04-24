@@ -1,9 +1,11 @@
-package ru.nsu.fit.wheretogo.entity;
+package ru.nsu.fit.wheretogo.entity.user_coeff;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import ru.nsu.fit.wheretogo.entity.Category;
+import ru.nsu.fit.wheretogo.entity.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,17 +17,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class UserCoefficient {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",nullable = false)
-    private Long id;
+    @EmbeddedId
+    UserCoefficientId coefficientId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @MapsId("user")
     private User user;
 
     @OneToOne
     @JoinColumn(name = "category_id", nullable = false)
+    @MapsId("category")
     private Category category;
 
     @Column(name = "coeff", nullable = false)

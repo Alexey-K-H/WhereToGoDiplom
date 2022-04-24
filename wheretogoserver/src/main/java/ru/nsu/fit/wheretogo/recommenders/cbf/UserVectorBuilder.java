@@ -1,10 +1,7 @@
 package ru.nsu.fit.wheretogo.recommenders.cbf;
 
 import ru.nsu.fit.wheretogo.entity.Category;
-import ru.nsu.fit.wheretogo.entity.Place;
-import ru.nsu.fit.wheretogo.entity.User;
-import ru.nsu.fit.wheretogo.entity.UserCoefficient;
-import ru.nsu.fit.wheretogo.entity.score.Score;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 
 import java.util.HashMap;
 import java.util.List;

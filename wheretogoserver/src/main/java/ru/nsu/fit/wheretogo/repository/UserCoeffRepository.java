@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.nsu.fit.wheretogo.entity.Category;
-import ru.nsu.fit.wheretogo.entity.UserCoefficient;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ public interface UserCoeffRepository extends JpaRepository<UserCoefficient, Long
 
     //Обновление коэффициента без добавления нового места
     @Modifying
-    @Query(value = "update user_coeff u set u.coeff = ((u.coeff) + (:_new_score/u.count_places))*(u.count_places/(u.count_places+1))" +
+    @Query(value = "update user_coeff u set u.coeff = ((u.coeff) + (:_new_score/u.count_places))" +
             "where u.category_id = :_category_id and u.user_id = :_user_id", nativeQuery = true)
     void updateCoeffWitOutInc(
             @Param("_new_score") Double newScore,
