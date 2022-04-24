@@ -23,7 +23,7 @@ public class CBFRecommender {
             coefficient += (userVector.get(category) * placeVector.get(category));
         }
 
-        return coefficient/categoryList.size();
+        return coefficient/(categoryList.size() * 5);
     }
 
     public static List<PlaceBriefDTO> getRecommendations(
