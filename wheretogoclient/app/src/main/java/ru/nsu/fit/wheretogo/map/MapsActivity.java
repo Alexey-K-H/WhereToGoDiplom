@@ -803,12 +803,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(context, "Добавлено в посещенное",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
-                    //Вызываем метод удаления места
-                    deleteVisitedPlace(selectedPlace.getId());
-                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
-                    //и делаем ее неактивной
-                    ImageButton visited = view.findViewById(R.id.visited_btn);
-                    visited.setImageResource(R.drawable.unknown);
+//                    //Вызываем метод удаления места
+//                    deleteVisitedPlace(selectedPlace.getId());
+//                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
+//                    //и делаем ее неактивной
+//                    ImageButton visited = view.findViewById(R.id.visited_btn);
+//                    visited.setImageResource(R.drawable.unknown);
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
