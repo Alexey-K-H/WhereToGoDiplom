@@ -62,25 +62,6 @@
             android:textSize="16sp" />
     </ScrollView>
 
-    <ImageButton
-        android:id="@+id/imageButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/place_title"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="68dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="63dp"
-        android:layout_marginBottom="56dp"
-        android:background="@color/white"
-        android:scaleX="1.3"
-        android:scaleY="1.3"
-        android:src="@drawable/make_path"
-        app:layout_constraintBottom_toTopOf="@+id/ratingBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/place_full_icon"
-        app:layout_constraintTop_toBottomOf="@+id/place_title" />
-
     <RatingBar
         android:id="@+id/ratingBar"
         android:layout_width="241dp"
