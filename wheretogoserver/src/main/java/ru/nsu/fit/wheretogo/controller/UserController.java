@@ -69,4 +69,10 @@ public class UserController {
     private ResponseEntity<Boolean> isUserHasFavourites(){
         return new ResponseEntity<>(!userService.getFavourite().isEmpty(), HttpStatus.OK);
     }
+
+    @GetMapping("/contain/visited/{id}")
+    private ResponseEntity<Boolean> isPlaceInUserVisited(
+            @PathVariable(name = "id") Long placeId){
+        return new ResponseEntity<>(userService.isPlaceInVisited(placeId), HttpStatus.OK);
+    }
 }

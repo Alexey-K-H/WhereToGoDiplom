@@ -16,6 +16,7 @@ import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -163,5 +164,22 @@ public class UserService {
 
         userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
                 currentUser -> currentUser.getFavouritePlaces().removeIf(place -> Objects.equals(place.getId(), placeId)));
+    }
+
+    @Transactional
+    public boolean isPlaceInVisited(Long placeId){
+
+        if(placeId == null){
+            return false;
+        }
+
+        List<Place> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces();
+        for(Place visitedPlace : visitedPlaces){
+            if(visitedPlace.getId().equals(placeId)){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

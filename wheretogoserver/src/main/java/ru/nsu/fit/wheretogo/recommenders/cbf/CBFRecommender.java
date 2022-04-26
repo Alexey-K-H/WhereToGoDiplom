@@ -37,11 +37,15 @@ public class CBFRecommender {
             //Для каждого из них строим itemVector
             Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(notVisitedPlace, categoryList);
             //Вычисляем для места коэффициент значимости и заносим в карту коэффициентов
-            System.out.println("Add coefficient:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
+//            System.out.println("Add coefficient:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
             placeCoefficients.put(
                     PlaceBriefDTO.getFromEntity(notVisitedPlace),
                     CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList)
             );
+        }
+
+        for (Map.Entry<PlaceBriefDTO, Double> entry : placeCoefficients.entrySet()) {
+            System.out.println("PLACE:" + entry.getKey().getName() + "/COEFFICIENT:" + entry.getValue());
         }
 
         Map<PlaceBriefDTO, Double> sortedCoefficients = placeCoefficients.entrySet()
