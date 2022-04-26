@@ -1,10 +1,12 @@
 package ru.nsu.fit.wheretogo;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -24,6 +26,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 
@@ -97,6 +100,7 @@ public class PlaceActivity extends AppCompatActivity {
 //                                    Toast.LENGTH_LONG).show();
 
                         ratingBar1.setRating(response.body().getScore());
+                        addVisitedPlace(placeFullDescView);
                     }else if(response.code() == 400){
 
                     }
@@ -139,5 +143,25 @@ public class PlaceActivity extends AppCompatActivity {
 
         TextView placeText = (TextView)view.findViewById(R.id.place_description);
         placeText.setText(placeDescription);
+    }
+
+    private void addVisitedPlace(View view) {
+        Call<String> call = ServiceGenerator.createService(PlaceService.class)
+                .addVisitedPlace(placeId);
+        Context context = this;
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if (response.code() != 200) {
+                    Toast.makeText(context, R.string.unexpectedErrorMsg,
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 }

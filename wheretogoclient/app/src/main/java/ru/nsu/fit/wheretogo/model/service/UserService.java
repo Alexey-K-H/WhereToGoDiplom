@@ -35,4 +35,7 @@ public interface UserService {
 
     @GET("/user/contain/favourites")
     Call<Boolean> isUserHasFavourites();
+
+    @GET("/user/contain/visited/{id}")
+    Call<Boolean> isPlaceInUserVisited(@Path("id") Long id);
 }

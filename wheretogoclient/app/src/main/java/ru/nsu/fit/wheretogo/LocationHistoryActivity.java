@@ -97,7 +97,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
             }
             else {
                 if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-                    Toast.makeText(this, "GPS отключен, запись истории невозможна. Включите GPS в настройках устройтсва", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "GPS отключен, запись истории невозможна. Включите GPS в настройках устройства", Toast.LENGTH_LONG).show();
                 }else{
                     startLocationTracker();
                     if(advise){

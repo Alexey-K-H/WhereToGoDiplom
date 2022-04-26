@@ -72,6 +72,7 @@ import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
 import ru.nsu.fit.wheretogo.model.service.CategoryService;
+import ru.nsu.fit.wheretogo.model.service.UserService;
 import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
@@ -91,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     //Default location (Novosibirsk Rechnoy Vokzal)
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
-    private static final int DEFAULT_ZOOM = 10;
+    private static final int DEFAULT_ZOOM = 12;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
 
@@ -697,6 +698,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
                     if(response.code() == 200 && response.body()!= null){
                         ratingBar.setRating(response.body().getScore());
+                        Call<Boolean> placeInVisited = ServiceGenerator.createService(UserService.class).isPlaceInUserVisited(selectedPlace.getId());
+                        placeInVisited.enqueue(new Callback<Boolean>() {
+                            @Override
+                            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                                if(response.code() == 200 && response.body()!= null){
+                                    if(!response.body()){
+                                        addVisitedPlace(view);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
+
+                            }
+                        });
                     }else if(response.code() == 400){
 
                     }
@@ -963,4 +980,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Destroy activity map");
         super.onDestroy();
     }
+
 }
