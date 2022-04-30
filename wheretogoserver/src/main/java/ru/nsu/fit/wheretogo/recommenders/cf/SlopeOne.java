@@ -77,7 +77,7 @@ public final class SlopeOne {
                         uPred.put(placeDiff, uPred.get(placeDiff) + finalValue);
                         uFreq.put(placeDiff, uFreq.get(placeDiff) + freq.get(placeDiff).get(place));
                     }
-                    catch (NullPointerException e){
+                    catch (NullPointerException ignored){
 
                     }
                 }

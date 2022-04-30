@@ -328,6 +328,8 @@ public class PlaceService {
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
         List<Place> notVisitedList = notVisitedPlacesPage.stream().toList();
 
+        List<Place> placeList = placeRepository.findAll();
+
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
 
@@ -348,7 +350,7 @@ public class PlaceService {
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, notVisitedList);
+        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
 
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
@@ -376,6 +378,8 @@ public class PlaceService {
 
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
+
+        List<Place> placeList = placeRepository.findAll();
 
         //Берем список избранных мест
 //        List<Score> favouritesPlaces = new ArrayList<>();
@@ -409,7 +413,7 @@ public class PlaceService {
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, notVisitedList);
+        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
 
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
