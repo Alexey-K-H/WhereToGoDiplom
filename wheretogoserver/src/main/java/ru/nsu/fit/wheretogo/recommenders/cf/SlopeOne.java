@@ -78,7 +78,7 @@ public final class SlopeOne {
                         uFreq.put(placeDiff, uFreq.get(placeDiff) + freq.get(placeDiff).get(place));
                     }
                     catch (NullPointerException e){
-                        e.printStackTrace();
+
                     }
                 }
             }

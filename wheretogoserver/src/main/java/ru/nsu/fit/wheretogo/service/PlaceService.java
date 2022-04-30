@@ -326,7 +326,7 @@ public class PlaceService {
 
         //Берем список всех мест, которые пользователь не посетил
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> placeList = notVisitedPlacesPage.stream().toList();
+        List<Place> notVisitedList = notVisitedPlacesPage.stream().toList();
 
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
@@ -348,10 +348,14 @@ public class PlaceService {
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, notVisitedList);
 
         //Предсказания конкретного пользователя
-        List<PlaceBriefDTO> recommendations = (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList();
+        List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
+
+        List<Long> notVisitedIds = notVisitedList.stream().map(Place::getId).toList();
+
+        recommendations.removeIf(recommendPlace -> !notVisitedIds.contains(recommendPlace.getId()));
 
         return new PagedListDTO<PlaceBriefDTO>()
                 .setList(recommendations)
@@ -368,24 +372,31 @@ public class PlaceService {
         User user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
 
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> placeList = notVisitedPlacesPage.stream().toList();
+        List<Place> notVisitedList = notVisitedPlacesPage.stream().toList();
 
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
 
         //Берем список избранных мест
-        List<Score> favouritesPlaces = new ArrayList<>();
-        List<User> systemUsers = userRepository.findAll();
+//        List<Score> favouritesPlaces = new ArrayList<>();
+//        List<User> systemUsers = userRepository.findAll();
 
-        for(User currUser : systemUsers){
-            List<Place> currUserFavourPlaces = currUser.getFavouritePlaces();
-            for(Place userFavour : currUserFavourPlaces){
-                favouritesPlaces.add(new Score().setPlace(userFavour).setUser(currUser).setScore(5));
-            }
+//        for(User currUser : systemUsers){
+//            List<Place> currUserFavourPlaces = currUser.getFavouritePlaces();
+//            for(Place userFavour : currUserFavourPlaces){
+//                favouritesPlaces.add(new Score().setPlace(userFavour).setUser(currUser).setScore(5));
+//            }
+//        }
+
+        //Берем из БД все оценки, которые можно найти
+        List<Score> scoreList = scoreRepository.findAll();
+        List<Place> currUserFavourPlaces = user.getFavouritePlaces();
+        for(Place favourPlace : currUserFavourPlaces){
+            scoreList.add(new Score().setPlace(favourPlace).setUser(user).setScore(5));
         }
 
         //Заполняем входные данные для рекомендательной системы
-        for(Score score : favouritesPlaces){
+        for(Score score : scoreList){
             if(data.containsKey(score.getUser())){
                 if(!data.get(score.getUser()).containsKey(score.getPlace())){
                     data.get(score.getUser()).put(score.getPlace(), (double)score.getScore());
@@ -398,10 +409,14 @@ public class PlaceService {
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, notVisitedList);
 
         //Предсказания конкретного пользователя
-        List<PlaceBriefDTO> recommendations = (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList();
+        List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
+
+        List<Long> notVisitedIds = notVisitedList.stream().map(Place::getId).toList();
+
+        recommendations.removeIf(recommendPlace -> !notVisitedIds.contains(recommendPlace.getId()));
 
         return new PagedListDTO<PlaceBriefDTO>()
                 .setList(recommendations)
