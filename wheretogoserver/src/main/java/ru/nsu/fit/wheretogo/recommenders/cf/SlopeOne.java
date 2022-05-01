@@ -71,14 +71,16 @@ public final class SlopeOne {
         for(Map.Entry<User, HashMap<Place, Double>> userMapEntry : data.entrySet()){
             for(Place place : userMapEntry.getValue().keySet()){
                 for(Place placeDiff : diff.keySet()){
-                    try{
-                        double predictedValue = diff.get(placeDiff).get(place) + userMapEntry.getValue().get(place);
-                        double finalValue = predictedValue * freq.get(placeDiff).get(place);
-                        uPred.put(placeDiff, uPred.get(placeDiff) + finalValue);
-                        uFreq.put(placeDiff, uFreq.get(placeDiff) + freq.get(placeDiff).get(place));
-                    }
-                    catch (NullPointerException ignored){
+                    if(places.contains(placeDiff)){
+                        try{
+                            double predictedValue = diff.get(placeDiff).get(place) + userMapEntry.getValue().get(place);
+                            double finalValue = predictedValue * freq.get(placeDiff).get(place);
+                            uPred.put(placeDiff, uPred.get(placeDiff) + finalValue);
+                            uFreq.put(placeDiff, uFreq.get(placeDiff) + freq.get(placeDiff).get(place));
+                        }
+                        catch (NullPointerException ignored){
 
+                        }
                     }
                 }
             }

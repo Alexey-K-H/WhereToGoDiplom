@@ -326,9 +326,7 @@ public class PlaceService {
 
         //Берем список всех мест, которые пользователь не посетил
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> notVisitedList = notVisitedPlacesPage.stream().toList();
-
-        List<Place> placeList = placeRepository.findAll();
+        List<Place> placeList = notVisitedPlacesPage.stream().toList();
 
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
@@ -355,9 +353,6 @@ public class PlaceService {
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
 
-        List<Long> notVisitedIds = notVisitedList.stream().map(Place::getId).toList();
-
-        recommendations.removeIf(recommendPlace -> !notVisitedIds.contains(recommendPlace.getId()));
 
         return new PagedListDTO<PlaceBriefDTO>()
                 .setList(recommendations)
@@ -374,12 +369,11 @@ public class PlaceService {
         User user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
 
         Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> notVisitedList = notVisitedPlacesPage.stream().toList();
+        List<Place> placeList = notVisitedPlacesPage.stream().toList();
 
         //Входные данные: пользователи и набор их оценок
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
 
-        List<Place> placeList = placeRepository.findAll();
 
         //Берем список избранных мест
 //        List<Score> favouritesPlaces = new ArrayList<>();
@@ -395,6 +389,8 @@ public class PlaceService {
         //Берем из БД все оценки, которые можно найти
         List<Score> scoreList = scoreRepository.findAll();
         List<Place> currUserFavourPlaces = user.getFavouritePlaces();
+
+        //Дополнительно добавляем оценки пользователя равные 5, так как места избранные
         for(Place favourPlace : currUserFavourPlaces){
             scoreList.add(new Score().setPlace(favourPlace).setUser(user).setScore(5));
         }
@@ -418,9 +414,6 @@ public class PlaceService {
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
 
-        List<Long> notVisitedIds = notVisitedList.stream().map(Place::getId).toList();
-
-        recommendations.removeIf(recommendPlace -> !notVisitedIds.contains(recommendPlace.getId()));
 
         return new PagedListDTO<PlaceBriefDTO>()
                 .setList(recommendations)
