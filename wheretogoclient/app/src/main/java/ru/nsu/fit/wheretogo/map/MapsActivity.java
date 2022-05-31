@@ -325,6 +325,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Call<PlaceList> placeCall;
         switch (showMapMode) {
             case NEAREST:
+                //TODO:исправить в будущем ошибку получения координат пользователя
                 placeCall = placeService.getNearestPlacesByCategory(
                         lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude(),
