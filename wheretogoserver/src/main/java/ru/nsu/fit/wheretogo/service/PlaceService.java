@@ -441,4 +441,20 @@ public class PlaceService {
                 .setPageNum(page)
                 .setTotalPages(places.getTotalPages());
     }
+
+    @Transactional
+    public void addPlaceCategory(Long placeId, Integer categoryId){
+        if(categoryId == null
+                || placeId == null
+                || !categoryRepository.existsById(categoryId)
+                || !placeRepository.existsById(placeId)){
+            return;
+        }
+
+        Category category = new Category();
+        category.setId(categoryId);
+
+        placeRepository.findById(placeId).ifPresent(currPlace -> currPlace.getCategories().add(category));
+
+    }
 }

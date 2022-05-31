@@ -286,4 +286,18 @@ public class PlaceController {
             );
         }
     }
+
+    @PostMapping("/category")
+    public ResponseEntity<String> addCategory(
+            @RequestParam(name = "placeId") Long placeId,
+            @RequestParam(name = "categoryId") Integer categoryId
+
+    ) {
+        try {
+            service.addPlaceCategory(placeId, categoryId);
+            return ResponseEntity.ok().build();
+        } catch (Exception exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
