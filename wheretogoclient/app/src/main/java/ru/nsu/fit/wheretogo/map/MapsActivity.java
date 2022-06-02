@@ -333,7 +333,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Call<PlaceList> placeCall;
         switch (showMapMode) {
             case NEAREST:
-                //TODO:исправить в будущем ошибку получения координат пользователя
                 placeCall = placeService.getNearestPlacesByCategory(
                         lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude(),
@@ -420,17 +419,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-//                                sendPlacesRequest();
-//                            locationUpdateThread.start();
-
-//                            //TODO:решить, должен ли сервис работать постоянно на фоне
-//                            if(!isServiceRunning()){
-//                                System.out.println("Run Background service");
-//                                Intent serviceIntent = new Intent(this, LocationTrackerService.class);
-////                                startForegroundService(serviceIntent);
-//                                startService(serviceIntent);
-//                            }
-
 
                             }
                         } else {
