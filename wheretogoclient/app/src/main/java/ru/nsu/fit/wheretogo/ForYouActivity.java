@@ -31,6 +31,7 @@ public class ForYouActivity extends AppCompatActivity {
     private ImageButton recommendByVisitedBtn;
     private ImageButton recommendByScoredBtn;
     private ImageButton recommendByOthersBtn;
+    private ImageButton recommendByGPSBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
         recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
-        ImageButton recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
+        recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
         //Выполняем проврку наличия в базе данных информации об оценках, stay-point-ах, посещенных и избранных
         Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
@@ -133,6 +134,7 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openNearestRecommender(View view){
+        recommendByGPSBtn.setImageResource(R.drawable.nearest_rec_btn_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
@@ -140,6 +142,7 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openVisitedRecommender(View view){
+        recommendByVisitedBtn.setImageResource(R.drawable.btn_by_places_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
@@ -147,6 +150,7 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openScoredRecommender(View view){
+        recommendByScoredBtn.setImageResource(R.drawable.btn_by_prefs_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
@@ -154,6 +158,7 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     public void openUsersRecommender(View view){
+        recommendByOthersBtn.setImageResource(R.drawable.btn_by_users_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
