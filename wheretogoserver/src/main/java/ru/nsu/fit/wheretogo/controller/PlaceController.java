@@ -209,7 +209,10 @@ public class PlaceController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
-        String categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String categoryIds = "";
+        if(categoryId != null){
+            categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
+        }
         return new ResponseEntity<>(
                 service.getNearestPlacesByCategory(
                         myLat,
