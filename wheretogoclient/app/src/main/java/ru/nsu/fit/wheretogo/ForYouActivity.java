@@ -33,10 +33,18 @@ public class ForYouActivity extends AppCompatActivity {
     private ImageButton recommendByOthersBtn;
     private ImageButton recommendByGPSBtn;
 
+    private Location lastLocation;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_for_you);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            lastLocation = extras.getParcelable("lastLocation");
+            Log.d(TAG, "Get lastKnownLocation (" + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + ")");
+        }
 
         recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
         recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
@@ -138,6 +146,7 @@ public class ForYouActivity extends AppCompatActivity {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
+        intent.putExtra("lastLocation", lastLocation);
         startActivity(intent);
     }
 
@@ -146,6 +155,7 @@ public class ForYouActivity extends AppCompatActivity {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
+        intent.putExtra("lastLocation", lastLocation);
         startActivity(intent);
     }
 
@@ -154,6 +164,7 @@ public class ForYouActivity extends AppCompatActivity {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
+        intent.putExtra("lastLocation", lastLocation);
         startActivity(intent);
     }
 
@@ -162,6 +173,7 @@ public class ForYouActivity extends AppCompatActivity {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
+        intent.putExtra("lastLocation", lastLocation);
         startActivity(intent);
     }
 

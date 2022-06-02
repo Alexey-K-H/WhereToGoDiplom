@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,7 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
-        //Утсанавливаем режим отображения мест
+        //Устанавливаем режим отображения мест
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
             showMapMode = ShowMapMode.ALL;
@@ -157,6 +158,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     showMapMode = ShowMapMode.RECOMMENDED_USERS;
                     break;
             }
+
+            if(showMapMode == ShowMapMode.NEAREST){
+                lastKnownLocation = extras.getParcelable("lastLocation");
+                Log.d(TAG, "Get lastKnownLocation for nearest: " + lastKnownLocation.getLatitude() + ", " + lastKnownLocation.getLongitude() + ")");
+            }
+
         }
 
         // Retrieve the content view that renders the map.
@@ -251,6 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         if (map != null) {
+            Log.d(TAG, "Save LastKnownLocation");
             outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, lastKnownLocation);
         }
@@ -740,6 +748,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void openRecommenders(View view){
 //        locationUpdateThread.quit();
         Intent intent = new Intent(this, ForYouActivity.class);
+        intent.putExtra("lastLocation", lastKnownLocation);
         startActivity(intent);
     }
 
@@ -959,6 +968,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Close recommender map and open recommenders
             finish();
             Intent intent = new Intent(this, ForYouActivity.class);
+            intent.putExtra("lastLocation", lastKnownLocation);
             startActivity(intent);
         }
     }
@@ -981,5 +991,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Destroy activity map");
         super.onDestroy();
     }
-
 }
