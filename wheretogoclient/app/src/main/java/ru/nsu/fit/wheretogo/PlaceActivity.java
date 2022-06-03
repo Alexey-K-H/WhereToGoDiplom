@@ -153,8 +153,7 @@ public class PlaceActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.code() != 200) {
-                    Toast.makeText(context, R.string.unexpectedErrorMsg,
-                            Toast.LENGTH_SHORT).show();
+
                 }
             }
 
