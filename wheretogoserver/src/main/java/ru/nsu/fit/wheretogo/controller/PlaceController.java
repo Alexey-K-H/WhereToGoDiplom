@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
@@ -13,6 +14,7 @@ import ru.nsu.fit.wheretogo.service.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +27,8 @@ public class PlaceController {
 
     private final StayPointService stayPointService;
     private final ScoreService scoreService;
+
+    private final CategoryService categoryService;
 
     @PostMapping
     public ResponseEntity<String> savePlace(@RequestBody @Valid PlaceDescriptionDTO place) {
@@ -72,7 +76,6 @@ public class PlaceController {
         }
     }
 
-    //TODO:Запросы для работы с посещенными, избранными
     @PostMapping("/favourite/{id}")
     public ResponseEntity<String> addFavourite(
             @PathVariable(name = "id") Long placeId
@@ -185,9 +188,11 @@ public class PlaceController {
             @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
     ) {
         String categoryIds = "";
-        if(categoryId != null){
-            categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
-        }
+        categoryIds = Objects.requireNonNullElseGet(
+                        categoryId,
+                        () -> categoryService.getAll().stream().map(CategoryDTO::getId).toList())
+                .stream().map(String::valueOf).collect(Collectors.joining(","));
+
         return new ResponseEntity<>(
                 service.getPlaces(
                         categoryIds,
@@ -210,9 +215,11 @@ public class PlaceController {
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
     ){
         String categoryIds = "";
-        if(categoryId != null){
-            categoryIds = categoryId.stream().map(String::valueOf).collect(Collectors.joining(","));
-        }
+        categoryIds = Objects.requireNonNullElseGet(
+                categoryId,
+                () -> categoryService.getAll().stream().map(CategoryDTO::getId).toList())
+                .stream().map(String::valueOf).collect(Collectors.joining(","));
+
         return new ResponseEntity<>(
                 service.getNearestPlacesByCategory(
                         myLat,
