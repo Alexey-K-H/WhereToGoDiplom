@@ -11,14 +11,14 @@ import ru.nsu.fit.wheretogo.entity.Place;
 public interface PlaceRepository extends JpaRepository<Place, Long> {
     boolean existsByNameOrDescriptionOrCoords(String name, String description, Coords coords);
 
-    @Query(value = "call GetPlaces(:_ids); -- #pageable", nativeQuery = true)
+    @Query(value = "select * from where_to_go.getplaces(:_ids) -- #pageable", nativeQuery = true)
     public Page<Place> getPlaces(
             @Param("_ids") String categoryIds,
             Pageable pageable
     );
 
 //    Процедура поиска ближайших мест к конкретной точке на карте
-    @Query(value = "call FindNearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit); -- #pageable",
+    @Query(value = "select * from where_to_go.findnearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit) -- #pageable",
             nativeQuery = true)
     public Page<Place> findNearestPlaces(
             @Param("_my_lat") Double lat,
@@ -30,7 +30,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     );
 
     //Процедура поиска ближайших мест по конкретной точке с учетом категорий
-    @Query(value = "call FindNearestByCategory(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids); -- #pageable",
+    @Query(value = "select * from where_to_go.findnearestwithids(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids, true) -- #pageable",
             nativeQuery = true)
     public Page<Place> findNearestByCategory(
             @Param("_my_lat") Double lat,
@@ -43,7 +43,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     );
 
     //Процедура поиска блмажйших мест по конкретной точке с учетом посещений пользователя
-    @Query(value = "call FindNearestByVisited(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids); -- #pageable",
+    @Query(value = "select * from where_to_go.findnearestwithids(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit, :_ids, false) -- #pageable",
             nativeQuery = true)
     public Page<Place> findNearestByVisited(
             @Param("_my_lat") Double lat,
@@ -57,7 +57,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     //Поиск мест, не посещенных пользователем
     //Необходимо для составления рекомендаций на основе контента
-    @Query(value = "select * from place where id not in (select place_id from user_visited_places where user_id = :_user_id); -- #pageable",
+    @Query(value = "select * from where_to_go.place where id not in (select place_id from where_to_go.user_visited_places where user_id = :_user_id) -- #pageable",
             nativeQuery = true)
     public Page<Place> findNotVisitedByUser(
             @Param("_user_id") Long userId,
