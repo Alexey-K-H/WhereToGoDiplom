@@ -141,44 +141,40 @@ $$;
 -- Используется как для поиска ближайших мест от пользователя, так и для поиска мест,
 -- расопложенных недлаеко от мест, посещенных пользователем в процессе использования приложения.
 drop function if exists where_to_go.findnearestWithIds;
-create function where_to_go.FindNearestByCategory(
-    _my_lat double precision, /*Широта в пределах [-90...90]*/
-    _my_lon double precision, /*Долгота в пределах [-180...180]*/
-    _START_dist double precision, /*Начальня оценка расстояния поиска*/
-    _max_dist double precision, /*Максимальная дистанция где искать*/
-    _limit int, /*Сколько найденных кандидатов нужно (делать сильно большим не стоит, чтобы не нагружать карту)*/
-    _ids int[], /*Индексы параметров для отбора мест по категориям*/
-    is_in_indexes boolean
-)returns table(
-                  id bigint,
-                  latitude numeric,
-                  longitude numeric,
-                  description varchar(255),
-                  name varchar(255),
-                  thumbnail varchar(255),
-                  uploaded_at timestamp,
-                  dist double precision
-              )
+create function findnearestwithids(_my_lat double precision, _my_lon double precision, _start_dist double precision,
+                                   _max_dist double precision, _limit integer, _ids text, is_in_indexes boolean)
+    returns TABLE
+            (
+                id          bigint,
+                latitude    numeric,
+                longitude   numeric,
+                description character varying,
+                name        character varying,
+                thumbnail   character varying,
+                uploaded_at timestamp without time zone,
+                dist        double precision
+            )
+    language plpgsql
 as
 $$
-declare _deg2rad double precision default PI()/180;
-        my_lat double precision := _my_lat;
-        my_lon double precision := _my_lon;
-        deg2dist double precision := 69.172; /*69.172 for miles; 111.325 for km  *** (mi vs km)*/
-        start_deg double precision := _START_dist / @deg2dist; /*начальный радиус поиска*/
-        max_deg double precision := _max_dist / @deg2dist; /*максимальный радиус поиска*/
-        cutoff double precision := @max_deg / sqrt(2);
-        dlat double precision := @start_deg;
-        dlon double precision;
-        lon2lat double precision := COS(_deg2rad * @my_lat);
-        iterations int := 0;
-
-        near_ct int;
-
-        west_lon double precision;
-        east_lon double precision;
-
+declare
+    _deg2rad   double precision default PI() / 180;
+    my_lat     double precision := _my_lat;
+    my_lon     double precision := _my_lon;
+    deg2dist   double precision := 69.172; /*69.172 for miles; 111.325 for km  *** (mi vs km)*/
+    start_deg  double precision := _START_dist / @deg2dist; /*начальный радиус поиска*/
+    max_deg    double precision := _max_dist / @deg2dist; /*максимальный радиус поиска*/
+    cutoff     double precision := @max_deg / sqrt(2);
+    dlat       double precision := @start_deg;
+    dlon       double precision;
+    lon2lat    double precision := COS(_deg2rad * @my_lat);
+    iterations int              := 0;
+    near_ct    int;
+    west_lon   double precision;
+    east_lon   double precision;
+    ids        int ARRAY;
 begin
+    ids = string_to_array(_ids, ',');
 
     <<MainLoop>>
     LOOP
@@ -194,8 +190,8 @@ begin
 
         near_ct = where_to_go.find_near_ct(my_lat := my_lat, my_lon := my_lon, dlat := dlat, dlon := dlon);
 
-        if(@near_ct >= _limit or
-           @dlat >= @cutoff) then
+        if (@near_ct >= _limit or
+            @dlat >= @cutoff) then
             exit MainLoop;/*Выход из цикла*/
         end if;
         /*Расширяем квадрат поиска*/
@@ -220,85 +216,94 @@ begin
 
     /*Последний запрос, который берет информауию об отобранных кандидатах*/
     /*Если мы не вышли в отрициатльные координаты*/
-    if(abs(@my_lon) + @dlon < 180 or
-       abs(@my_lat) + @dlat < 90) then
-        return query (select * from where_to_go.filter_candidates_with_ids(
-                my_lat := my_lat,
-                my_lon := my_lon,
-                dlat := dlat,
-                dlon := dlon,
-                _ids := _ids,
-                _limit := _limit,
-                _max_dist := _max_dist,
-                deg2dist := deg2dist,
-                is_in_indexes := is_in_indexes));
+    if (abs(@my_lon) + @dlon < 180 or
+        abs(@my_lat) + @dlat < 90) then
+        return query (select *
+                      from where_to_go.filter_candidates_with_ids(
+                              my_lat := my_lat,
+                              my_lon := my_lon,
+                              dlat := dlat,
+                              dlon := dlon,
+                              _ids := ids,
+                              _limit := _limit,
+                              _max_dist := _max_dist,
+                              deg2dist := deg2dist,
+                              is_in_indexes := is_in_indexes));
     else
         /*Если вышли в отрицательные координаты, то пересчитываем*/
-        CASE WHEN @my_lon < 0
-                 THEN
-                     west_lon := @my_lon;
-             ELSE
-                 west_lon := @my_lon - 360;
+        CASE
+            WHEN @my_lon < 0
+                THEN west_lon := @my_lon;
+            ELSE west_lon := @my_lon - 360;
             END CASE;
 
         east_lon := @west_lon + 360;
 
-        return query (select * from where_to_go.filter_candidates_with_ids(
-                my_lat := my_lat,
-                my_lon := west_lon,
-                dlat := dlat,
-                dlon := dlon,
-                _ids := _ids,
-                _limit := _limit,
-                _max_dist := _max_dist,
-                deg2dist := deg2dist,
-                is_in_indexes := is_in_indexes));
+        return query (select *
+                      from where_to_go.filter_candidates_with_ids(
+                              my_lat := my_lat,
+                              my_lon := west_lon,
+                              dlat := dlat,
+                              dlon := dlon,
+                              _ids := ids,
+                              _limit := _limit,
+                              _max_dist := _max_dist,
+                              deg2dist := deg2dist,
+                              is_in_indexes := is_in_indexes));
     end if;
 end;
-$$LANGUAGE plpgsql;
+$$;
+
 
 --Пример вызова финальной функции
 select * from where_to_go.findnearestWithIds(
-        _my_lat := 55.00867, _my_lon := 82.93807, _start_dist := 1, _max_dist := 2, _limit := 2, _ids := '{1,2,3,4,5,6,7}', is_in_indexes :=  true
+        _my_lat := 55.00867, _my_lon := 82.93807, _start_dist := 1, _max_dist := 2, _limit := 2, _ids := '1,2,3,4,5,6,7', is_in_indexes :=  true
     );
 
 --Функция получения всех мест из БД в соответсвтии с категориями
 drop function if exists where_to_go.getPlaces;
-create or replace function where_to_go.getPlaces(
-    _ids int[]
-)
-    returns table
+create function getplaces(_ids text)
+    returns TABLE
             (
                 id          bigint,
                 latitude    numeric,
                 longitude   numeric,
-                description varchar(255),
-                name        varchar(255),
-                thumbnail   varchar(255),
-                uploaded_at timestamp
+                description character varying,
+                name        character varying,
+                thumbnail   character varying,
+                uploaded_at timestamp without time zone
             )
     language plpgsql
 as
 $$
+DECLARE
+    ids int ARRAY;
 BEGIN
-    return query (with cte1 as (select places_info.id,
-                                       places_info.latitude,
-                                       places_info.longitude,
-                                       places_info.description,
-                                       places_info.name,
-                                       places_info.thumbnail,
-                                       places_info.uploaded_at,
-                                       places_info.category_id
-                                from places_info
-                                where places_info.category_id = any (_ids)
-                                order by places_info.name)
-                  select distinct cte1.id, cte1.latitude, cte1.longitude, cte1.description, cte1.name, cte1.thumbnail, cte1.uploaded_at
+    ids = string_to_array(_ids, ',');
+    return query (with cte1 as (select where_to_go.places_info.id,
+                                       where_to_go.places_info.latitude,
+                                       where_to_go.places_info.longitude,
+                                       where_to_go.places_info.description,
+                                       where_to_go.places_info.name,
+                                       where_to_go.places_info.thumbnail,
+                                       where_to_go.places_info.uploaded_at,
+                                       where_to_go.places_info.category_id
+                                from where_to_go.places_info
+                                where where_to_go.places_info.category_id = any (ids)
+                                order by where_to_go.places_info.name)
+                  select distinct cte1.id,
+                                  cte1.latitude,
+                                  cte1.longitude,
+                                  cte1.description,
+                                  cte1.name,
+                                  cte1.thumbnail,
+                                  cte1.uploaded_at
                   from cte1);
 end
 $$;
 
 --Пример выхова функции получения мест
-select * from where_to_go.getplaces('{1,2,3,4,5,6,7}');
+select * from where_to_go.getplaces('1,2,3,4,5,6,7');
 
 
 --Упрощенные функции без индексов
