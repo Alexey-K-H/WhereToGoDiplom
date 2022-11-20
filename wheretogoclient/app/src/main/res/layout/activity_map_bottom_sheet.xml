@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottomSheetContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bottom_sheet_background">
+
+    <ImageButton
+        android:id="@+id/back_btn"
+        android:layout_width="141dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="10dp"
+
+        android:layout_marginBottom="11dp"
+        android:background="@android:color/transparent"
+        android:scaleX="0.7"
+        android:scaleY="0.7"
+        android:src="@drawable/back_btn"
+        app:layout_constraintBottom_toTopOf="@+id/place_image"
+        app:layout_constraintEnd_toStartOf="@+id/ratingBar_short_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/place_image"
+        android:layout_width="177dp"
+        android:layout_height="170dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:color/white"
+        android:src="@drawable/unknown"
+        app:layout_constraintBottom_toTopOf="@+id/place_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_btn" />
+
+    <ImageButton
+        android:id="@+id/visited_btn"
+        android:layout_width="39dp"
+        android:layout_height="41dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="122dp"
+        android:layout_marginBottom="5dp"
+        android:background="@android:color/white"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/visited_button"
+        app:layout_constraintBottom_toTopOf="@+id/more_info_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/favour_btn"
+        app:layout_constraintTop_toBottomOf="@+id/place_name"
+        app:layout_constraintVertical_bias="0.078" />
+
+    <ImageButton
+        android:id="@+id/more_info_btn"
+        android:layout_width="171dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="28dp"
+        android:background="@android:color/white"
+        android:backgroundTint="@android:color/transparent"
+        android:onClick="openFullPlaceInfo"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        android:src="@drawable/more_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/visited_btn" />
+
+    <ImageButton
+        android:id="@+id/favour_btn"
+        android:layout_width="38dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/white"
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:src="@drawable/favour_button"
+        app:layout_constraintEnd_toStartOf="@+id/visited_btn"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/place_name" />
+
+    <TextView
+        android:id="@+id/place_name"
+        android:layout_width="201dp"
+        android:layout_height="67dp"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/default_place_name"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/ratingBar_short_info" />
+
+    <TextView
+        android:id="@+id/place_description"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/place_name"
+        app:layout_constraintStart_toStartOf="@+id/place_image"
+        app:layout_constraintTop_toBottomOf="@+id/place_image" />
+
+    <RatingBar
+        android:id="@+id/ratingBar_short_info"
+        android:layout_width="241dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="11dp"
+        android:numStars="5"
+        android:progressDrawable="@drawable/custom_star"
+        android:stepSize="1"
+        app:layout_constraintBottom_toTopOf="@+id/place_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/back_btn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

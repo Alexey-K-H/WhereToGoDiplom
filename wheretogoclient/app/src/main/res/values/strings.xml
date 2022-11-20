@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">WhereToGo</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="option_get_place">Get place</string>
+    <string name="default_info_title">Default Location</string>
+    <string name="default_info_snippet">No places found, because location permission is disabled.</string>
+    <string name="pick_place">Choose a place</string>
+    <string name="open_map">Открыть карту</string>
+    <string name="favorite">Избранное</string>
+    <string name="visited">Посещенное</string>
+    <string name="filter">Фильтры</string>
+    <string name="profilebutton">profileButton</string>
+    <string name="email_str">e-mail</string>
+    <string name="pwd_str">Пароль</string>
+    <string name="EnterButton">Enter button</string>
+    <string name="name_str">Имя</string>
+    <string name="RegisterButton">Register button</string>
+    <string name="wheretogo_nsk">WhereToGo.NSK</string>
+    <string name="title_additional_info">Интеллектуальный гид\n по Новосибирску</string>
+    <string name="default_place_name">Название места</string>
+    <string name="back_button">Назад</string>
+    <string name="favourite_text">❤ ️Избранное</string>
+    <string name="visited_text">📍 Посещенное</string>
+
+    <string name="unexpectedErrorMsg">Произошла непредвиденная ошибка</string>
+    <string name="usernameAlreadyRegisteredMsg">Пользователь с таким именем уже существует</string>
+    <string name="emailAlreadyRegisteredMsg">Пользователь с такой почтой уже существует</string>
+    <string name="wrongCredentialsMsg">Неверная почта или пароль</string>
+    <string name="authErrorLoginAgain">Ошибка авторизации. Войдите в систему заново.</string>
+    <string name="wrongEmailFormatMsg">Неверный формат адреса электронной почты</string>
+    <string name="emptyEmailMsg">Введите адрес электронной почты</string>
+    <string name="emptyUsernameMsg">Введите имя пользователя</string>
+
+    <string name="register_str">Зарегистрироваться</string>
+    <string name="login_str">Войти</string>
+    <string name="submit_reg_str">Зарегистрироваться</string>
+    <string name="register_title">РЕГИСТРАЦИЯ</string>
+    <string name="back_from_short_info">Назад</string>
+    <string name="place_title">Название места</string>
+    <string name="place_description">Информация о месте</string>
+    <string name="reviews">Отзывы</string>
+    <string name="user_name_str">Имя пользователя</string>
+    <string name="edit_profile_str">Редактировать профиль</string>
+    <string name="exit_account_str">Выйти</string>
+    <string name="categoriesHeader">Категории</string>
+    <string name="score_text">Ваша оценка</string>
+    <string name="visited_recommend_title">Рекомендации на основе посещенных вами мест</string>
+    <string name="location_history_explain">Получите доступ ко всем возможностям приложения, разрешив вести запись ваших перемещений. Это позволит нам сформировать для вас персональные рекомендации мест, где вы можете провести досуг.</string>
+    <string name="old_pwd_str">Старый пароль</string>
+    <string name="new_pwd_str">Новый пароль</string>
+    <string name="username_str">Изменить имя пользователя</string>
+    <string name="location_history_btn_str">История перемещений</string>
+
+</resources>
