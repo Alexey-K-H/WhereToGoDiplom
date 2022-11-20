@@ -18,11 +18,11 @@ import javax.crypto.spec.PBEParameterSpec;
 
 public class ObscuredSharedPreferences implements SharedPreferences {
     protected static final String UTF8 = "UTF-8";
-    private static char[] SECRET =null;
-    private static byte[] SALT=null;
+    private static char[] SECRET = null;
+    private static byte[] SALT = null;
 
-    private static char[] backup_secret=null;
-    private static byte[] backup_salt=null;
+    private static char[] backup_secret = null;
+    private static byte[] backup_salt = null;
 
     protected SharedPreferences delegate;
     protected Context context;
@@ -51,7 +51,7 @@ public class ObscuredSharedPreferences implements SharedPreferences {
             //make sure to use application context since preferences live outside an Activity
             //use for objects that have global scope like: prefs or starting services
             prefs.put(domain, new ObscuredSharedPreferences(
-                    c.getApplicationContext(), c.getApplicationContext().getSharedPreferences(domain, contextMode) )
+                    c.getApplicationContext(), c.getApplicationContext().getSharedPreferences(domain, contextMode))
             );
         }
         return prefs.get(domain);
@@ -145,12 +145,12 @@ public class ObscuredSharedPreferences implements SharedPreferences {
         //Boolean string values should be 'true' or 'false'
         //Boolean.parseBoolean does not throw a format exception, so check manually
         String parsed = decrypt(v);
-        if (!checkBooleanString(parsed) ) {
+        if (!checkBooleanString(parsed)) {
             //could not decrypt the Boolean.  Maybe the wrong key was used.
             decryptionErrorFlag = true;
             Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key used.");
         }
-        return v!=null ? Boolean.parseBoolean(parsed) : defValue;
+        return v != null ? Boolean.parseBoolean(parsed) : defValue;
     }
 
     private boolean checkBooleanString(String str) {
@@ -170,7 +170,7 @@ public class ObscuredSharedPreferences implements SharedPreferences {
         } catch (NumberFormatException e) {
             //could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true;
-            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  "+e.getMessage());
+            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  " + e.getMessage());
         }
         return defValue;
     }
@@ -188,7 +188,7 @@ public class ObscuredSharedPreferences implements SharedPreferences {
         } catch (NumberFormatException e) {
             //could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true;
-            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  "+e.getMessage());
+            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  " + e.getMessage());
         }
         return defValue;
     }
@@ -206,7 +206,7 @@ public class ObscuredSharedPreferences implements SharedPreferences {
         } catch (NumberFormatException e) {
             //could not decrypt the number.  Maybe we are using the wrong key?
             decryptionErrorFlag = true;
-            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  "+e.getMessage());
+            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  Possible incorrect key.  " + e.getMessage());
         }
         return defValue;
     }
@@ -267,31 +267,31 @@ public class ObscuredSharedPreferences implements SharedPreferences {
         SALT = backup_salt;
     }
 
-    protected String encrypt( String value ) {
+    protected String encrypt(String value) {
 
         try {
-            final byte[] bytes = value!=null ? value.getBytes(StandardCharsets.UTF_8) : new byte[0];
+            final byte[] bytes = value != null ? value.getBytes(StandardCharsets.UTF_8) : new byte[0];
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
             SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SECRET));
             Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
             pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
             return new String(Base64Support.encode(pbeCipher.doFinal(bytes), Base64Support.NO_WRAP), StandardCharsets.UTF_8);
-        } catch( Exception e ) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    protected String decrypt(String value){
+    protected String decrypt(String value) {
         try {
-            final byte[] bytes = value!=null ? Base64Support.decode(value,Base64Support.DEFAULT) : new byte[0];
+            final byte[] bytes = value != null ? Base64Support.decode(value, Base64Support.DEFAULT) : new byte[0];
             SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
             SecretKey key = keyFactory.generateSecret(new PBEKeySpec(SECRET));
             Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
             pbeCipher.init(Cipher.DECRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
             return new String(pbeCipher.doFinal(bytes), StandardCharsets.UTF_8);
-        } catch( Exception e) {
-            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  It may be stored in plaintext.  "+e.getMessage());
+        } catch (Exception e) {
+            Log.e(this.getClass().getName(), "Warning, could not decrypt the value.  It may be stored in plaintext.  " + e.getMessage());
             return value;
         }
     }

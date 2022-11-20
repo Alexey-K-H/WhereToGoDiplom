@@ -1,19 +1,14 @@
 package ru.nsu.fit.wheretogo;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.time.Instant;
-import java.util.Date;
+import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
@@ -30,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         loginEmailText = findViewById(R.id.loginEmailText);
         loginPasswordText = findViewById(R.id.loginPasswordText);
     }
+
     public void login(View view) {
         String email = loginEmailText.getText().toString();
         String password = loginPasswordText.getText().toString();
@@ -59,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void openLocationHistoryAdvice(){
+    private void openLocationHistoryAdvice() {
         finish();
         Intent intent = new Intent(this, LocationHistoryActivity.class);
         intent.putExtra("advice", "location_history");
@@ -70,7 +66,7 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-    private void saveAuthData(String email, String password){
+    private void saveAuthData(String email, String password) {
 //        SharedPreferences sharedPreferences = getSharedPreferences("AUTH_DATA", MODE_PRIVATE);
 
         SharedPreferences sharedPreferences = new ObscuredSharedPreferences(

@@ -1,6 +1,5 @@
 package ru.nsu.fit.wheretogo.util;
 
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.util.Log;
 
@@ -64,8 +63,7 @@ public class AuthorizationHelper {
                 if (response.isSuccessful()) {
                     AuthorizationHelper.setUserProfile(response.body());
                     onSuccess.accept(response);
-                }
-                else {
+                } else {
                     onFail.accept(response);
                 }
             }
@@ -93,8 +91,7 @@ public class AuthorizationHelper {
                 if (response.isSuccessful()) {
                     AuthorizationHelper.setUserProfile(response.body());
                     onSuccess.accept(response);
-                }
-                else {
+                } else {
                     onFail.accept(response);
                 }
             }
@@ -111,16 +108,15 @@ public class AuthorizationHelper {
             Consumer<Response<Void>> onSuccess,
             Consumer<Response<Void>> onFail,
             Runnable onUnexpectedError
-    ){
+    ) {
         userService.logout().enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     AuthorizationHelper.setEmail("");
                     AuthorizationHelper.setPassword("");
                     onSuccess.accept(response);
-                }
-                else {
+                } else {
                     onFail.accept(response);
                 }
             }
@@ -137,13 +133,13 @@ public class AuthorizationHelper {
             Consumer<Response<User>> onSuccess,
             Consumer<Response<User>> onFail,
             Runnable onUnexpectedError
-    ){
+    ) {
         userService.setUsername(newUsername).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onSuccess.accept(response);
-                }else {
+                } else {
                     onFail.accept(response);
                 }
             }
@@ -160,13 +156,13 @@ public class AuthorizationHelper {
             Consumer<Response<Void>> onSuccess,
             Consumer<Response<Void>> onFail,
             Runnable onUnexpectedError
-    ){
+    ) {
         userService.setPassword(newPassword).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     onSuccess.accept(response);
-                }else {
+                } else {
                     onFail.accept(response);
                 }
             }
@@ -178,5 +174,6 @@ public class AuthorizationHelper {
         });
     }
 
-    private AuthorizationHelper() {}
+    private AuthorizationHelper() {
+    }
 }

@@ -1,7 +1,5 @@
 package ru.nsu.fit.wheretogo;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +7,8 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +32,7 @@ public class RegistrationActivity extends AppCompatActivity {
         registerEmailText = findViewById(R.id.registerEmailText);
         registerPasswordText = findViewById(R.id.registerPasswordText);
     }
+
     public void register(View view) {
         String username = registerNameText.getText().toString();
         String email = registerEmailText.getText().toString();
@@ -58,7 +59,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         loginSuccessResponse -> {
                             saveAuthData(AuthorizationHelper.getEmail(), AuthorizationHelper.getPassword());
                             openLocationHistoryAdvice();
-                            },
+                        },
                         loginFailResponse -> showUnexpectedErrorMessage(),
                         this::showUnexpectedErrorMessage
                 ),
@@ -90,7 +91,7 @@ public class RegistrationActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void openLocationHistoryAdvice(){
+    private void openLocationHistoryAdvice() {
         finish();
         Intent intent = new Intent(this, LocationHistoryActivity.class);
         intent.putExtra("advice", "location_history");
@@ -105,7 +106,7 @@ public class RegistrationActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-    private void saveAuthData(String email, String password){
+    private void saveAuthData(String email, String password) {
 //        SharedPreferences sharedPreferences = getSharedPreferences("AUTH_DATA", MODE_PRIVATE);
 
         SharedPreferences sharedPreferences = new ObscuredSharedPreferences(

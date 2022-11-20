@@ -1,7 +1,6 @@
 package ru.nsu.fit.wheretogo;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -9,8 +8,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.map.MapsActivity;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
-import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
@@ -41,12 +38,12 @@ public class AuthorizationActivity extends AppCompatActivity {
 //        }
     }
 
-    public void openLogin(View view){
+    public void openLogin(View view) {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
-    public void openRegister(View view){
+    public void openRegister(View view) {
         Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
     }

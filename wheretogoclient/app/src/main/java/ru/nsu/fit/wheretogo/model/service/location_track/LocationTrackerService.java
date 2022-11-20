@@ -45,16 +45,15 @@ public class LocationTrackerService extends Service {
             //Получаем текущее метосположение пользователя
             if (locationResult != null) {
                 //Сравниваем его с предыдущим местоположением
-                if(mLocation == null){
+                if (mLocation == null) {
                     mLocation = locationResult.getLastLocation();
                 }
                 double distance = locationResult.getLastLocation().distanceTo(mLocation);
                 //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
-                if(distance <= 200.00){
+                if (distance <= 200.00) {
                     Log.d(TAG, "Find point inside 2 kilometers area");
                     countSameFindings += 1;
-                }
-                else {
+                } else {
                     //Сбрасываем счетчик
                     countSameFindings = 0;
                     //Обновляем местоположение
@@ -62,7 +61,7 @@ public class LocationTrackerService extends Service {
                 }
 
                 //Если счетчик дважды увеличился в промежутке 15 мин, то мы нашли stay-point
-                if(countSameFindings == 2){
+                if (countSameFindings == 2) {
                     Log.d(TAG, "Find new stay-point candidate");
                     countSameFindings = 0;
 
@@ -95,12 +94,12 @@ public class LocationTrackerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null){
+        if (intent != null) {
             String action = intent.getAction();
-            if(action != null){
-                if(action.equals(Constants.TRACKER_SERVICE_START)){
+            if (action != null) {
+                if (action.equals(Constants.TRACKER_SERVICE_START)) {
                     startLocationService();
-                }else if(action.equals(Constants.TRACKER_SERVICE_STOP)){
+                } else if (action.equals(Constants.TRACKER_SERVICE_STOP)) {
                     stopLocationService();
                 }
             }
@@ -134,7 +133,7 @@ public class LocationTrackerService extends Service {
         super.onDestroy();
     }
 
-    private void startLocationService(){
+    private void startLocationService() {
         String channelId = "location_notification_channel";
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent resultIntent = new Intent(this, LocationHistoryActivity.class);
@@ -157,8 +156,8 @@ public class LocationTrackerService extends Service {
         builder.setAutoCancel(false);
         builder.setPriority(NotificationCompat.PRIORITY_MAX);
 
-        if(notificationManager != null
-                    && notificationManager.getNotificationChannel(channelId) == null){
+        if (notificationManager != null
+                && notificationManager.getNotificationChannel(channelId) == null) {
             NotificationChannel notificationChannel = new NotificationChannel(
                     channelId,
                     "Location Service",
@@ -174,14 +173,14 @@ public class LocationTrackerService extends Service {
         locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
 
         getLocationPermission();
-        if(locationPermissionGranted){
+        if (locationPermissionGranted) {
             locationUpdateThread.start();
         }
 
         startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
     }
 
-    private void stopLocationService(){
+    private void stopLocationService() {
         LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
         stopForeground(true);
         stopSelf();

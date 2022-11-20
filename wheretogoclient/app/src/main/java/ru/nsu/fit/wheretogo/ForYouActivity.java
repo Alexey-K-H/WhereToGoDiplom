@@ -41,7 +41,7 @@ public class ForYouActivity extends AppCompatActivity {
         setContentView(R.layout.activity_for_you);
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null){
+        if (extras != null) {
             lastLocation = extras.getParcelable("lastLocation");
             Log.d(TAG, "Get lastKnownLocation (" + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + ")");
         }
@@ -56,21 +56,20 @@ public class ForYouActivity extends AppCompatActivity {
         checkStayPoints.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if(response.code() == 200 && response.body() != null){
-                    if(response.body()){
+                if (response.code() == 200 && response.body() != null) {
+                    if (response.body()) {
                         Log.d(TAG, "Find some stay-points");
                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
-                    }else {
+                    } else {
                         Call<Boolean> checkVisited = ServiceGenerator.createService(UserService.class).isUserHasVisited();
                         checkVisited.enqueue(new Callback<Boolean>() {
                             @Override
                             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                                if(response.code() == 200 && response.body() != null){
-                                    if(response.body()){
+                                if (response.code() == 200 && response.body() != null) {
+                                    if (response.body()) {
                                         Log.d(TAG, "Find some visited places");
                                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
-                                    }
-                                    else {
+                                    } else {
                                         blockRecommendButton(recommendByVisitedBtn);
                                     }
                                 }
@@ -96,22 +95,22 @@ public class ForYouActivity extends AppCompatActivity {
         checkScores.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if(response.code() == 200 && response.body() != null){
-                    if(response.body()){
+                if (response.code() == 200 && response.body() != null) {
+                    if (response.body()) {
                         Log.d(TAG, "Find some scores of user");
                         recommendByScoredBtn.setOnClickListener(ForYouActivity.this::openScoredRecommender);
                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
-                    }else {
+                    } else {
                         blockRecommendButton(recommendByScoredBtn);
                         Call<Boolean> checkFavourites = ServiceGenerator.createService(UserService.class).isUserHasFavourites();
                         checkFavourites.enqueue(new Callback<Boolean>() {
                             @Override
                             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                                if(response.code() == 200 && response.body() != null){
-                                    if(response.body()){
+                                if (response.code() == 200 && response.body() != null) {
+                                    if (response.body()) {
                                         Log.d(TAG, "Find some favourites places");
                                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
-                                    }else {
+                                    } else {
                                         blockRecommendButton(recommendByOthersBtn);
                                     }
                                 }
@@ -132,16 +131,16 @@ public class ForYouActivity extends AppCompatActivity {
             }
         });
 
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-        if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             blockRecommendButton(recommendByGPSBtn);
-        }else{
+        } else {
             recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
         }
 
     }
 
-    public void openNearestRecommender(View view){
+    public void openNearestRecommender(View view) {
         recommendByGPSBtn.setImageResource(R.drawable.nearest_rec_btn_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
@@ -150,7 +149,7 @@ public class ForYouActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void openVisitedRecommender(View view){
+    public void openVisitedRecommender(View view) {
         recommendByVisitedBtn.setImageResource(R.drawable.btn_by_places_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
@@ -159,7 +158,7 @@ public class ForYouActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void openScoredRecommender(View view){
+    public void openScoredRecommender(View view) {
         recommendByScoredBtn.setImageResource(R.drawable.btn_by_prefs_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
@@ -168,7 +167,7 @@ public class ForYouActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void openUsersRecommender(View view){
+    public void openUsersRecommender(View view) {
         recommendByOthersBtn.setImageResource(R.drawable.btn_by_users_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
@@ -178,7 +177,7 @@ public class ForYouActivity extends AppCompatActivity {
     }
 
     //Блокирует кнопку вызова рекомендации в случае, если не хватает данных
-    private void blockRecommendButton(ImageButton imageButton){
+    private void blockRecommendButton(ImageButton imageButton) {
         imageButton.setClickable(false);
         imageButton.setImageResource(R.drawable.not_available_recommend);
     }

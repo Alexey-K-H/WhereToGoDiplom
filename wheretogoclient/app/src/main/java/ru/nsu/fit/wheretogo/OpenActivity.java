@@ -3,7 +3,6 @@ package ru.nsu.fit.wheretogo;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,7 +25,7 @@ public class OpenActivity extends AppCompatActivity {
 
         String email = sharedPreferences.getString("email", "");
         String password = sharedPreferences.getString("password", "");
-        if(!email.equals("") && !password.equals("")){
+        if (!email.equals("") && !password.equals("")) {
             AuthorizationHelper.login(
                     email,
                     password,
@@ -36,18 +35,18 @@ public class OpenActivity extends AppCompatActivity {
                     failResponse -> {
                         showNotification(getString(R.string.authErrorLoginAgain));
                         openAuthScreen();
-                        },
+                    },
                     () -> {
                         showUnexpectedErrorMessage();
                         openAuthScreen();
                     }
             );
-        }else {
+        } else {
             openAuthScreen();
         }
     }
 
-    private void openAuthScreen(){
+    private void openAuthScreen() {
         finish();
         Intent intent = new Intent(this, AuthorizationActivity.class);
         startActivity(intent);

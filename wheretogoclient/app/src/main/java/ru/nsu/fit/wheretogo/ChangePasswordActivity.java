@@ -30,23 +30,23 @@ public class ChangePasswordActivity extends AppCompatActivity {
         saveButton.setOnClickListener(this::updateUserPassword);
     }
 
-    public void updateUserPassword(View view){
+    public void updateUserPassword(View view) {
         String oldPwd = oldPasswordText.getText().toString();
         String newPwd = newPasswordText.getText().toString();
 
-        if(oldPwd.isEmpty() || !oldPwd.equals(AuthorizationHelper.getPassword())){
+        if (oldPwd.isEmpty() || !oldPwd.equals(AuthorizationHelper.getPassword())) {
             showNotification("Неправильно введен старый пароль!");
             return;
         }
 
-        if(newPwd.isEmpty()){
+        if (newPwd.isEmpty()) {
             showNotification("Введите новый пароль!");
             return;
         }
 
-        if(newPwd.equals(oldPwd)){
+        if (newPwd.equals(oldPwd)) {
             showNotification("Новый и старый пароли не должны совпадать!");
-        }else {
+        } else {
             AuthorizationHelper.changePassword(
                     newPwd,
                     successResponse -> {

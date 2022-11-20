@@ -23,7 +23,7 @@ import ru.nsu.fit.wheretogo.model.service.location_track.Constants;
 import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 
 public class LocationHistoryActivity extends AppCompatActivity {
-    private static final String TAG  = LocationHistoryActivity.class.getSimpleName();
+    private static final String TAG = LocationHistoryActivity.class.getSimpleName();
     private ImageButton locationTrackerSwitcher;
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
     private boolean advise = false;
@@ -36,28 +36,28 @@ public class LocationHistoryActivity extends AppCompatActivity {
         ImageButton skipBtn = (ImageButton) findViewById(R.id.skip_btn_history);
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null){
+        if (extras != null) {
             String advice = extras.getString("advice");
             String from = extras.getString("from");
-            if(advice!= null && advice.equals("location_history")){
+            if (advice != null && advice.equals("location_history")) {
                 skipBtn.setOnClickListener(this::skip);
                 advise = true;
             }
-            if(from != null && from.equals("notification")){
+            if (from != null && from.equals("notification")) {
                 Log.d(TAG, "get from Notification");
                 skipBtn.setVisibility(View.GONE);
             }
-        }else {
+        } else {
             skipBtn.setVisibility(View.GONE);
         }
 
         locationTrackerSwitcher = (ImageButton) findViewById(R.id.location_history_switcher);
 
         //Проверка того, что сервис мониторинга запущен
-        if(isServiceRunning()){
+        if (isServiceRunning()) {
             Log.d(TAG, "Location service history working");
             locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history);
-        }else {
+        } else {
             Log.d(TAG, "Location service history not working");
             locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history_not_active);
         }
@@ -70,37 +70,35 @@ public class LocationHistoryActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode == REQUEST_CODE_LOCATION_PERMISSION && grantResults.length > 0){
-            if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == REQUEST_CODE_LOCATION_PERMISSION && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 startLocationTracker();
-            }else {
+            } else {
                 Toast.makeText(this, "Доступ к геоданным отклонен", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public void switchLocationTracker(View view){
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+    public void switchLocationTracker(View view) {
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        if(isServiceRunning()){
+        if (isServiceRunning()) {
             stopLocationTracker();
-        }
-        else {
-            if(ContextCompat.checkSelfPermission(
+        } else {
+            if (ContextCompat.checkSelfPermission(
                     getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED){
+            ) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(
                         LocationHistoryActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_CODE_LOCATION_PERMISSION
                 );
-            }
-            else {
-                if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            } else {
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     Toast.makeText(this, "GPS отключен, запись истории невозможна. Включите GPS в настройках устройства", Toast.LENGTH_LONG).show();
-                }else{
+                } else {
                     startLocationTracker();
-                    if(advise){
+                    if (advise) {
                         finish();
                         Intent intent = new Intent(this, MapsActivity.class);
                         startActivity(intent);
@@ -119,7 +117,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
         Log.d(TAG, "Запись истории перемещений включена");
     }
 
-    private void stopLocationTracker(){
+    private void stopLocationTracker() {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
         intent.setAction(Constants.TRACKER_SERVICE_STOP);
         startService(intent);
@@ -128,11 +126,11 @@ public class LocationHistoryActivity extends AppCompatActivity {
         Log.d(TAG, "Запись истории перемещений отключена");
     }
 
-    private boolean isServiceRunning(){
+    private boolean isServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
-            if(LocationTrackerService.class.getName().equals(service.service.getClassName())){
-                if(service.foreground){
+        for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (LocationTrackerService.class.getName().equals(service.service.getClassName())) {
+                if (service.foreground) {
                     return true;
                 }
             }
@@ -140,7 +138,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
         return false;
     }
 
-    public void skip(View view){
+    public void skip(View view) {
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);

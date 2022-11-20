@@ -14,7 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.map.MapsActivity;
 import ru.nsu.fit.wheretogo.model.service.location_track.Constants;
 import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
@@ -45,17 +44,17 @@ public class AccountActivity extends AppCompatActivity {
         nameLabel.setText(AuthorizationHelper.getUserProfile().getUsername());
     }
 
-    public void openLocationHistoryManager(View view){
+    public void openLocationHistoryManager(View view) {
         Intent intent = new Intent(this, LocationHistoryActivity.class);
         startActivity(intent);
     }
 
-    public void openAccountEditor(View view){
+    public void openAccountEditor(View view) {
         Intent intent = new Intent(this, AccountEditActivity.class);
         startActivity(intent);
     }
 
-    public void logout(View view){
+    public void logout(View view) {
         AuthorizationHelper.logout(
                 successResponse -> {
                     Log.d(TAG, "Clear shared preferences");
@@ -69,7 +68,7 @@ public class AccountActivity extends AppCompatActivity {
                     editor.apply();
 
                     Log.d(TAG, "Stop service location tracker if it runs...");
-                    if(isServiceRunning()){
+                    if (isServiceRunning()) {
                         Log.d(TAG, "Need to stop running service");
                         stopLocationTracker();
                     }
@@ -90,11 +89,11 @@ public class AccountActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
-    private boolean isServiceRunning(){
+    private boolean isServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
-            if(LocationTrackerService.class.getName().equals(service.service.getClassName())){
-                if(service.foreground){
+        for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (LocationTrackerService.class.getName().equals(service.service.getClassName())) {
+                if (service.foreground) {
                     return true;
                 }
             }
@@ -102,7 +101,7 @@ public class AccountActivity extends AppCompatActivity {
         return false;
     }
 
-    private void stopLocationTracker(){
+    private void stopLocationTracker() {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
         intent.setAction(Constants.TRACKER_SERVICE_STOP);
         startService(intent);

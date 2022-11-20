@@ -1,7 +1,6 @@
 package ru.nsu.fit.wheretogo;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -12,7 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
-import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class AccountEditActivity extends AppCompatActivity {
     private String oldUserName;
@@ -34,20 +32,20 @@ public class AccountEditActivity extends AppCompatActivity {
         saveButton = (ImageButton) findViewById(R.id.save_profile_btn);
         saveButton.setOnClickListener(this::updateUserSettings);
 
-        editPasswordButton =  (ImageButton) findViewById(R.id.changePwd_btn);
+        editPasswordButton = (ImageButton) findViewById(R.id.changePwd_btn);
         editPasswordButton.setOnClickListener(this::openChangePwdEditor);
     }
 
-    public void updateUserSettings(View view){
+    public void updateUserSettings(View view) {
         String newUsername = editNameText.getText().toString();
 
 
-        if(newUsername.isEmpty()){
+        if (newUsername.isEmpty()) {
             showNotification(getString(R.string.emptyUsernameMsg));
             return;
         }
 
-        if(!newUsername.equals(oldUserName)){
+        if (!newUsername.equals(oldUserName)) {
             AuthorizationHelper.changeUsername(
                     newUsername,
                     successResponse -> {
@@ -61,7 +59,7 @@ public class AccountEditActivity extends AppCompatActivity {
 
     }
 
-    public void openChangePwdEditor(View view){
+    public void openChangePwdEditor(View view) {
         Intent intent = new Intent(this, ChangePasswordActivity.class);
         startActivity(intent);
     }

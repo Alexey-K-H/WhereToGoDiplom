@@ -16,8 +16,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 import com.google.maps.android.ui.IconGenerator;
 
-import java.util.Set;
-
 import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 

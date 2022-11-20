@@ -20,7 +20,8 @@ public class User {
     @Expose
     private String avatarThumbnailLink;
 
-    public User() {}
+    public User() {
+    }
 
     public User(Long id, String email, String username, String avatarLink, String avatarThumbnailLink) {
         this.id = id;

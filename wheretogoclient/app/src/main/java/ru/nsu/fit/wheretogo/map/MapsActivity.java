@@ -1,20 +1,14 @@
 package ru.nsu.fit.wheretogo.map;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -73,11 +66,10 @@ import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
 import ru.nsu.fit.wheretogo.model.service.CategoryService;
-import ru.nsu.fit.wheretogo.model.service.UserService;
-import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
 import ru.nsu.fit.wheretogo.model.service.PlaceListService;
 import ru.nsu.fit.wheretogo.model.service.PlaceService;
 import ru.nsu.fit.wheretogo.model.service.ScoreService;
+import ru.nsu.fit.wheretogo.model.service.UserService;
 import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
@@ -159,7 +151,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     break;
             }
 
-            if(showMapMode == ShowMapMode.NEAREST){
+            if (showMapMode == ShowMapMode.NEAREST) {
                 lastKnownLocation = extras.getParcelable("lastLocation");
                 Log.d(TAG, "Get lastKnownLocation for nearest: " + lastKnownLocation.getLatitude() + ", " + lastKnownLocation.getLongitude() + ")");
             }
@@ -206,7 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Buttons init
         ImageButton recommenderButton = (ImageButton) findViewById(R.id.for_you_btn);
 
-        if(showMapMode != ShowMapMode.ALL){
+        if (showMapMode != ShowMapMode.ALL) {
             recommenderButton.setImageResource(R.drawable.back_from_rec_map);
         }
 
@@ -216,7 +208,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ImageButton userPrefs = (ImageButton) findViewById(R.id.user_settings_btn);
 
         //Buttons listeners
-        if(showMapMode != ShowMapMode.ALL){
+        if (showMapMode != ShowMapMode.ALL) {
             recommenderButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -224,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             });
             userPrefs.setVisibility(View.GONE);
-        }else{
+        } else {
             userPrefs.setOnClickListener(this::openUserPrefs);
             recommenderButton.setOnClickListener(this::openRecommenders);
         }
@@ -232,10 +224,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         favoritesButton.setOnClickListener(this::openFavourites);
         visitedButton.setOnClickListener(this::openVisited);
 
-        if(showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST){
+        if (showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST) {
             filters.setEnabled(false);
             filters.setVisibility(View.INVISIBLE);
-        }else{
+        } else {
             filters.setOnClickListener(this::openFilters);
         }
 
@@ -243,7 +235,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                if(action.equals("logout")){
+                if (action.equals("logout")) {
                     finish();
                 }
             }
@@ -274,10 +266,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap map) {
         this.map = map;
 
-        try{
+        try {
             this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(), R.raw.map_without_labels_style));
             Log.d(TAG, "Load configuration file successfully");
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, "Cannot load JSON file to configure map");
         }
 
@@ -353,8 +345,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case RECOMMENDED_SCORED:
                 placeCall = placeService.getRecommendByScores(
-                      1,
-                      0
+                        1,
+                        0
                 );
                 break;
             case RECOMMENDED_USERS:
@@ -391,6 +383,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
+
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
@@ -399,16 +392,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
-            if(!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 Log.d(TAG, "GPS unavailable, set default location");
                 map.moveCamera(CameraUpdateFactory
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
 //                sendPlacesRequest();
-            }else {
+            } else {
                 if (locationPermissionGranted) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                     locationResult.addOnCompleteListener(this, task -> {
@@ -429,7 +422,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             map.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     });
-                }else  {
+                } else {
                     Log.d(TAG, "No gps access, set default location");
                     map.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
@@ -600,7 +593,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onResponse(@NonNull Call<Place> call, @NonNull Response<Place> response) {
                 TextView placeDescription = view.findViewById(R.id.place_description);
-                if(response.isSuccessful() && response.body() != null){
+                if (response.isSuccessful() && response.body() != null) {
                     String descriptionText = response.body().getDescription();
                     descriptionText = descriptionText.substring(0, 1).toUpperCase()
                             + descriptionText.substring(1);
@@ -608,8 +601,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     selectedPlace.getPlace().setDescription(descriptionText);
                     selectedPlace.setId(item.getId());
-                }
-                else {
+                } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -627,11 +619,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         visitedCheckCall.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    if(response.body()){
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body()) {
                         visited.setImageResource(R.drawable.add_to_visited);
-                    }
-                    else {
+                    } else {
                         visited.setImageResource(R.drawable.unknown);
                     }
                 }
@@ -647,11 +638,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         favouriteCheckCall.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                if(response.isSuccessful() && response.body() != null){
-                    if(response.body()){
+                if (response.isSuccessful() && response.body() != null) {
+                    if (response.body()) {
                         favourite.setImageResource(R.drawable.add_to_favour);
-                    }
-                    else {
+                    } else {
                         favourite.setImageResource(R.drawable.add_to_favour_not_active);
                     }
                 }
@@ -671,9 +661,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         scoreCall.enqueue(new Callback<Score>() {
             @Override
             public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
-                if(response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
                     Long userMark = response.body().getScore();
-                    placeScore.setRating((float)userMark);
+                    placeScore.setRating((float) userMark);
                 }
             }
 
@@ -688,19 +678,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Call<Score> call = ServiceGenerator.createService(ScoreService.class)
                     .setScore(AuthorizationHelper.getUserProfile().getId(),
                             selectedPlace.getId(),
-                            (int)v);
+                            (int) v);
 
             call.enqueue(new Callback<Score>() {
                 @Override
                 public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
-                    if(response.code() == 200 && response.body()!= null){
+                    if (response.code() == 200 && response.body() != null) {
                         ratingBar.setRating(response.body().getScore());
                         Call<Boolean> placeInVisited = ServiceGenerator.createService(UserService.class).isPlaceInUserVisited(selectedPlace.getId());
                         placeInVisited.enqueue(new Callback<Boolean>() {
                             @Override
                             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                                if(response.code() == 200 && response.body()!= null){
-                                    if(!response.body()){
+                                if (response.code() == 200 && response.body() != null) {
+                                    if (!response.body()) {
                                         addVisitedPlace(view);
                                     }
                                 }
@@ -711,10 +701,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             }
                         });
-                    }else if(response.code() == 400){
+                    } else if (response.code() == 400) {
 
-                    }
-                    else {
+                    } else {
                         Toast.makeText(context, R.string.unexpectedErrorMsg,
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -733,19 +722,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(intent);
     }
 
-    private void openRecommenders(View view){
+    public void openRecommenders(View view) {
 //        locationUpdateThread.quit();
         Intent intent = new Intent(this, ForYouActivity.class);
         intent.putExtra("lastLocation", lastKnownLocation);
         startActivity(intent);
     }
 
-    private void openUserPrefs(View view){
+    private void openUserPrefs(View view) {
         Intent intent = new Intent(this, AccountActivity.class);
         startActivity(intent);
     }
 
-    private void openFullPlaceInfo(View view){
+    public void openFullPlaceInfo(View view) {
         Intent intent = new Intent(this, PlaceActivity.class);
 
         intent.putExtra("id", selectedPlace.getId().toString());
@@ -820,17 +809,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void deleteVisitedPlace(Long placeId){
+    private void deleteVisitedPlace(Long placeId) {
         Call<String> call = ServiceGenerator.createService(PlaceService.class)
                 .deleteVisited(placeId);
         Context context = this;
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if(response.code() == 200){
+                if (response.code() == 200) {
                     Toast.makeText(context, "Удалено из посещенного",
                             Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -843,17 +832,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private void deleteFavouritePlace(Long placeId){
+    private void deleteFavouritePlace(Long placeId) {
         Call<String> call = ServiceGenerator.createService(PlaceService.class)
                 .deleteFavourite(placeId);
         Context context = this;
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if(response.code() == 200){
+                if (response.code() == 200) {
                     Toast.makeText(context, "Удалено из избранного",
                             Toast.LENGTH_SHORT).show();
-                }else {
+                } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -952,7 +941,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onBackPressed() {
         super.onBackPressed();
 
-        if(showMapMode != ShowMapMode.ALL){
+        if (showMapMode != ShowMapMode.ALL) {
             //Close recommender map and open recommenders
             finish();
             Intent intent = new Intent(this, ForYouActivity.class);

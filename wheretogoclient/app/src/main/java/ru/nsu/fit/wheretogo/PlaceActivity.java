@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -45,12 +44,12 @@ public class PlaceActivity extends AppCompatActivity {
         View placeFullDescView = LayoutInflater.from(getApplicationContext())
                 .inflate(
                         R.layout.activity_map_place,
-                        (ConstraintLayout)findViewById(R.id.place_description_container)
+                        (ConstraintLayout) findViewById(R.id.place_description_container)
                 );
 
 
         Bundle arguments = getIntent().getExtras();
-        if(arguments != null){
+        if (arguments != null) {
             //Берем информацию о местах
             placeId = Long.parseLong(getIntent().getStringExtra("id"));
             placeTitle = getIntent().getStringExtra("title");
@@ -72,9 +71,9 @@ public class PlaceActivity extends AppCompatActivity {
         call.enqueue(new Callback<Score>() {
             @Override
             public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
-                if(response.code() == 200 && response.body() != null){
+                if (response.code() == 200 && response.body() != null) {
                     Long userMark = response.body().getScore();
-                    ratingBar.setRating((float)userMark);
+                    ratingBar.setRating((float) userMark);
                 }
             }
 
@@ -90,21 +89,20 @@ public class PlaceActivity extends AppCompatActivity {
             Call<Score> call1 = ServiceGenerator.createService(ScoreService.class)
                     .setScore(AuthorizationHelper.getUserProfile().getId(),
                             placeId,
-                            (int)v);
+                            (int) v);
 
             call1.enqueue(new Callback<Score>() {
                 @Override
                 public void onResponse(@NonNull Call<Score> call1, @NonNull Response<Score> response) {
-                    if(response.code() == 200 && response.body()!= null){
+                    if (response.code() == 200 && response.body() != null) {
 //                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
 //                                    Toast.LENGTH_LONG).show();
 
                         ratingBar1.setRating(response.body().getScore());
                         addVisitedPlace(placeFullDescView);
-                    }else if(response.code() == 400){
+                    } else if (response.code() == 400) {
 
-                    }
-                    else {
+                    } else {
                         Toast.makeText(PlaceActivity.this, R.string.unexpectedErrorMsg,
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -118,8 +116,8 @@ public class PlaceActivity extends AppCompatActivity {
         });
     }
 
-    private void fillPlaceFields(View view){
-        TextView placeName = (TextView)view.findViewById(R.id.place_title);
+    private void fillPlaceFields(View view) {
+        TextView placeName = (TextView) view.findViewById(R.id.place_title);
         placeName.setText(placeTitle);
 
         ImageView placeImage = (ImageView) view.findViewById(R.id.place_full_icon);
@@ -141,7 +139,7 @@ public class PlaceActivity extends AppCompatActivity {
                 });
 
 
-        TextView placeText = (TextView)view.findViewById(R.id.place_description);
+        TextView placeText = (TextView) view.findViewById(R.id.place_description);
         placeText.setText(placeDescription);
     }
 
