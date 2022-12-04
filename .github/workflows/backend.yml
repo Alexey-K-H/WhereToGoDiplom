@@ -3,6 +3,7 @@ name: backend-CI
 on:
   pull_request:
     types: [opened, reopened, synchronize]
+    paths: ./wheretogoserver/*
     
 defaults:
     run:
