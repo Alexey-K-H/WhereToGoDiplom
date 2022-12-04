@@ -9,5 +9,6 @@ import ru.nsu.fit.wheretogo.entity.User;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     public Page<Review> findByAuthor(User author, Pageable pageable);
+
     public Page<Review> findByPlace(Place place, Pageable pageable);
 }

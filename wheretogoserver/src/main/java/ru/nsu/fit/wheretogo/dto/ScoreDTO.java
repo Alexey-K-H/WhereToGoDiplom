@@ -15,7 +15,7 @@ import javax.validation.constraints.Min;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScoreDTO extends BaseDTO{
+public class ScoreDTO extends BaseDTO {
 
     private Long author;
     private Long place;
@@ -24,8 +24,8 @@ public class ScoreDTO extends BaseDTO{
     @Max(value = 5, message = "Maximum score for a place is 5.")
     private Integer score;
 
-    public static ScoreDTO getFromEntity(Score score){
-        if(score == null){
+    public static ScoreDTO getFromEntity(Score score) {
+        if (score == null) {
             return null;
         }
         return new ScoreDTO()

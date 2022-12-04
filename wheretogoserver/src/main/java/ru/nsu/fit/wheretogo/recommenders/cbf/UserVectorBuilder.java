@@ -8,16 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 public class UserVectorBuilder {
-    public UserVectorBuilder(){}
+    public UserVectorBuilder() {
+    }
 
-    public static Map<Category, Double> getUserVector(List<UserCoefficient> userCoefficients, List<Category> categories){
+    public static Map<Category, Double> getUserVector(List<UserCoefficient> userCoefficients, List<Category> categories) {
         //Инициализируем вектор средних оценок
         Map<Category, Double> avgScores = new HashMap<>();
-        for(Category category : categories){
+        for (Category category : categories) {
             avgScores.put(category, 0.0);
         }
 
-        for(UserCoefficient userCoefficient : userCoefficients){
+        for (UserCoefficient userCoefficient : userCoefficients) {
             avgScores.put(userCoefficient.getCategory(), userCoefficient.getCoeff());
         }
 

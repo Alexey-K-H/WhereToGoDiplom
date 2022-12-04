@@ -4,13 +4,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
-import ru.nsu.fit.wheretogo.service.*;
+import ru.nsu.fit.wheretogo.service.CategoryService;
+import ru.nsu.fit.wheretogo.service.PlacePicturesService;
+import ru.nsu.fit.wheretogo.service.PlaceService;
+import ru.nsu.fit.wheretogo.service.ScoreService;
+import ru.nsu.fit.wheretogo.service.StayPointService;
+import ru.nsu.fit.wheretogo.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -56,7 +68,7 @@ public class PlaceController {
     public ResponseEntity<String> addPicture(
             @RequestParam(name = "file") MultipartFile file,
             @RequestParam(name = "placeId") Long placeId
-            ) {
+    ) {
         try {
             picturesService.savePicture(file, placeId);
         } catch (Exception exception) {
@@ -119,30 +131,29 @@ public class PlaceController {
     }
 
     @GetMapping("/visited/{id}")
-    public ResponseEntity<Boolean> existVisitedById(@PathVariable(name = "id") Long id){
+    public ResponseEntity<Boolean> existVisitedById(@PathVariable(name = "id") Long id) {
         try {
             return ResponseEntity.ok(userService.findVisitedById(id));
-        }catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @GetMapping("/favourite/{id}")
-    public ResponseEntity<Boolean> existFavouriteById(@PathVariable(name = "id") Long id){
-        try{
+    public ResponseEntity<Boolean> existFavouriteById(@PathVariable(name = "id") Long id) {
+        try {
             return ResponseEntity.ok(userService.findFavouriteById(id));
-        }catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/visited/{id}")
-    public ResponseEntity<String> deleteVisitedById(@PathVariable(name = "id") Long id){
+    public ResponseEntity<String> deleteVisitedById(@PathVariable(name = "id") Long id) {
         try {
             userService.deleteVisited(id);
             return new ResponseEntity<>("Deleted", HttpStatus.OK);
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             exception.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -150,11 +161,10 @@ public class PlaceController {
 
     @DeleteMapping("/favourite/{id}")
     public ResponseEntity<String> deleteFavouriteById(@PathVariable(name = "id") Long id) {
-        try{
+        try {
             userService.deleteFavourite(id);
             return new ResponseEntity<>("Deleted", HttpStatus.OK);
-        }
-        catch (Exception exception){
+        } catch (Exception exception) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -213,11 +223,11 @@ public class PlaceController {
             @RequestParam(name = "category", required = false) List<Integer> categoryId,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ){
+    ) {
         String categoryIds = "";
         categoryIds = Objects.requireNonNullElseGet(
-                categoryId,
-                () -> categoryService.getAll().stream().map(CategoryDTO::getId).toList())
+                        categoryId,
+                        () -> categoryService.getAll().stream().map(CategoryDTO::getId).toList())
                 .stream().map(String::valueOf).collect(Collectors.joining(","));
 
         return new ResponseEntity<>(
@@ -239,14 +249,14 @@ public class PlaceController {
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getStayPointRecommendations(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ){
-        if(stayPointService.ifUserHasStayPoints()){
+    ) {
+        if (stayPointService.ifUserHasStayPoints()) {
             return new ResponseEntity<>(
                     service.getNearestPlacesByStayPoints(
                             page,
                             pageSize),
                     HttpStatus.OK);
-        }else {
+        } else {
             //Запрос на получение рекомендаций с учетом посещенных мест
             //(2-ая часть контент-ориентированной рекомендательной системы)
             return new ResponseEntity<>(
@@ -263,7 +273,7 @@ public class PlaceController {
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getContentBasedRecommendations(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ){
+    ) {
         return new ResponseEntity<>(
                 service.getContentBasedRecommendations(
                         page,
@@ -277,8 +287,8 @@ public class PlaceController {
     public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getCollaborativeFilteringRecommendations(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ){
-        if(scoreService.ifUserHasScores(userService.getCurrentUserDto().getId())){
+    ) {
+        if (scoreService.ifUserHasScores(userService.getCurrentUserDto().getId())) {
             return new ResponseEntity<>(
                     service.getCollaborativeRecommendationsByScores(
                             page,
@@ -286,7 +296,7 @@ public class PlaceController {
                     ),
                     HttpStatus.OK
             );
-        }else{
+        } else {
             return new ResponseEntity<>(
                     service.getCollaborativeRecommendationsByFavourites(
                             page,

@@ -3,14 +3,12 @@ package ru.nsu.fit.wheretogo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.StayPoint;
 import ru.nsu.fit.wheretogo.repository.StayPointRepository;
 import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -26,7 +24,7 @@ public class StayPointService {
     private UserRepository userRepository;
 
     @Transactional
-    public void addStoryPoint(double lat, double lon){
+    public void addStoryPoint(double lat, double lon) {
 
         StayPoint stayPoint = new StayPoint()
                 .setUser(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow())
@@ -39,14 +37,14 @@ public class StayPointService {
         boolean exist = false;
         double eps = 0.000001;//нужно для сравнения вещественных чисел
 
-        for(StayPoint userStayPoint : userStayPoints){
+        for (StayPoint userStayPoint : userStayPoints) {
             if (Math.abs(userStayPoint.getLatitude() - lat) < eps && Math.abs(userStayPoint.getLongitude() - lon) < eps) {
                 exist = true;
                 break;
             }
         }
 
-        if(exist){
+        if (exist) {
             //Обнволяем дату загрузки
             //Удаляем старую запись
             userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
@@ -61,7 +59,7 @@ public class StayPointService {
 
             stayPointRepository.setNewPointTimeStamp(Instant.now());
 
-        }else {
+        } else {
             userRepository.findByEmail(SecurityContextHelper.email()).ifPresent(
                     currentUser -> currentUser.getStayPoints().add(stayPoint)
             );
@@ -72,16 +70,16 @@ public class StayPointService {
         //Проверяем число stay-point-ов в базе данных
         //Если их стало больше 5(тетосвое значение), то удаялем самый старый
 
-        if(stayPointRepository.countByUserId(
+        if (stayPointRepository.countByUserId(
                 userRepository.findByEmail(SecurityContextHelper.email())
                         .orElseThrow()
-                        .getId()) > 5){
+                        .getId()) > 5) {
             deleteOldStoryPoint();
         }
     }
 
     @Transactional
-    public void deleteOldStoryPoint(){
+    public void deleteOldStoryPoint() {
         //Сперва берем список stay-point-ов пользователя и находим в них самый старый
         List<StayPoint> userStayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints();
         userStayPoints.sort(Comparator.comparing(StayPoint::getUploadedAt));
@@ -95,14 +93,14 @@ public class StayPointService {
     }
 
     @Transactional(readOnly = true)
-    public List<StayPointDTO> getByUser(){
+    public List<StayPointDTO> getByUser() {
         return userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity
         ).toList();
     }
 
     @Transactional(readOnly = true)
-    public boolean ifUserHasStayPoints(){
+    public boolean ifUserHasStayPoints() {
         return stayPointRepository.existsByUserId(userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId());
     }
 

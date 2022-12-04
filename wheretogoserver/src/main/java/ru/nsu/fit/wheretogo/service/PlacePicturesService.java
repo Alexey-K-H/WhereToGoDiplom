@@ -1,19 +1,17 @@
 package ru.nsu.fit.wheretogo.service;
 
-import org.springframework.core.io.Resource;//для работы с ресурсами - фрагментами данных
-import org.springframework.core.io.UrlResource;//используется для доступа к ресурсам по его url
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;////spring boot юзает для передачи файлов от сервера к клиенту, те тот, который приходит с запросов
+import org.springframework.web.multipart.MultipartFile;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.PlacePicture;
 import ru.nsu.fit.wheretogo.repository.PicturesRepository;
-import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;////утилитный класс для работы с файлами, локальными!
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -32,7 +30,7 @@ public class PlacePicturesService {
         this.picturesRepository = picturesRepository;
         Path uploadDirectory;
         try {
-            uploadDirectory = Paths.get( "/data/pictures").toAbsolutePath().normalize();////с помощью функции get получаем объект, инкапсулирующий информацию о пути к директории, преобразуем путь к абсолютному - те указываем точное местарасположение
+            uploadDirectory = Paths.get("/data/pictures").toAbsolutePath().normalize();////с помощью функции get получаем объект, инкапсулирующий информацию о пути к директории, преобразуем путь к абсолютному - те указываем точное местарасположение
             Files.createDirectory(uploadDirectory);////создаем директорию для хранения файлов - картинок
         } catch (IOException exception) {
             uploadDirectory = null;

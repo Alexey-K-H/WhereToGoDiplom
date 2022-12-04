@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.entity.StayPoint;
 
 import java.time.Instant;
@@ -17,9 +16,11 @@ public interface StayPointRepository extends JpaRepository<StayPoint, Integer> {
     //Получить список стори-поинтов конкретного пользователя
     //Нужно для рекомендательной системы
     public Page<StayPoint> getStoryPointByUserId(Long userId, Pageable pageable);
+
     public void deleteByUploadedAt(Instant instant);
 
     public boolean existsByLatitudeAndLongitudeAndUserId(double lat, double lon, Long user_id);
+
     public int countByUserId(Long userId);
 
     @Modifying

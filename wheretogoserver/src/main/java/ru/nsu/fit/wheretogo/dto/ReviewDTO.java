@@ -28,7 +28,7 @@ public class ReviewDTO extends BaseDTO {
     private Integer score;
     private PlaceDescriptionDTO place;
     private Instant writtenAt;
-    
+
     public static ReviewDTO getFromEntity(Review review) {
         if (review == null) {
             return null;

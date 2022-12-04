@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import java.time.Instant;
 import ru.nsu.fit.wheretogo.entity.User;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -29,7 +28,7 @@ public class UserDTO {
     private String username;
 
     private Instant createdAt;
-    
+
     public static UserDTO getFromEntity(User user) {
         if (user == null) {
             return null;

@@ -12,14 +12,14 @@ import ru.nsu.fit.wheretogo.entity.StayPoint;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class StayPointDTO extends BaseDTO{
+public class StayPointDTO extends BaseDTO {
     private Long id;
     private double latitude;
     private double longitude;
     private Long userId;
 
-    public static StayPointDTO getFromEntity(StayPoint stayPoint){
-        if(stayPoint == null){
+    public static StayPointDTO getFromEntity(StayPoint stayPoint) {
+        if (stayPoint == null) {
             return null;
         }
         return new StayPointDTO()

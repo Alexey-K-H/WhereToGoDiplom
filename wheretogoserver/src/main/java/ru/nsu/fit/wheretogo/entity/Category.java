@@ -6,7 +6,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "category")
@@ -27,7 +32,7 @@ public class Category {
         this.name = name;
     }
 
-    public static Category getFromDTO(CategoryDTO dto ) {
+    public static Category getFromDTO(CategoryDTO dto) {
         if (dto == null) {
             return null;
         }

@@ -21,10 +21,11 @@ public class ScoreId implements Serializable {
     @Column(name = "place_id")
     private Long place;
 
-    public ScoreId(Long userId, Long placeId){
+    public ScoreId(Long userId, Long placeId) {
         this.user = userId;
         this.place = placeId;
     }
 
-    public ScoreId(){}
+    public ScoreId() {
+    }
 }

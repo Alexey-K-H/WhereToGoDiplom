@@ -12,19 +12,26 @@ import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
-import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.score.Score;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOne;
-import ru.nsu.fit.wheretogo.repository.*;
+import ru.nsu.fit.wheretogo.repository.CategoryRepository;
+import ru.nsu.fit.wheretogo.repository.PlaceRepository;
+import ru.nsu.fit.wheretogo.repository.ScoreRepository;
+import ru.nsu.fit.wheretogo.repository.UserCoeffRepository;
+import ru.nsu.fit.wheretogo.repository.UserRepository;
 import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -82,7 +89,7 @@ public class PlaceService {
             int limit,
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Place> places = placeRepository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit, pageRequest);
         List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
@@ -106,7 +113,7 @@ public class PlaceService {
             String categoryIds,
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Place> places = placeRepository.findNearestByCategory(
                 myLat,
@@ -132,7 +139,7 @@ public class PlaceService {
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
             int page,
             int size
-    ){
+    ) {
         //Ищем пользователя по его id/email в базе данных и берем список посещенных им мест
         List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
@@ -141,7 +148,7 @@ public class PlaceService {
 
         //Создаем список из id посещенных мест (мест, исключенных из поиска)
         List<Long> isolatorIds = new ArrayList<>();
-        for(PlaceBriefDTO place : visitedPlaces){
+        for (PlaceBriefDTO place : visitedPlaces) {
             isolatorIds.add(place.getId());
         }
 
@@ -154,7 +161,7 @@ public class PlaceService {
 
         //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
         //функции поиска ближайших мест к этим местам
-        for(PlaceBriefDTO place : visitedPlaces){
+        for (PlaceBriefDTO place : visitedPlaces) {
             //Извлекаем координаты посещенного места
             Coords placeCoords = place.getCoords();
 
@@ -181,7 +188,7 @@ public class PlaceService {
             recommendations.addAll(currentPlaceRecommendations);
 
             //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
-            for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
+            for (PlaceBriefDTO recPlace : currentPlaceRecommendations) {
                 isolatorIds.add(recPlace.getId());
             }
             //Оновляем строку-параметров с дополнительными
@@ -198,7 +205,7 @@ public class PlaceService {
     public PagedListDTO<PlaceBriefDTO> getNearestPlacesByStayPoints(
             int page,
             int size
-    ){
+    ) {
         //Ищем пользователя по его id/email в базе данных и берем его stay-point-ы
         List<StayPointDTO> stayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity).toList();
@@ -214,8 +221,8 @@ public class PlaceService {
         List<PlaceBriefDTO> recommendations = new ArrayList<>();
         int totalPages = 0;
 
-        if(visitedPlaces.isEmpty()){
-            for(StayPointDTO stayPoint : stayPoints){
+        if (visitedPlaces.isEmpty()) {
+            for (StayPointDTO stayPoint : stayPoints) {
                 //Отправляем запрос на поиск ближайших мест к данному stay-point-у
                 Page<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
                         stayPoint.getLatitude(),
@@ -240,11 +247,11 @@ public class PlaceService {
                 //Убираем дубликаты из списка мест
                 recommendations = recommendations.stream().distinct().collect(toList());
             }
-        }else {
+        } else {
             //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
             //функции поиска ближайших мест к этим местам
             List<Long> isolatorsVisited = new ArrayList<>();
-            for(PlaceBriefDTO place : visitedPlaces){
+            for (PlaceBriefDTO place : visitedPlaces) {
                 isolatorsVisited.add(place.getId());
             }
 
@@ -253,7 +260,7 @@ public class PlaceService {
 
             //Обходим все места в списке посещенных, извлекаем координаты из каждого из них, используем их в качестве параметров для вызова
             //функции поиска ближайших мест к этим местам
-            for(StayPointDTO stayPoint : stayPoints){
+            for (StayPointDTO stayPoint : stayPoints) {
                 //Отправляем запрос на поиск ближайших мест к данному посещенному
                 Page<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
                         stayPoint.getLatitude(),
@@ -277,7 +284,7 @@ public class PlaceService {
                 recommendations.addAll(currentPlaceRecommendations);
 
                 //Обновляем список изоляторов, чтобы исключить их при поиске в последующем
-                for(PlaceBriefDTO recPlace : currentPlaceRecommendations){
+                for (PlaceBriefDTO recPlace : currentPlaceRecommendations) {
                     isolatorsVisited.add(recPlace.getId());
                 }
                 //Оновляем строку-параметров с дополнительными
@@ -295,7 +302,7 @@ public class PlaceService {
     public PagedListDTO<PlaceBriefDTO> getContentBasedRecommendations(
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
 
         //Берем список категорий мест в базе данных
@@ -320,7 +327,7 @@ public class PlaceService {
     public PagedListDTO<PlaceBriefDTO> getCollaborativeRecommendationsByScores(
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         User user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
 
@@ -335,20 +342,20 @@ public class PlaceService {
         List<Score> scoreList = scoreRepository.findAll();
 
         //Заполняем входные данные для рекомендательной системы
-        for(Score score : scoreList){
-            if(data.containsKey(score.getUser())){
-                if(!data.get(score.getUser()).containsKey(score.getPlace())){
-                    data.get(score.getUser()).put(score.getPlace(), (double)score.getScore());
+        for (Score score : scoreList) {
+            if (data.containsKey(score.getUser())) {
+                if (!data.get(score.getUser()).containsKey(score.getPlace())) {
+                    data.get(score.getUser()).put(score.getPlace(), (double) score.getScore());
                 }
-            }else {
-                HashMap<Place, Double>  userRating = new HashMap<>();
-                userRating.put(score.getPlace(), (double)score.getScore());
+            } else {
+                HashMap<Place, Double> userRating = new HashMap<>();
+                userRating.put(score.getPlace(), (double) score.getScore());
                 data.put(score.getUser(), userRating);
             }
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
 
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
@@ -364,7 +371,7 @@ public class PlaceService {
     public PagedListDTO<PlaceBriefDTO> getCollaborativeRecommendationsByFavourites(
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         User user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
 
@@ -391,25 +398,25 @@ public class PlaceService {
         List<Place> currUserFavourPlaces = user.getFavouritePlaces();
 
         //Дополнительно добавляем оценки пользователя равные 5, так как места избранные
-        for(Place favourPlace : currUserFavourPlaces){
+        for (Place favourPlace : currUserFavourPlaces) {
             scoreList.add(new Score().setPlace(favourPlace).setUser(user).setScore(5));
         }
 
         //Заполняем входные данные для рекомендательной системы
-        for(Score score : scoreList){
-            if(data.containsKey(score.getUser())){
-                if(!data.get(score.getUser()).containsKey(score.getPlace())){
-                    data.get(score.getUser()).put(score.getPlace(), (double)score.getScore());
+        for (Score score : scoreList) {
+            if (data.containsKey(score.getUser())) {
+                if (!data.get(score.getUser()).containsKey(score.getPlace())) {
+                    data.get(score.getUser()).put(score.getPlace(), (double) score.getScore());
                 }
-            }else {
-                HashMap<Place, Double>  userRating = new HashMap<>();
-                userRating.put(score.getPlace(), (double)score.getScore());
+            } else {
+                HashMap<Place, Double> userRating = new HashMap<>();
+                userRating.put(score.getPlace(), (double) score.getScore());
                 data.put(score.getUser(), userRating);
             }
         }
 
         //Запуск алгоритма составления предсказаний
-        Map<User, HashMap<Place, Double>> projectedData  = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
 
         //Предсказания конкретного пользователя
         List<PlaceBriefDTO> recommendations = new ArrayList<>((projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
@@ -426,7 +433,7 @@ public class PlaceService {
             String categoryIds,
             int page,
             int size
-    ){
+    ) {
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Place> places = placeRepository.getPlaces(
                 categoryIds,
@@ -443,11 +450,11 @@ public class PlaceService {
     }
 
     @Transactional
-    public void addPlaceCategory(Long placeId, Integer categoryId){
-        if(categoryId == null
+    public void addPlaceCategory(Long placeId, Integer categoryId) {
+        if (categoryId == null
                 || placeId == null
                 || !categoryRepository.existsById(categoryId)
-                || !placeRepository.existsById(placeId)){
+                || !placeRepository.existsById(placeId)) {
             return;
         }
 

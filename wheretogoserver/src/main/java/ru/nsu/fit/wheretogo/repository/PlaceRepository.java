@@ -17,7 +17,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
             Pageable pageable
     );
 
-//    Процедура поиска ближайших мест к конкретной точке на карте
+    //    Процедура поиска ближайших мест к конкретной точке на карте
     @Query(value = "select * from where_to_go.findnearest(:_my_lat, :_my_lon, :_START_dist, :_max_dist, :_limit) -- #pageable",
             nativeQuery = true)
     public Page<Place> findNearestPlaces(

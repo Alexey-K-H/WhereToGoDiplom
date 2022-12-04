@@ -1,17 +1,28 @@
 package ru.nsu.fit.wheretogo.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
-import java.time.Instant;
-import java.util.List;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -22,13 +33,13 @@ import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "email",nullable = false)
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "username")
@@ -70,7 +81,8 @@ public class User {
         this.email = email;
         this.password = password;
         this.username = username;
-        this.createdAt = createdAt;;
+        this.createdAt = createdAt;
+        ;
     }
 
     public static User getFromDTO(UserDTO dto) {

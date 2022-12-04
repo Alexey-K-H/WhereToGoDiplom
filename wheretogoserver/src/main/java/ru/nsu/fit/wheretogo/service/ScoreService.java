@@ -5,13 +5,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.fit.wheretogo.dto.*;
+import ru.nsu.fit.wheretogo.dto.PagedListDTO;
+import ru.nsu.fit.wheretogo.dto.PlaceDescriptionDTO;
+import ru.nsu.fit.wheretogo.dto.ScoreDTO;
+import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.entity.Place;
-import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
-import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.User;
+import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.score.ScoreId;
+import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficientId;
 import ru.nsu.fit.wheretogo.repository.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.ScoreRepository;
@@ -36,7 +39,7 @@ public class ScoreService {
     @Transactional
     public ScoreDTO createScore(Long userId, Long placeId, Integer value) {
         int oldValue = 0;
-        if(scoreRepository.existsByUserIdAndPlaceId(userId, placeId)){
+        if (scoreRepository.existsByUserIdAndPlaceId(userId, placeId)) {
             Score currScore = scoreRepository.findByUserIdAndPlaceId(userId, placeId);
             oldValue = currScore.getScore();
         }
@@ -51,17 +54,17 @@ public class ScoreService {
         List<Category> placeCategories = placeRepository.findById(placeId).orElseThrow().getCategories();
 
         //Проходим по всем катгориям и смотрим где обновить или создать коэффициенты
-        for(Category category : placeCategories){
-            if(userCoeffRepository.existsByCategory(category)){
+        for (Category category : placeCategories) {
+            if (userCoeffRepository.existsByCategory(category)) {
                 //Обновляем коэффицент
-                if(oldValue != 0){
+                if (oldValue != 0) {
                     double newValue = value - oldValue;
                     userCoeffRepository.updateCoeffWitOutInc(newValue, category.getId(), userId);
-                }else{
+                } else {
                     userCoeffRepository.updateCoeffWithInc(value.doubleValue(), category.getId(), userId);
                 }
 
-            }else {
+            } else {
                 //Создаем новый коэффициент
                 userCoeffRepository.save(new UserCoefficient()
                         .setCoefficientId(new UserCoefficientId().setUser(userId).setCategory(category.getId()))
@@ -82,8 +85,8 @@ public class ScoreService {
     }
 
     @Transactional
-    public ScoreDTO getByUserPlace(Long userId, Long placeId){
-        if(userId == null || placeId == null){
+    public ScoreDTO getByUserPlace(Long userId, Long placeId) {
+        if (userId == null || placeId == null) {
             return null;
         }
         return ScoreDTO.getFromEntity(scoreRepository.findByUserIdAndPlaceId(userId, placeId));
@@ -104,7 +107,7 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScoreDTO> getScoreDtoListByUserId(Long userId){
+    public List<ScoreDTO> getScoreDtoListByUserId(Long userId) {
         PageRequest pageRequest = PageRequest.of(0, 20);
         Page<Score> scores = scoreRepository.findByUserId(userId, pageRequest);
         return scores.toList()
@@ -129,7 +132,7 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public boolean ifUserHasScores(Long userId){
+    public boolean ifUserHasScores(Long userId) {
         return scoreRepository.existsByUserId(userId);
     }
 }

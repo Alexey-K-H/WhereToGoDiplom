@@ -8,20 +8,21 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemVectorBuilder {
-    public ItemVectorBuilder(){}
+    public ItemVectorBuilder() {
+    }
 
-    public static Map<Category, Double> getItemVector(Place place, List<Category> categories){
+    public static Map<Category, Double> getItemVector(Place place, List<Category> categories) {
         //Берем ктаегории места
         List<Category> placeCategories = place.getCategories();
 
         //Инициализируем вектор нулями
         Map<Category, Double> itemVector = new HashMap<>();
-        for(Category category : categories){
+        for (Category category : categories) {
             itemVector.put(category, 0.0);
         }
 
         //Те категории, которые имеют отноешние к месту получают значения 1.0
-        for(Category placeCategory : placeCategories){
+        for (Category placeCategory : placeCategories) {
             itemVector.replace(placeCategory, 1.0);
         }
 

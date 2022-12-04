@@ -10,7 +10,14 @@ import ru.nsu.fit.wheretogo.dto.ScoreDTO;
 import ru.nsu.fit.wheretogo.entity.Place;
 import ru.nsu.fit.wheretogo.entity.User;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "score")
@@ -37,8 +44,8 @@ public class Score {
     @Column(name = "score_value")
     private Integer score;
 
-    public static Score getFromDto(ScoreDTO dto){
-        if(dto == null){
+    public static Score getFromDto(ScoreDTO dto) {
+        if (dto == null) {
             return null;
         }
         return new Score()

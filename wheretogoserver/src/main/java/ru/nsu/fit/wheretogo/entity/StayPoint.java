@@ -4,10 +4,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import ru.nsu.fit.wheretogo.common.Coords;
 import ru.nsu.fit.wheretogo.dto.StayPointDTO;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
 import java.time.Instant;
 
 @Entity
@@ -19,7 +26,7 @@ import java.time.Instant;
 public class StayPoint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",nullable = false)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @ManyToOne
@@ -47,8 +54,8 @@ public class StayPoint {
         uploadedAt = Instant.now();
     }
 
-    public static StayPoint getFromDTO(StayPointDTO dto){
-        if(dto == null){
+    public static StayPoint getFromDTO(StayPointDTO dto) {
+        if (dto == null) {
             return null;
         }
         return new StayPoint()

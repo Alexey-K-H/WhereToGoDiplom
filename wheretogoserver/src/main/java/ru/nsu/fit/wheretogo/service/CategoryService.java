@@ -2,13 +2,14 @@ package ru.nsu.fit.wheretogo.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.nsu.fit.wheretogo.dto.CategoryDTO;
 import ru.nsu.fit.wheretogo.entity.Category;
 import ru.nsu.fit.wheretogo.repository.CategoryRepository;
 
-import java.util.List;
-import static java.util.stream.Collectors.toList;
 import javax.validation.ValidationException;
-import ru.nsu.fit.wheretogo.dto.CategoryDTO;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class CategoryService {

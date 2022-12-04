@@ -16,7 +16,6 @@ import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +55,7 @@ public class UserService {
     public User getCurrentUser() {
         return userRepository.findByEmail(SecurityContextHelper.email()).orElse(null);
     }
+
     public UserDTO getUser(Long userId) {
         return UserDTO.getFromEntity(userRepository.findById(userId).orElse(null));
     }
@@ -88,16 +88,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public boolean findVisitedById(Long placeId){
-        List<PlaceBriefDTO> userVisitedPlaces =  userRepository.findByEmail(SecurityContextHelper.email())
+    public boolean findVisitedById(Long placeId) {
+        List<PlaceBriefDTO> userVisitedPlaces = userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow()
                 .getVisitedPlaces()
                 .stream().
                 map(PlaceBriefDTO::getFromEntity).
                 toList();
 
-        for(PlaceBriefDTO place : userVisitedPlaces){
-            if(Objects.equals(place.getId(), placeId)){
+        for (PlaceBriefDTO place : userVisitedPlaces) {
+            if (Objects.equals(place.getId(), placeId)) {
                 return true;
             }
         }
@@ -105,16 +105,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public boolean findFavouriteById(Long placeId){
-        List<PlaceBriefDTO> userFavouritePlaces =  userRepository.findByEmail(SecurityContextHelper.email())
+    public boolean findFavouriteById(Long placeId) {
+        List<PlaceBriefDTO> userFavouritePlaces = userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow()
                 .getFavouritePlaces()
                 .stream().
                 map(PlaceBriefDTO::getFromEntity).
                 toList();
 
-        for(PlaceBriefDTO place : userFavouritePlaces){
-            if(Objects.equals(place.getId(), placeId)){
+        for (PlaceBriefDTO place : userFavouritePlaces) {
+            if (Objects.equals(place.getId(), placeId)) {
                 return true;
             }
         }
@@ -146,8 +146,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteVisited(Long placeId){
-        if(placeId == null){
+    public void deleteVisited(Long placeId) {
+        if (placeId == null) {
             return;
         }
 
@@ -157,8 +157,8 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteFavourite(Long placeId){
-        if(placeId == null){
+    public void deleteFavourite(Long placeId) {
+        if (placeId == null) {
             return;
         }
 
@@ -167,15 +167,15 @@ public class UserService {
     }
 
     @Transactional
-    public boolean isPlaceInVisited(Long placeId){
+    public boolean isPlaceInVisited(Long placeId) {
 
-        if(placeId == null){
+        if (placeId == null) {
             return false;
         }
 
         List<Place> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces();
-        for(Place visitedPlace : visitedPlaces){
-            if(visitedPlace.getId().equals(placeId)){
+        for (Place visitedPlace : visitedPlaces) {
+            if (visitedPlace.getId().equals(placeId)) {
                 return true;
             }
         }

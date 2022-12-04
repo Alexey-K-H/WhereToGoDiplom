@@ -3,8 +3,12 @@ package ru.nsu.fit.wheretogo.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.nsu.fit.wheretogo.dto.UserDTO;
 import ru.nsu.fit.wheretogo.exception.EmailAlreadyRegistered;
 import ru.nsu.fit.wheretogo.exception.UsernameAlreadyRegistered;
@@ -61,18 +65,18 @@ public class UserController {
     }
 
     @GetMapping("/contain/visited")
-    private ResponseEntity<Boolean> isUserHasVisited(){
+    private ResponseEntity<Boolean> isUserHasVisited() {
         return new ResponseEntity<>(!userService.getVisited().isEmpty(), HttpStatus.OK);
     }
 
     @GetMapping("/contain/favourites")
-    private ResponseEntity<Boolean> isUserHasFavourites(){
+    private ResponseEntity<Boolean> isUserHasFavourites() {
         return new ResponseEntity<>(!userService.getFavourite().isEmpty(), HttpStatus.OK);
     }
 
     @GetMapping("/contain/visited/{id}")
     private ResponseEntity<Boolean> isPlaceInUserVisited(
-            @PathVariable(name = "id") Long placeId){
+            @PathVariable(name = "id") Long placeId) {
         return new ResponseEntity<>(userService.isPlaceInVisited(placeId), HttpStatus.OK);
     }
 }
