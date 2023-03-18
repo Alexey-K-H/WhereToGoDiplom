@@ -3,11 +3,11 @@ name: backend-CI
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    paths: ./wheretogoserver/*
+    paths: ./where_to_go_back/*
     
 defaults:
     run:
-      working-directory: ./wheretogoserver
+      working-directory: ./where_to_go_back
     
 jobs:
   build-maven:
