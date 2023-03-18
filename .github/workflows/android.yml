@@ -1,9 +1,10 @@
-name: Android-CI
+name: android-CI
 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    paths: ./where_to_go_ui/*
+    paths:
+      - 'where_to_go_ui/**'
     
 defaults:
     run:
