@@ -31,6 +31,16 @@ android {
     }
 }
 
+apply plugin: "org.sonarqube"
+sonarqube {
+    properties {
+        property "sonar.projectName", "WhereToGo Mobile"
+        property "sonar.projectKey", "where_to_go_ui"
+        property "sonar.host.url", "http://localhost:9081"
+        property "sonar.login", "squ_c1ad78508391045e649c20cff409b3542cfccae4"
+    }
+}
+
 dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
