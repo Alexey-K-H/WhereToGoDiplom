@@ -3,7 +3,8 @@ name: backend-CI
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    paths: ./where_to_go_back/*
+    paths:
+      - 'where_to_go_back/**'
     
 defaults:
     run:
