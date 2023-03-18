@@ -3,11 +3,11 @@ name: Android-CI
 on:
   pull_request:
     types: [opened, reopened, synchronize]
-    paths: ./wheretogoclient/*
+    paths: ./where_to_go_ui/*
     
 defaults:
     run:
-      working-directory: ./wheretogoclient
+      working-directory: ./where_to_go_ui
 
 jobs:
   build:
