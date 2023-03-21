@@ -22,7 +22,7 @@ jobs:
           distribution: 'adopt-hotspot'
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots package -DskipTests
-  test-maven:
+  test:
     needs: build-maven
     runs-on: windows-latest
     steps:
