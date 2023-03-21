@@ -11,7 +11,7 @@ defaults:
       working-directory: ./where_to_go_ui
 
 jobs:
-  build:
+  mobile:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
