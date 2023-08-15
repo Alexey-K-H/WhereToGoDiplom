@@ -8,7 +8,7 @@ on:
     
 defaults:
     run:
-      working-directory: ./where_to_go_ui
+      working-directory: ./where-to-go-ui
 
 jobs:
   mobile:
@@ -21,6 +21,6 @@ jobs:
           java-version: '17'
           distribution: 'adopt-hotspot'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
       - name: Run build with Gradle Wrapper
         run: ./gradlew app:build -x test
