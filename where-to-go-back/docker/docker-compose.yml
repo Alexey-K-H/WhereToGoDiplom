@@ -1,12 +1,13 @@
 version: '3.7'
 
+name: where-to-go-nsk
 services:
   db:
-    container_name: where-to-go-postgres
+    container_name: where-to-go-postgres-db
     image: postgres:latest
     ports:
       - "5435:5432"
     environment:
-      POSTGRES_DB: where_to_go
+      POSTGRES_DB: where-to-go
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

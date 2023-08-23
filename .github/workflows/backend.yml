@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     paths:
-      - 'where_to_go_back/**'
+      - 'where-to-go-back/**'
     
 defaults:
     run:
