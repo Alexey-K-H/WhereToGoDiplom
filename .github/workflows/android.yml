@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     paths:
-      - 'where_to_go_ui/**'
+      - 'where-to-go-ui/**'
     
 defaults:
     run:
