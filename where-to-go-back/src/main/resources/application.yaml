@@ -2,13 +2,13 @@ server:
   port: 8080
 spring:
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5435/where_to_go}
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5435/where-to-go}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     database-platform: org.hibernate.dialect.PostgreSQL9Dialect
     show-sql: true
   mvc:
