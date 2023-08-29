@@ -1,9 +1,6 @@
 package ru.nsu.fit.wheretogo.service.recommender;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.user.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
@@ -54,70 +51,51 @@ public class RecommenderServiceImpl implements RecommenderService {
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByCategory(
+    public List<PlaceBriefDTO> getNearestPlacesByCategory(
             double myLat,
             double myLon,
             double startDist,
             double maxDist,
             int limit,
-            String categoryIds,
-            int page,
-            int size
+            String categoryIds
     ) {
-        var pageRequest = PageRequest.of(page, size);
-        Page<Place> places = placeRepository.findNearestByCategory(
+        List<Place> places = placeRepository.findNearestByCategory(
                 myLat,
                 myLon,
                 startDist,
                 maxDist,
                 limit,
-                categoryIds,
-                pageRequest
+                categoryIds
         );
-        List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
+
+        return places
                 .stream()
                 .map(PlaceBriefDTO::getFromEntity)
                 .toList();
-
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(nearestPlaceDtos);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(places.getTotalPages());
-
-        return listDto;
     }
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByStayPoints(
-            int page,
-            int size
-    ) {
+    public List<PlaceBriefDTO> getNearestPlacesByStayPoints() {
         List<StayPointDTO> stayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity).toList();
-        var pageRequest = PageRequest.of(page, size);
 
         List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
         String isolators;
-
         List<PlaceBriefDTO> recommendations = new ArrayList<>();
-        var totalPages = 0;
 
         if (visitedPlaces.isEmpty()) {
             for (StayPointDTO stayPoint : stayPoints) {
-                Page<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
+                List<Place> currentStayPointPlaces = placeRepository.findNearestPlaces(
                         stayPoint.getLatitude(),
                         stayPoint.getLongitude(),
                         1.0,
                         5.0,
-                        2,
-                        pageRequest
+                        2
                 );
 
-                totalPages += currentStayPointPlaces.getTotalPages();
-
-                List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces.toList()
+                List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces
                         .stream()
                         .map(PlaceBriefDTO::getFromEntity).toList();
 
@@ -133,49 +111,28 @@ public class RecommenderServiceImpl implements RecommenderService {
             isolators = isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
 
             for (StayPointDTO stayPoint : stayPoints) {
-                Page<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
+                List<Place> currentStayPointPlaces = placeRepository.findNearestByVisited(
                         stayPoint.getLatitude(),
                         stayPoint.getLongitude(),
                         1.0,
                         5.0,
                         2,
-                        isolators,
-                        pageRequest
+                        isolators
                 );
 
-                totalPages += currentStayPointPlaces.getTotalPages();
-
-                List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces.toList()
-                        .stream()
-                        .map(PlaceBriefDTO::getFromEntity).toList();
-
-                recommendations.addAll(currentPlaceRecommendations);
-
-                for (PlaceBriefDTO recPlace : currentPlaceRecommendations) {
-                    isolatorsVisited.add(recPlace.getId());
-                }
-                isolators = isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
+                isolators = updateIsolators(recommendations, isolatorsVisited, currentStayPointPlaces);
             }
         }
 
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(recommendations);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(totalPages);
-
-        return listDto;
+        return recommendations;
     }
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getNearestPlacesByVisited(
-            int page,
-            int size
-    ) {
-        List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getVisitedPlaces().stream().map(
+    public List<PlaceBriefDTO> getNearestPlacesByVisited() {
+        List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email())
+                .orElseThrow().getVisitedPlaces().stream().map(
                 PlaceBriefDTO::getFromEntity).toList();
-
-        var pageRequest = PageRequest.of(page, size);
 
         List<Long> isolatorIds = new ArrayList<>();
         for (PlaceBriefDTO place : visitedPlaces) {
@@ -183,52 +140,28 @@ public class RecommenderServiceImpl implements RecommenderService {
         }
 
         String isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
-
         List<PlaceBriefDTO> recommendations = new ArrayList<>();
-        var totalPages = 0;
 
         for (PlaceBriefDTO place : visitedPlaces) {
             var placeCoordinates = place.getCoordinates();
-            Page<Place> currentVisitedPlaces = placeRepository.findNearestByVisited(
+            List<Place> currentVisitedPlaces = placeRepository.findNearestByVisited(
                     placeCoordinates.getLatitude().doubleValue(),
                     placeCoordinates.getLongitude().doubleValue(),
                     1.0,
                     5.0,
                     2,
-                    isolators,
-                    pageRequest
+                    isolators
             );
 
-            totalPages += currentVisitedPlaces.getTotalPages();
-
-            List<PlaceBriefDTO> currentPlaceRecommendations = currentVisitedPlaces.toList()
-                    .stream()
-                    .map(PlaceBriefDTO::getFromEntity).toList();
-
-            recommendations.addAll(currentPlaceRecommendations);
-
-            for (PlaceBriefDTO recPlace : currentPlaceRecommendations) {
-                isolatorIds.add(recPlace.getId());
-            }
-
-            isolators = isolatorIds.stream().map(String::valueOf).collect(Collectors.joining(","));
+            isolators = updateIsolators(recommendations, isolatorIds, currentVisitedPlaces);
         }
 
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(recommendations);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(totalPages);
-
-        return listDto;
+        return recommendations;
     }
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getContentBasedRecommendations(
-            int page,
-            int size
-    ) {
-        var pageRequest = PageRequest.of(page, size);
+    public List<PlaceBriefDTO> getContentBasedRecommendations() {
         List<Category> categoryList = categoryRepository.findAll();
 
         List<UserCoefficientMain> userCoefficientMains = userCoefficientMainRepository
@@ -236,84 +169,53 @@ public class RecommenderServiceImpl implements RecommenderService {
                         .orElseThrow().getId());
         Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficientMains, categoryList);
 
-        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(
-                userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId(),
-                pageRequest);
+        List<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(
+                userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId());
 
-        List<PlaceBriefDTO> recommendations = CBFRecommender.getRecommendations(
+        return CBFRecommender.getRecommendations(
                 categoryList,
                 userVector,
                 notVisitedPlacesPage);
-
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(recommendations);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(notVisitedPlacesPage.getTotalPages());
-
-        return listDto;
     }
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getCollaborativeRecommendationsByScores(
-            int page,
-            int size
-    ) {
-        var pageRequest = PageRequest.of(page, size);
+    public List<PlaceBriefDTO> getCollaborativeRecommendationsByScores() {
         var user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
-
-        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> placeList = notVisitedPlacesPage.stream().toList();
-
+        List<Place> placeList = placeRepository.findNotVisitedByUser(user.getId());
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
 
-        List<Score> scoreList = scoreRepository.findAll();
-
-        for (Score score : scoreList) {
-            if (data.containsKey(score.getUser())) {
-                if (!data.get(score.getUser()).containsKey(score.getPlace())) {
-                    data.get(score.getUser()).put(score.getPlace(), (double) score.getScoreValue());
-                }
-            } else {
-                HashMap<Place, Double> userRating = new HashMap<>();
-                userRating.put(score.getPlace(), (double) score.getScoreValue());
-                data.put(score.getUser(), userRating);
-            }
-        }
+        prepareCollaborativeDataFromScoreList(data, scoreRepository.findAll());
 
         Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
-        List<PlaceBriefDTO> recommendations = new ArrayList<>(
+
+        return new ArrayList<>(
                 (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
-
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(recommendations);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(notVisitedPlacesPage.getTotalPages());
-
-        return listDto;
     }
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getCollaborativeRecommendationsByFavourites(
-            int page,
-            int size
-    ) {
-        var pageRequest = PageRequest.of(page, size);
+    public List<PlaceBriefDTO> getCollaborativeRecommendationsByFavourites() {
         var user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
-
-        Page<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(user.getId(), pageRequest);
-        List<Place> placeList = notVisitedPlacesPage.stream().toList();
-
+        List<Place> placeList = placeRepository.findNotVisitedByUser(user.getId());
         Map<User, HashMap<Place, Double>> data = new HashMap<>();
-
         List<Score> scoreList = scoreRepository.findAll();
+
         List<Place> currUserFavourPlaces = user.getFavouritePlaces();
 
         for (Place favourPlace : currUserFavourPlaces) {
             scoreList.add(new Score().setPlace(favourPlace).setUser(user).setScoreValue(5));
         }
 
+        prepareCollaborativeDataFromScoreList(data, scoreList);
+
+        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
+
+        return new ArrayList<>(
+                (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
+    }
+
+    private void prepareCollaborativeDataFromScoreList(Map<User, HashMap<Place, Double>> data, List<Score> scoreList) {
         for (Score score : scoreList) {
             if (data.containsKey(score.getUser())) {
                 if (!data.get(score.getUser()).containsKey(score.getPlace())) {
@@ -325,17 +227,21 @@ public class RecommenderServiceImpl implements RecommenderService {
                 data.put(score.getUser(), userRating);
             }
         }
+    }
 
-        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
+    private String updateIsolators(
+            List<PlaceBriefDTO> recommendations,
+            List<Long> isolatorsVisited,
+            List<Place> currentStayPointPlaces) {
+        List<PlaceBriefDTO> currentPlaceRecommendations = currentStayPointPlaces
+                .stream()
+                .map(PlaceBriefDTO::getFromEntity).toList();
 
-        List<PlaceBriefDTO> recommendations = new ArrayList<>(
-                (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
+        recommendations.addAll(currentPlaceRecommendations);
 
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(recommendations);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(notVisitedPlacesPage.getTotalPages());
-
-        return listDto;
+        for (PlaceBriefDTO recPlace : currentPlaceRecommendations) {
+            isolatorsVisited.add(recPlace.getId());
+        }
+        return isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
     }
 }

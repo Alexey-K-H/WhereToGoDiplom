@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
@@ -148,11 +147,8 @@ public class PlaceController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> searchPlaces(
-            @RequestParam(name = "category", required = false) List<Integer> categoryId,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize
-    ) {
+    public ResponseEntity<List<PlaceBriefDTO>> searchPlaces(
+            @RequestParam(name = "category", required = false) List<Integer> categoryId) {
         var categoryIds = "";
         categoryIds = Objects.requireNonNullElseGet(
                         categoryId,
@@ -161,9 +157,7 @@ public class PlaceController {
 
         return new ResponseEntity<>(
                 placeService.getPlaces(
-                        categoryIds,
-                        page,
-                        pageSize),
+                        categoryIds),
                 HttpStatus.OK);
     }
 

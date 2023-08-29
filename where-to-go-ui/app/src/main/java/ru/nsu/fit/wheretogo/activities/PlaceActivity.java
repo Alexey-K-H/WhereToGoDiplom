@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,11 +23,12 @@ import com.bumptech.glide.request.transition.Transition;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.Score;
-import ru.nsu.fit.wheretogo.model.service.PlaceService;
-import ru.nsu.fit.wheretogo.model.service.ScoreService;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.service.PlaceService;
+import ru.nsu.fit.wheretogo.service.ScoreService;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 
 public class PlaceActivity extends AppCompatActivity {
@@ -72,7 +73,7 @@ public class PlaceActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
                 if (response.code() == 200 && response.body() != null) {
-                    Long userMark = response.body().getScore();
+                    Long userMark = response.body().getScoreValue();
                     ratingBar.setRating((float) userMark);
                 }
             }
@@ -98,7 +99,7 @@ public class PlaceActivity extends AppCompatActivity {
 //                            Toast.makeText(PlaceActivity.this, "Ваша оценка: " + (int)v,
 //                                    Toast.LENGTH_LONG).show();
 
-                        ratingBar1.setRating(response.body().getScore());
+                        ratingBar1.setRating(response.body().getScoreValue());
                         addVisitedPlace(placeFullDescView);
                     } else if (response.code() == 400) {
 

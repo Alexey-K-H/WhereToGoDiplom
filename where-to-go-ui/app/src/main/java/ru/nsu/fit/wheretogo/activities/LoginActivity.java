@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,8 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.map.MapsActivity;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class LoginActivity extends AppCompatActivity {

@@ -3,7 +3,7 @@ package ru.nsu.fit.wheretogo.model.entity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Coords {
+public class Coordinates {
     @SerializedName("latitude")
     @Expose
     private Double latitude;
@@ -11,7 +11,7 @@ public class Coords {
     @Expose
     private Double longitude;
 
-    public Coords(Double latitude, Double longitude) {
+    public Coordinates(Double latitude, Double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

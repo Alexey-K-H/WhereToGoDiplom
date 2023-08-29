@@ -59,13 +59,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<UserDTO> getCurrentUser() {
-        return checkIfFound(userService.getCurrentUserDto());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable(name = "id") Long userId) {
-        UserDTO user = userService.getUser(userId);
-        return checkIfFound(user);
+        return checkIfFound(userService.getCurrentUser());
     }
 
     private ResponseEntity<UserDTO> checkIfFound(UserDTO userDto) {

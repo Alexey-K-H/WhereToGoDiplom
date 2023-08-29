@@ -1,9 +1,10 @@
 package ru.nsu.fit.wheretogo.service.score;
 
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.user.ScoreDTO;
 import ru.nsu.fit.wheretogo.dto.user.UserDTO;
+
+import java.util.List;
 
 /**
  * Сервис по работе с оценками пользователей
@@ -13,54 +14,50 @@ public interface ScoreService {
     /**
      * Добавить оценку пользователя
      *
-     * @param userId
-     * @param placeId
-     * @param value
-     * @return
+     * @param userId  идентификатор пользователя
+     * @param placeId идентификатор места
+     * @param value   значение оценки
+     * @return данные сформированной оценки
      */
     ScoreDTO createScore(Long userId, Long placeId, Integer value);
 
     /**
      * Удалить оценку пользователя
      *
-     * @param scoreDTO
+     * @param scoreDTO данные запроса
      */
     void deleteScore(ScoreDTO scoreDTO);
 
     /**
      * Получить оценку места от конкретного пользователя
      *
-     * @param userId
-     * @param placeId
-     * @return
+     * @param userId  идентификатор пользователя
+     * @param placeId идентификатор места
+     * @return оценка пользователя
      */
     ScoreDTO getByPlaceScoreFromUser(Long userId, Long placeId);
 
     /**
      * Получить все оценки пользователя
      *
-     * @param userDto
-     * @param page
-     * @param size
-     * @return
+     * @param userDto данные пользователя
+     * @return список оценок
      */
-    PagedListDTO<ScoreDTO> getByUser(UserDTO userDto, int page, int size);
+    List<ScoreDTO> getByUser(UserDTO userDto);
 
     /**
      * Получить все оценки места
      *
-     * @param placeDto
-     * @param page
-     * @param size
-     * @return
+     * @param placeDto данные места
+     * @return список оценок
      */
-    PagedListDTO<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto, int page, int size);
+    List<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto);
 
     /**
      * Проверка того, что у пользователя есть оценки
      *
-     * @param userId
-     * @return
+     * @param userId идентификатор пользователя
+     * @return true или false
      */
     boolean ifUserHasScores(Long userId);
 }

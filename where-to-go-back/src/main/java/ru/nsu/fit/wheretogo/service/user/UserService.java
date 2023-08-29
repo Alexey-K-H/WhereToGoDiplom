@@ -16,12 +16,12 @@ public interface UserService {
     /**
      * Создать пользователя
      *
-     * @param email
-     * @param username
-     * @param password
-     * @return
-     * @throws EmailAlreadyRegistered
-     * @throws UsernameAlreadyRegistered
+     * @param email    эл. почта пользователя
+     * @param username имя пользователя
+     * @param password пароль в кодировке base64
+     * @return данные созданного пользователя
+     * @throws EmailAlreadyRegistered    ошибка в случае, если эл. почта уже существует в системе
+     * @throws UsernameAlreadyRegistered ошибка в случае, если имя пользователя уже занято
      */
     UserDTO createUser(String email, String username, String password)
             throws EmailAlreadyRegistered, UsernameAlreadyRegistered;
@@ -29,10 +29,10 @@ public interface UserService {
     /**
      * Изменить имя пользователя
      *
-     * @param username
-     * @return
-     * @throws UsernameAlreadyRegistered
-     * @throws UserNotFoundException
+     * @param username имя пользователя
+     * @return данные обновленного пользователя
+     * @throws UsernameAlreadyRegistered ошибка в случае, если имя пользователя уже занято
+     * @throws UserNotFoundException     ошибка, в случае если пользователь не найден
      */
     UserDTO setCurrentUsername(String username)
             throws UsernameAlreadyRegistered, UserNotFoundException;
@@ -40,81 +40,73 @@ public interface UserService {
     /**
      * Изменить пароль пользователя
      *
-     * @param password
-     * @throws UserNotFoundException
+     * @param password пароль
+     * @throws UserNotFoundException ошибка, в случае если пользователь не найден
      */
     void setCurrentPassword(String password) throws UserNotFoundException;
 
     /**
-     * Получить данные пользователя в виде dto
+     * Получить данные пользователя в рамках текущей сессии
      *
-     * @return
+     * @return данные пользователя
      */
-    UserDTO getCurrentUserDto();
-
-    /**
-     * Получить данные пользователя
-     *
-     * @param userId
-     * @return
-     */
-    UserDTO getUser(Long userId);
+    UserDTO getCurrentUser();
 
     /**
      * Получить список избранных мест текущего пользователя
      *
-     * @return
+     * @return список мест
      */
     List<PlaceBriefDTO> getFavourites();
 
     /**
      * Получить список посещенных мест пользователя
      *
-     * @return
+     * @return список мест
      */
     List<PlaceBriefDTO> getVisited();
 
     /**
      * Проверка, что место в списке посещенных пользователя
      *
-     * @param placeId
-     * @return
+     * @param placeId идентификатор места
+     * @return true или false
      */
     boolean findVisitedById(Long placeId);
 
     /**
      * Проверка, что место в списке избранных пользователя
      *
-     * @param placeId
-     * @return
+     * @param placeId идентификатор места
+     * @return true или false
      */
     boolean findFavouriteById(Long placeId);
 
     /**
      * Добавить место в список избранных пользователя
      *
-     * @param placeId
+     * @param placeId идентификатор места
      */
     void addFavourite(Long placeId);
 
     /**
      * Добавить место в список посещенных пользователя
      *
-     * @param placeId
+     * @param placeId идентификатор места
      */
     void addVisited(Long placeId);
 
     /**
      * Удалить место из списка посещенных пользователя
      *
-     * @param placeId
+     * @param placeId идентификатор места
      */
     void deleteVisited(Long placeId);
 
     /**
      * Удалить место из списка избранных пользователя
      *
-     * @param placeId
+     * @param placeId идентификатор места
      */
     void deleteFavourite(Long placeId);
 }

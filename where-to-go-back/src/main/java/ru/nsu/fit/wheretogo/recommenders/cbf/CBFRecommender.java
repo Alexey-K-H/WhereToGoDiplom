@@ -1,6 +1,5 @@
 package ru.nsu.fit.wheretogo.recommenders.cbf;
 
-import org.springframework.data.domain.Page;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.place.Place;
@@ -36,7 +35,7 @@ public final class CBFRecommender {
     public static List<PlaceBriefDTO> getRecommendations(
             List<Category> categoryList,
             Map<Category, Double> userVector,
-            Page<Place> notVisitedPlacesPage) {
+            List<Place> notVisitedPlacesPage) {
         Map<PlaceBriefDTO, Double> placeCoefficients = new HashMap<>();
         for (Place notVisitedPlace : notVisitedPlacesPage) {
             Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(notVisitedPlace, categoryList);
