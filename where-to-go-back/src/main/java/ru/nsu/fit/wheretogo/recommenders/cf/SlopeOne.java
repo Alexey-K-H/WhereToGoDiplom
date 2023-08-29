@@ -1,7 +1,7 @@
 package ru.nsu.fit.wheretogo.recommenders.cf;
 
-import ru.nsu.fit.wheretogo.entity.Place;
-import ru.nsu.fit.wheretogo.entity.User;
+import ru.nsu.fit.wheretogo.entity.place.Place;
+import ru.nsu.fit.wheretogo.entity.user.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Map;
 public final class SlopeOne {
     private static final int TOP_RECOMMENDATIONS = 5;
 
-    public SlopeOne() {
+    private SlopeOne() {
     }
 
     private static final Map<Place, Map<Place, Double>> diff = new HashMap<>();

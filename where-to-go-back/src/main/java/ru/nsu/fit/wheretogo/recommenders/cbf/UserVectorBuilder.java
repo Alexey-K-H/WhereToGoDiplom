@@ -1,25 +1,24 @@
 package ru.nsu.fit.wheretogo.recommenders.cbf;
 
-import ru.nsu.fit.wheretogo.entity.Category;
-import ru.nsu.fit.wheretogo.entity.user_coeff.UserCoefficient;
+import ru.nsu.fit.wheretogo.entity.place.Category;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMain;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class UserVectorBuilder {
-    public UserVectorBuilder() {
+public final class UserVectorBuilder {
+    private UserVectorBuilder() {
     }
 
-    public static Map<Category, Double> getUserVector(List<UserCoefficient> userCoefficients, List<Category> categories) {
-        //Инициализируем вектор средних оценок
+    public static Map<Category, Double> getUserVector(List<UserCoefficientMain> userCoefficientMains, List<Category> categories) {
         Map<Category, Double> avgScores = new HashMap<>();
         for (Category category : categories) {
             avgScores.put(category, 0.0);
         }
 
-        for (UserCoefficient userCoefficient : userCoefficients) {
-            avgScores.put(userCoefficient.getCategory(), userCoefficient.getCoeff());
+        for (UserCoefficientMain userCoefficientMain : userCoefficientMains) {
+            avgScores.put(userCoefficientMain.getCategory(), userCoefficientMain.getCoefficient());
         }
 
         return avgScores;

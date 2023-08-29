@@ -1,0 +1,95 @@
+package ru.nsu.fit.wheretogo.repository.place;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import ru.nsu.fit.wheretogo.common.Coordinates;
+import ru.nsu.fit.wheretogo.entity.place.Place;
+
+public interface PlaceRepository extends JpaRepository<Place, Long> {
+    boolean existsByNameOrDescriptionOrCoordinates(String name, String description, Coordinates coordinates);
+
+    /**
+     * Получение списка мест, в соответствии со списком категорий
+     */
+    @Query(value = "SELECT * FROM GET_PLACES(:_ids) -- #pageable", nativeQuery = true)
+    Page<Place> getPlaces(
+            @Param("_ids") String categoryIds,
+            Pageable pageable
+    );
+
+    /**
+     * Процедура поиска ближайших мест к конкретной точке на карте.
+     */
+    @Query(value = "SELECT * FROM FIND_NEAREST(" +
+            ":_my_lat," +
+            " :_my_lon," +
+            " :_START_dist," +
+            " :_max_dist," +
+            " :_limit) -- #pageable",
+            nativeQuery = true)
+    Page<Place> findNearestPlaces(
+            @Param("_my_lat") Double lat,
+            @Param("_my_lon") Double lon,
+            @Param("_START_dist") Double startDist,
+            @Param("_max_dist") Double maxDist,
+            @Param("_limit") Integer limit,
+            Pageable pageable
+    );
+
+    /**
+     * Процедура поиска ближайших мест по конкретной точке с учетом категорий.
+     */
+    @Query(value = "SELECT * FROM FIND_NEAREST_WITH_CATEGORY_IDS(" +
+            ":_my_lat," +
+            " :_my_lon," +
+            " :_START_dist," +
+            " :_max_dist," +
+            " :_limit," +
+            " :_ids) -- #pageable",
+            nativeQuery = true)
+    Page<Place> findNearestByCategory(
+            @Param("_my_lat") Double lat,
+            @Param("_my_lon") Double lon,
+            @Param("_START_dist") Double startDist,
+            @Param("_max_dist") Double maxDist,
+            @Param("_limit") Integer limit,
+            @Param("_ids") String categoryIds,
+            Pageable pageable
+    );
+
+    /**
+     * Процедура поиска ближайших мест по конкретной точке с учетом посещений пользователя.
+     */
+    @Query(value = "SELECT * FROM FIND_NEAREST_WITH_VISITED_IDS(" +
+            ":_my_lat," +
+            " :_my_lon," +
+            " :_START_dist," +
+            " :_max_dist," +
+            " :_limit," +
+            " :_ids) -- #pageable",
+            nativeQuery = true)
+    Page<Place> findNearestByVisited(
+            @Param("_my_lat") Double lat,
+            @Param("_my_lon") Double lon,
+            @Param("_START_dist") Double startDist,
+            @Param("_max_dist") Double maxDist,
+            @Param("_limit") Integer limit,
+            @Param("_ids") String visitedIds,
+            Pageable pageable
+    );
+
+    /**
+     * Поиск мест, не посещенных пользователем.
+     * Необходимо для составления рекомендаций на основе контента.
+     */
+    @Query(value = "SELECT * FROM T_PLACE WHERE ID NOT IN (" +
+            "SELECT PLACE_ID FROM T_USER_VISITED_PLACES WHERE USER_ID = :_user_id) -- #pageable",
+            nativeQuery = true)
+    Page<Place> findNotVisitedByUser(
+            @Param("_user_id") Long userId,
+            Pageable pageable
+    );
+}

@@ -7,8 +7,9 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-//Ссылка для подключения к Swagger: http://localhost:8080/swagger-ui/
-
+/**
+ * <a href="http://localhost:8080/swagger-ui/">Swagger-ui-url</a>
+ */
 @Configuration
 public class SpringFoxConfig {
     @Bean
