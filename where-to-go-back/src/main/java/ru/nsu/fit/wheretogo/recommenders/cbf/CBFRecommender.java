@@ -1,9 +1,9 @@
 package ru.nsu.fit.wheretogo.recommenders.cbf;
 
 import org.springframework.data.domain.Page;
-import ru.nsu.fit.wheretogo.dto.PlaceBriefDTO;
-import ru.nsu.fit.wheretogo.entity.Category;
-import ru.nsu.fit.wheretogo.entity.Place;
+import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
+import ru.nsu.fit.wheretogo.entity.place.Category;
+import ru.nsu.fit.wheretogo.entity.place.Place;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,17 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class CBFRecommender {
+public final class CBFRecommender {
     private static final int TOP_RECOMMENDATIONS = 5;
 
-    public CBFRecommender() {
+    private CBFRecommender() {
     }
 
     public static double getPlaceCoefficient(
             Map<Category, Double> userVector,
             Map<Category, Double> placeVector,
             List<Category> categoryList) {
-        double coefficient = 0.0;
+        var coefficient = 0.0;
 
         for (Category category : categoryList) {
             coefficient += (userVector.get(category) * placeVector.get(category));
@@ -37,12 +37,9 @@ public class CBFRecommender {
             List<Category> categoryList,
             Map<Category, Double> userVector,
             Page<Place> notVisitedPlacesPage) {
-        //Места с их коэффициентами значимости для рекмоендаций
         Map<PlaceBriefDTO, Double> placeCoefficients = new HashMap<>();
         for (Place notVisitedPlace : notVisitedPlacesPage) {
-            //Для каждого из них строим itemVector
             Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(notVisitedPlace, categoryList);
-            //Вычисляем для места коэффициент значимости и заносим в карту коэффициентов
 //            System.out.println("Add coefficient:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
             placeCoefficients.put(
                     PlaceBriefDTO.getFromEntity(notVisitedPlace),
@@ -64,10 +61,9 @@ public class CBFRecommender {
                 ));
 
         Iterator<Map.Entry<PlaceBriefDTO, Double>> i = sortedCoefficients.entrySet().iterator();
-        int topCount = TOP_RECOMMENDATIONS;
 
         List<PlaceBriefDTO> topPlaces = new ArrayList<>();
-        //Формируем список из первого топа рекомендаций
+        int topCount = TOP_RECOMMENDATIONS;
         while (i.hasNext() && topCount > 0) {
             Map.Entry<PlaceBriefDTO, Double> entry = i.next();
             topPlaces.add(entry.getKey());

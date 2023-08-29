@@ -1,0 +1,10 @@
+package ru.nsu.fit.wheretogo.repository.place;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.nsu.fit.wheretogo.entity.place.Category;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+    boolean existsByName(String name);
+}
