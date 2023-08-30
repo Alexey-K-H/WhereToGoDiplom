@@ -64,14 +64,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserDTO getCurrentUserDto() {
+    public UserDTO getCurrentUser() {
         return UserDTO.getFromEntity(userRepository.findByEmail(SecurityContextHelper.email()).orElse(null));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDTO getUser(Long userId) {
-        return UserDTO.getFromEntity(userRepository.findById(userId).orElse(null));
     }
 
     @Override

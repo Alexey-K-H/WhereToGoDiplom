@@ -1,17 +1,19 @@
-package ru.nsu.fit.wheretogo.model.service;
+package ru.nsu.fit.wheretogo.service;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 
+/**
+ * Сервис по работе с местами
+ */
 public interface PlaceService {
+
     @GET("/place/{id}")
     Call<Place> getPlace(@Path("id") Long id);
 

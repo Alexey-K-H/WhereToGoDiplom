@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.map.MapsActivity;
+import ru.nsu.fit.wheretogo.R;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
@@ -15,27 +15,6 @@ public class AuthorizationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
-
-        //Check auth data
-//        SharedPreferences sharedPreferences = getSharedPreferences("AUTH_DATA", MODE_PRIVATE);
-
-//        SharedPreferences sharedPreferences = new ObscuredSharedPreferences(
-//                this, this.getSharedPreferences("AUTH_DATA", MODE_PRIVATE)
-//        );
-//
-//        String email = sharedPreferences.getString("email", "");
-//        String password = sharedPreferences.getString("password", "");
-//        if(!email.equals("") && !password.equals("")){
-//            AuthorizationHelper.login(
-//                    email,
-//                    password,
-//                    successResponse -> {
-//                        openMap();
-//                    },
-//                    failResponse -> showNotification(getString(R.string.wrongCredentialsMsg)),
-//                    this::showUnexpectedErrorMessage
-//            );
-//        }
     }
 
     public void openLogin(View view) {

@@ -30,13 +30,13 @@ public final class SlopeOne {
                 }
 
                 for (Map.Entry<Place, Double> placeEntryInner : user.entrySet()) {
-                    int oldCount = 0;
+                    var oldCount = 0;
 
                     if (freq.get(placeEntry.getKey()).containsKey(placeEntryInner.getKey())) {
                         oldCount = freq.get(placeEntry.getKey()).get(placeEntryInner.getKey());
                     }
 
-                    double oldDiff = 0.0;
+                    var oldDiff = 0.0;
 
                     if (diff.get(placeEntry.getKey()).containsKey(placeEntryInner.getKey())) {
                         oldDiff = diff.get(placeEntry.getKey()).get(placeEntryInner.getKey());

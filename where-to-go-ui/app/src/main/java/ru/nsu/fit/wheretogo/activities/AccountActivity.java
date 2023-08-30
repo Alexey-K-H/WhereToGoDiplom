@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -14,33 +14,34 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.model.service.location_track.Constants;
-import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
+import ru.nsu.fit.wheretogo.util.tracker.LocationTrackerService;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class AccountActivity extends AppCompatActivity {
-    private static final String TAG = AccountActivity.class.getSimpleName();
 
-    ImageButton locationHistoryBtn;
-    ImageButton logoutBtn;
-    ImageButton editProfileBtn;
-    TextView nameLabel;
+    private static final String TAG = AccountActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        TextView nameLabel;
+        ImageButton editProfileBtn;
+        ImageButton logoutBtn;
+        ImageButton locationHistoryBtn;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_settings);
 
-        locationHistoryBtn = (ImageButton) findViewById(R.id.location_history);
-        logoutBtn = (ImageButton) findViewById(R.id.logout);
-        editProfileBtn = (ImageButton) findViewById(R.id.edit_profile);
+        locationHistoryBtn = findViewById(R.id.location_history);
+        logoutBtn = findViewById(R.id.logout);
+        editProfileBtn = findViewById(R.id.edit_profile);
 
         locationHistoryBtn.setOnClickListener(this::openLocationHistoryManager);
         editProfileBtn.setOnClickListener(this::openAccountEditor);
         logoutBtn.setOnClickListener(this::logout);
 
-        nameLabel = (TextView) findViewById(R.id.name_label);
+        nameLabel = findViewById(R.id.name_label);
         nameLabel.setText(AuthorizationHelper.getUserProfile().getUsername());
     }
 
@@ -89,13 +90,13 @@ public class AccountActivity extends AppCompatActivity {
         Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
+    @SuppressWarnings("deprecation")
     private boolean isServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (LocationTrackerService.class.getName().equals(service.service.getClassName())) {
-                if (service.foreground) {
+            if (LocationTrackerService.class.getName().equals(service.service.getClassName())
+                    && (service.foreground)) {
                     return true;
-                }
             }
         }
         return false;
@@ -103,9 +104,8 @@ public class AccountActivity extends AppCompatActivity {
 
     private void stopLocationTracker() {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
-        intent.setAction(Constants.TRACKER_SERVICE_STOP);
+        intent.setAction(TrackerConstants.TRACKER_SERVICE_STOP);
         startService(intent);
-//        Toast.makeText(this, "Запись истории перемещений отключена", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Запись истории перемещений отключена");
     }
 }

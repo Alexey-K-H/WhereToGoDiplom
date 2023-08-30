@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,22 +10,24 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class ChangePasswordActivity extends AppCompatActivity {
+
     private EditText oldPasswordText;
     private EditText newPasswordText;
-    private ImageButton saveButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ImageButton saveButton;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_pwd);
 
-        oldPasswordText = (EditText) findViewById(R.id.old_pwd);
-        newPasswordText = (EditText) findViewById(R.id.new_pwd);
-        saveButton = (ImageButton) findViewById(R.id.save_pwd_btn);
+        oldPasswordText = findViewById(R.id.old_pwd);
+        newPasswordText = findViewById(R.id.new_pwd);
+        saveButton = findViewById(R.id.save_pwd_btn);
 
         saveButton.setOnClickListener(this::updateUserPassword);
     }

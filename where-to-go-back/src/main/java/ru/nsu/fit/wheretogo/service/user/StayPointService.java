@@ -12,8 +12,8 @@ public interface StayPointService {
     /**
      * Добавить точку остановки пользователя
      *
-     * @param lat
-     * @param lon
+     * @param lat широта
+     * @param lon долгота
      */
     void addStoryPoint(double lat, double lon);
 

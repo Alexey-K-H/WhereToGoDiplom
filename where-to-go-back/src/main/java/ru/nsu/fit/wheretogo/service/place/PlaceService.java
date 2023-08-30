@@ -1,8 +1,9 @@
 package ru.nsu.fit.wheretogo.service.place;
 
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
+
+import java.util.List;
 
 /**
  * Сервис для работы с местами
@@ -10,18 +11,24 @@ import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 public interface PlaceService {
 
     /**
-     * @param place
+     * Добавление места
+     *
+     * @param place данные запроса
      */
     void addPlace(PlaceDescriptionDTO place);
 
     /**
-     * @param place
+     * Удаление места
+     *
+     * @param place данные запроса
      */
     void deletePlace(PlaceDescriptionDTO place);
 
     /**
-     * @param id
-     * @return
+     * Получение места по идентификатору
+     *
+     * @param id идентификатор места
+     * @return данные места
      */
     PlaceDescriptionDTO getPlaceById(Long id);
 
@@ -29,40 +36,36 @@ public interface PlaceService {
      * Получение списка ближайших мест к определенной точке на карте,
      * заданной координатами (myLat, myLon)
      *
-     * @param myLat
-     * @param myLon
-     * @param startDist
-     * @param maxDist
-     * @param limit
-     * @param page
-     * @param size
-     * @return
+     * @param myLat     широта
+     * @param myLon     долгота
+     * @param startDist начальный радиус поиска
+     * @param maxDist   конечный радиус поиска
+     * @param limit     максимальное количество мест
+     * @return список мест
      */
-    PagedListDTO<PlaceBriefDTO> getNearestPlacesToPoint(
+    List<PlaceBriefDTO> getNearestPlacesToPoint(
             double myLat,
             double myLon,
             double startDist,
             double maxDist,
-            int limit,
-            int page,
-            int size
+            int limit
     );
 
     /**
-     * @param categoryIds
-     * @param page
-     * @param size
-     * @return
+     * Получение списка мест, относящихся к выбранным категориям
+     *
+     * @param categoryIds список идентификаторов категорий
+     * @return список мест
      */
-    PagedListDTO<PlaceBriefDTO> getPlaces(
-            String categoryIds,
-            int page,
-            int size
+    List<PlaceBriefDTO> getPlaces(
+            String categoryIds
     );
 
     /**
-     * @param placeId
-     * @param categoryId
+     * Добавление категории конкретному месту
+     *
+     * @param placeId    идентификатор места
+     * @param categoryId идентификатор категории
      */
     void addPlaceCategory(Long placeId, Long categoryId);
 

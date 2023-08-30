@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,8 +15,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import ru.nsu.fit.wheretogo.map.MapsActivity;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
 
 public class RegistrationActivity extends AppCompatActivity {
@@ -85,12 +85,6 @@ public class RegistrationActivity extends AppCompatActivity {
         );
     }
 
-    private void openMap() {
-        finish();
-        Intent intent = new Intent(this, MapsActivity.class);
-        startActivity(intent);
-    }
-
     private void openLocationHistoryAdvice() {
         finish();
         Intent intent = new Intent(this, LocationHistoryActivity.class);
@@ -107,12 +101,9 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void saveAuthData(String email, String password) {
-//        SharedPreferences sharedPreferences = getSharedPreferences("AUTH_DATA", MODE_PRIVATE);
-
         SharedPreferences sharedPreferences = new ObscuredSharedPreferences(
                 this, this.getSharedPreferences("AUTH_DATA", MODE_PRIVATE)
         );
-
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("email", email);
         editor.putString("password", password);

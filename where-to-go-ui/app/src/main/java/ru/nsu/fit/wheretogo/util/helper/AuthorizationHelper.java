@@ -1,10 +1,8 @@
-package ru.nsu.fit.wheretogo.util;
+package ru.nsu.fit.wheretogo.util.helper;
 
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import java.util.function.Consumer;
 
@@ -13,7 +11,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.entity.User;
-import ru.nsu.fit.wheretogo.model.service.UserService;
+import ru.nsu.fit.wheretogo.service.UserService;
 
 public class AuthorizationHelper {
     private static final String TAG = AuthorizationHelper.class.getSimpleName();
@@ -22,6 +20,9 @@ public class AuthorizationHelper {
     private static User userProfile;
     private static String email;
     private static String password;
+
+    private AuthorizationHelper() {
+    }
 
     public static User getUserProfile() {
         return userProfile;
@@ -57,7 +58,6 @@ public class AuthorizationHelper {
             Runnable onUnexpectedError
     ) {
         userService.registerUser(email, username, password).enqueue(new Callback<User>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
                 if (response.isSuccessful()) {
@@ -71,7 +71,7 @@ public class AuthorizationHelper {
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 onUnexpectedError.run();
-                Log.e("registration", t.getMessage());
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -99,7 +99,7 @@ public class AuthorizationHelper {
             @Override
             public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
                 onUnexpectedError.run();
-                Log.e("authorization", t.getMessage());
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -172,8 +172,5 @@ public class AuthorizationHelper {
                 onUnexpectedError.run();
             }
         });
-    }
-
-    private AuthorizationHelper() {
     }
 }

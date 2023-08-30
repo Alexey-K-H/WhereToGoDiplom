@@ -16,16 +16,18 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
-import ru.nsu.fit.wheretogo.RecyclerViewAdapter;
-import ru.nsu.fit.wheretogo.map.MapsActivity;
+import ru.nsu.fit.wheretogo.activities.RecyclerViewAdapter;
+import ru.nsu.fit.wheretogo.activities.MapsActivity;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 
 public class PictureLoader {
     private static final String TAG = MapsActivity.class.getSimpleName();
 
+    private PictureLoader() {
+    }
+
     public static void loadPlaceThumbnail(Context context, Place place,
-                                          int clusterNumber,
                                           List<ClusterMarker> clusterMarkers,
                                           ClusterManager<ClusterMarker> clusterManager) {
         Glide.with(context)
@@ -53,6 +55,7 @@ public class PictureLoader {
 
                     @Override
                     public void onLoadCleared(@Nullable Drawable placeholder) {
+                        //do nothing
                     }
                 });
     }
@@ -76,10 +79,9 @@ public class PictureLoader {
 
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) {
+                            //do nothing
                         }
                     });
-
-
         }
     }
 

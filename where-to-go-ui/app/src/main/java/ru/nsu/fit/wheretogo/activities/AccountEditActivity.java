@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,29 +10,30 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class AccountEditActivity extends AppCompatActivity {
-    private String oldUserName;
 
+    private String oldUserName;
     private EditText editNameText;
-    private ImageButton editPasswordButton;
-    private ImageButton saveButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        ImageButton saveButton;
+        ImageButton editPasswordButton;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_account);
 
-        editNameText = (EditText) findViewById(R.id.name_edit);
+        editNameText = findViewById(R.id.name_edit);
 
         oldUserName = AuthorizationHelper.getUserProfile().getUsername();
         editNameText.setText(oldUserName);
 
-        saveButton = (ImageButton) findViewById(R.id.save_profile_btn);
+        saveButton = findViewById(R.id.save_profile_btn);
         saveButton.setOnClickListener(this::updateUserSettings);
 
-        editPasswordButton = (ImageButton) findViewById(R.id.changePwd_btn);
+        editPasswordButton = findViewById(R.id.changePwd_btn);
         editPasswordButton.setOnClickListener(this::openChangePwdEditor);
     }
 
@@ -52,11 +53,11 @@ public class AccountEditActivity extends AppCompatActivity {
                         AuthorizationHelper.getUserProfile().setUsername(newUsername);
                         showNotification("Имя успешно изменено");
                     },
-                    failResponse -> showNotification("Не удалось изменить имя. Возможно оно уже занято"),
+                    failResponse ->
+                            showNotification("Не удалось изменить имя. Возможно, оно уже занято"),
                     () -> showNotification(getString(R.string.unexpectedErrorMsg))
             );
         }
-
     }
 
     public void openChangePwdEditor(View view) {

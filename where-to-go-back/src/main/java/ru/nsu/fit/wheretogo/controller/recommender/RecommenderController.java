@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.service.place.CategoryService;
@@ -43,15 +42,13 @@ public class RecommenderController {
     }
 
     @GetMapping("/nearest/category")
-    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getNearestPlaces(
+    public ResponseEntity<List<PlaceBriefDTO>> getNearestPlaces(
             @RequestParam(name = "_my_lat") Double myLat,
             @RequestParam(name = "_my_lon") Double myLon,
             @RequestParam(name = "_start_dist") Double startDist,
             @RequestParam(name = "_max_dist") Double maxDist,
             @RequestParam(name = "_limit") Integer limit,
-            @RequestParam(name = "category", required = false) List<Integer> categoryId,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+            @RequestParam(name = "category", required = false) List<Integer> categoryId
     ) {
         var categoryIds = "";
         categoryIds = Objects.requireNonNullElseGet(
@@ -66,63 +63,40 @@ public class RecommenderController {
                         startDist,
                         maxDist,
                         limit,
-                        categoryIds,
-                        page,
-                        pageSize),
+                        categoryIds),
                 HttpStatus.OK);
     }
 
     @GetMapping("/stay_points")
-    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getStayPointRecommendations(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ) {
+    public ResponseEntity<List<PlaceBriefDTO>> getStayPointRecommendations() {
         if (stayPointService.ifUserHasStayPoints()) {
             return new ResponseEntity<>(
-                    recommenderService.getNearestPlacesByStayPoints(
-                            page,
-                            pageSize),
+                    recommenderService.getNearestPlacesByStayPoints(),
                     HttpStatus.OK);
         } else {
             return new ResponseEntity<>(
-                    recommenderService.getNearestPlacesByVisited(
-                            page,
-                            pageSize),
+                    recommenderService.getNearestPlacesByVisited(),
                     HttpStatus.OK);
         }
     }
 
     @GetMapping("/content_based")
-    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getContentBasedRecommendations(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ) {
+    public ResponseEntity<List<PlaceBriefDTO>> getContentBasedRecommendations() {
         return new ResponseEntity<>(
-                recommenderService.getContentBasedRecommendations(
-                        page,
-                        pageSize),
+                recommenderService.getContentBasedRecommendations(),
                 HttpStatus.OK);
     }
 
     @GetMapping("/collaborative_filter")
-    public ResponseEntity<PagedListDTO<PlaceBriefDTO>> getCollaborativeFilteringRecommendations(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
-    ) {
-        if (scoreService.ifUserHasScores(userService.getCurrentUserDto().getId())) {
+    public ResponseEntity<List<PlaceBriefDTO>> getCollaborativeFilteringRecommendations() {
+        if (scoreService.ifUserHasScores(userService.getCurrentUser().getId())) {
             return new ResponseEntity<>(
-                    recommenderService.getCollaborativeRecommendationsByScores(
-                            page,
-                            pageSize
-                    ),
+                    recommenderService.getCollaborativeRecommendationsByScores(),
                     HttpStatus.OK
             );
         } else {
             return new ResponseEntity<>(
-                    recommenderService.getCollaborativeRecommendationsByFavourites(
-                            page,
-                            pageSize
-                    ),
+                    recommenderService.getCollaborativeRecommendationsByFavourites(),
                     HttpStatus.OK
             );
         }

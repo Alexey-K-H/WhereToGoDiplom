@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.user.ScoreDTO;
 import ru.nsu.fit.wheretogo.dto.user.UserDTO;
 import ru.nsu.fit.wheretogo.service.score.ScoreService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/score")
@@ -48,27 +49,23 @@ public class ScoreController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<PagedListDTO<ScoreDTO>> getScores(
-            @RequestParam(name = "placeId") Long placeId,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+    public ResponseEntity<List<ScoreDTO>> getScores(
+            @RequestParam(name = "placeId") Long placeId
     ) {
         var dto = new PlaceDescriptionDTO();
         dto.setId(placeId);
 
-        return new ResponseEntity<>(scoreService.getByPlace(dto, page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(scoreService.getByPlace(dto), HttpStatus.OK);
     }
 
     @GetMapping("/user")
-    public ResponseEntity<PagedListDTO<ScoreDTO>> getByUser(
-            @RequestParam(name = "userId") Long userId,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize
+    public ResponseEntity<List<ScoreDTO>> getByUser(
+            @RequestParam(name = "userId") Long userId
     ) {
         var dto = new UserDTO();
         dto.setId(userId);
 
-        return new ResponseEntity<>(scoreService.getByUser(dto, page, pageSize), HttpStatus.OK);
+        return new ResponseEntity<>(scoreService.getByUser(dto), HttpStatus.OK);
     }
 
     @GetMapping("/{user_id}/{place_id}")

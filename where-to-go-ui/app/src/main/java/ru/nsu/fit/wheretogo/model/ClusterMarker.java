@@ -13,6 +13,7 @@ import java.io.Serializable;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 
 public class ClusterMarker implements Serializable, ClusterItem {
+
     private Long id;
     private LatLng position;
     private String title;
@@ -27,9 +28,6 @@ public class ClusterMarker implements Serializable, ClusterItem {
         this.snippet = snippet;
         this.iconPicture = iconPicture;
         this.place = place;
-    }
-
-    public ClusterMarker() {
     }
 
     @NonNull

@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,23 +16,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.map.MapsActivity;
+import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
-import ru.nsu.fit.wheretogo.model.service.ScoreService;
-import ru.nsu.fit.wheretogo.model.service.StayPointService;
-import ru.nsu.fit.wheretogo.model.service.UserService;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
-
+import ru.nsu.fit.wheretogo.service.ScoreService;
+import ru.nsu.fit.wheretogo.service.StayPointService;
+import ru.nsu.fit.wheretogo.service.UserService;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class ForYouActivity extends AppCompatActivity {
     private static final String TAG = ForYouActivity.class.getSimpleName();
+    private static final String LAST_LOCATION_STRING = "lastLocation";
+    private static final String SHOW_MAP_MODE_STRING = "show_map_mode";
 
     private ImageButton recommendByVisitedBtn;
     private ImageButton recommendByScoredBtn;
     private ImageButton recommendByOthersBtn;
     private ImageButton recommendByGPSBtn;
-
     private Location lastLocation;
 
     @Override
@@ -42,8 +42,9 @@ public class ForYouActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            lastLocation = extras.getParcelable("lastLocation");
-            Log.d(TAG, "Get lastKnownLocation (" + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + ")");
+            lastLocation = extras.getParcelable(LAST_LOCATION_STRING);
+            Log.d(TAG, "Последнее местоположение:["
+                    + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + "]");
         }
 
         recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
@@ -51,14 +52,13 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
         recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
 
-        //Выполняем проврку наличия в базе данных информации об оценках, stay-point-ах, посещенных и избранных
         Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
         checkStayPoints.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if (response.code() == 200 && response.body() != null) {
-                    if (response.body()) {
-                        Log.d(TAG, "Find some stay-points");
+                    if (Boolean.TRUE.equals(response.body())) {
+                        Log.d(TAG, "Найдены точки останова");
                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
                     } else {
                         Call<Boolean> checkVisited = ServiceGenerator.createService(UserService.class).isUserHasVisited();
@@ -66,7 +66,7 @@ public class ForYouActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                                 if (response.code() == 200 && response.body() != null) {
-                                    if (response.body()) {
+                                    if (Boolean.TRUE.equals(response.body())) {
                                         Log.d(TAG, "Find some visited places");
                                         recommendByVisitedBtn.setOnClickListener(ForYouActivity.this::openVisitedRecommender);
                                     } else {
@@ -77,7 +77,7 @@ public class ForYouActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                                Log.e(TAG, t.getMessage());
                             }
                         });
                     }
@@ -86,7 +86,7 @@ public class ForYouActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -96,7 +96,7 @@ public class ForYouActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if (response.code() == 200 && response.body() != null) {
-                    if (response.body()) {
+                    if (Boolean.TRUE.equals(response.body())) {
                         Log.d(TAG, "Find some scores of user");
                         recommendByScoredBtn.setOnClickListener(ForYouActivity.this::openScoredRecommender);
                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
@@ -107,7 +107,7 @@ public class ForYouActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                                 if (response.code() == 200 && response.body() != null) {
-                                    if (response.body()) {
+                                    if (Boolean.TRUE.equals(response.body())) {
                                         Log.d(TAG, "Find some favourites places");
                                         recommendByOthersBtn.setOnClickListener(ForYouActivity.this::openUsersRecommender);
                                     } else {
@@ -118,7 +118,7 @@ public class ForYouActivity extends AppCompatActivity {
 
                             @Override
                             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                                Log.e(TAG, t.getMessage());
                             }
                         });
                     }
@@ -127,7 +127,7 @@ public class ForYouActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -144,8 +144,8 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByGPSBtn.setImageResource(R.drawable.nearest_rec_btn_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("show_map_mode", ShowMapMode.NEAREST.ordinal());
-        intent.putExtra("lastLocation", lastLocation);
+        intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.NEAREST.ordinal());
+        intent.putExtra(LAST_LOCATION_STRING, lastLocation);
         startActivity(intent);
     }
 
@@ -153,8 +153,8 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByVisitedBtn.setImageResource(R.drawable.btn_by_places_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_VISITED.ordinal());
-        intent.putExtra("lastLocation", lastLocation);
+        intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.RECOMMENDED_VISITED.ordinal());
+        intent.putExtra(LAST_LOCATION_STRING, lastLocation);
         startActivity(intent);
     }
 
@@ -162,8 +162,8 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByScoredBtn.setImageResource(R.drawable.btn_by_prefs_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_SCORED.ordinal());
-        intent.putExtra("lastLocation", lastLocation);
+        intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.RECOMMENDED_SCORED.ordinal());
+        intent.putExtra(LAST_LOCATION_STRING, lastLocation);
         startActivity(intent);
     }
 
@@ -171,8 +171,8 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByOthersBtn.setImageResource(R.drawable.btn_by_users_selected);
         finish();
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("show_map_mode", ShowMapMode.RECOMMENDED_USERS.ordinal());
-        intent.putExtra("lastLocation", lastLocation);
+        intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.RECOMMENDED_USERS.ordinal());
+        intent.putExtra(LAST_LOCATION_STRING, lastLocation);
         startActivity(intent);
     }
 
