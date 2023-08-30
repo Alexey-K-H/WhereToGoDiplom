@@ -9,6 +9,7 @@ import java.util.List;
 
 
 public class Place {
+
     @SerializedName("id")
     @Expose
     private Long id;
@@ -18,12 +19,9 @@ public class Place {
     @SerializedName("description")
     @Expose
     private String description;
-    @SerializedName("coords")
+    @SerializedName("coordinates")
     @Expose
-    private Coords coords;
-    @SerializedName("averageScore")
-    @Expose
-    private Double averageScore;
+    private Coordinates coordinates;
     @SerializedName("thumbnailLink")
     @Expose
     private String thumbnailLink;
@@ -33,23 +31,17 @@ public class Place {
     @SerializedName("categories")
     @Expose
     private List<Category> categories;
-    @SerializedName("picturesLinks")
-    @Expose
-    private List<Object> picturesLinks;
 
     public Place(Long id, String name, String description,
-                 Coords coords, Double averageScore, String thumbnailLink,
-                 String uploadedAt, List<Category> categories,
-                 List<Object> picturesLinks) {
+                 Coordinates coordinates, String thumbnailLink,
+                 String uploadedAt, List<Category> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.coords = coords;
-        this.averageScore = averageScore;
+        this.coordinates = coordinates;
         this.thumbnailLink = thumbnailLink;
         this.uploadedAt = uploadedAt;
         this.categories = categories;
-        this.picturesLinks = picturesLinks;
     }
 
     public Long getId() {
@@ -76,20 +68,12 @@ public class Place {
         this.description = description;
     }
 
-    public Coords getCoords() {
-        return coords;
+    public Coordinates getCoordinates() {
+        return coordinates;
     }
 
-    public void setCoords(Coords coords) {
-        this.coords = coords;
-    }
-
-    public Double getAverageScore() {
-        return averageScore;
-    }
-
-    public void setAverageScore(Double averageScore) {
-        this.averageScore = averageScore;
+    public void setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
     }
 
     public String getThumbnailLink() {
@@ -116,28 +100,20 @@ public class Place {
         this.categories = categories;
     }
 
-    public List<Object> getPicturesLinks() {
-        return picturesLinks;
-    }
-
-    public void setPicturesLinks(List<Object> picturesLinks) {
-        this.picturesLinks = picturesLinks;
-    }
-
     public Double getLatitude() {
-        return coords.getLatitude();
+        return coordinates.getLatitude();
     }
 
     public void setLatitude(Double latitude) {
-        this.coords.setLatitude(latitude);
+        this.coordinates.setLatitude(latitude);
     }
 
     public Double getLongitude() {
-        return coords.getLongitude();
+        return coordinates.getLongitude();
     }
 
     public void setLongitude(Double longitude) {
-        this.coords.setLatitude(longitude);
+        this.coordinates.setLatitude(longitude);
     }
 
     @NonNull
@@ -145,8 +121,7 @@ public class Place {
     public String toString() {
         return "\nname: " + getName() + "\n" +
                 "description: " + getDescription() + "\n" +
-                "cords: " + getCoords().toString() + "\n" +
-                "averageScore: " + getAverageScore() + "\n" +
+                "cords: " + getCoordinates().toString() + "\n" +
                 "thumbnailLink: " + getThumbnailLink() + "\n" +
                 "uploadedAt: " + getUploadedAt();
     }

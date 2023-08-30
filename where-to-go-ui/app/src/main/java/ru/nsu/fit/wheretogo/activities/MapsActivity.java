@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.map;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -51,92 +51,66 @@ import java.util.stream.Collectors;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.AccountActivity;
-import ru.nsu.fit.wheretogo.FavouritesActivity;
-import ru.nsu.fit.wheretogo.ForYouActivity;
-import ru.nsu.fit.wheretogo.PlaceActivity;
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.VisitedActivity;
 import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
-import ru.nsu.fit.wheretogo.model.PlaceList;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
-import ru.nsu.fit.wheretogo.model.service.CategoryService;
-import ru.nsu.fit.wheretogo.model.service.PlaceListService;
-import ru.nsu.fit.wheretogo.model.service.PlaceService;
-import ru.nsu.fit.wheretogo.model.service.ScoreService;
-import ru.nsu.fit.wheretogo.model.service.UserService;
-import ru.nsu.fit.wheretogo.util.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.service.CategoryService;
+import ru.nsu.fit.wheretogo.service.PlaceService;
+import ru.nsu.fit.wheretogo.service.RecommenderService;
+import ru.nsu.fit.wheretogo.service.ScoreService;
+import ru.nsu.fit.wheretogo.service.UserService;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+
     private static final String TAG = MapsActivity.class.getSimpleName();
-    private static final int HALF_OUR_SEC = 1800;
-
-    private Map<Integer, CategoryNameChosen> categories;
-
-    // The entry point to the Fused Location Provider.
-    private FusedLocationProviderClient fusedLocationProviderClient;
-
-    //Default location (Novosibirsk Rechnoy Vokzal)
-    private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
     private static final int DEFAULT_ZOOM = 12;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted;
-
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
-    private Location lastKnownLocation;
-
-    //vars for markers
-    private final ArrayList<Place> places = new ArrayList<>();
-
-    // Keys for storing activity state.
-    private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
+    private static final String LAST_LOCATION_STR = "lastLocation";
 
-    //adding markers on map
-    private ClusterManager<ClusterMarker> clusterManager;
-    private ClusterManagerRenderer clusterManagerRenderer;
+    private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
+    private final ArrayList<Place> places = new ArrayList<>();
     private final ArrayList<ClusterMarker> clusterMarkers = new ArrayList<>();
 
-    //current_selected_place
+    private Map<Integer, CategoryNameChosen> categories;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private boolean locationPermissionGranted;
+    private Location lastKnownLocation;
+    private ClusterManager<ClusterMarker> clusterManager;
+    private ClusterManagerRenderer clusterManagerRenderer;
     private ClusterMarker selectedPlace;
-
     private GoogleMap map;
-
     private SlidingPaneLayout mapSlidingPane;
     private LinearLayout filtersLayout;
-
-    //map show mode
     private ShowMapMode showMapMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "Инициализация списка категорий");
         getCategories(null, null);
 
-        // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
+            Log.d(TAG, String.format("Last location [lat:%s, lon:%s]",
+                    lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
         }
 
-        //Устанавливаем режим отображения мест
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
+            Log.d(TAG, "Нет дополнительных параметров, используется модуль отображения ALL");
             showMapMode = ShowMapMode.ALL;
         } else {
             int mode = extras.getInt("show_map_mode");
             switch (mode) {
-                case 0:
-                    showMapMode = ShowMapMode.ALL;
-                    break;
                 case 1:
                     showMapMode = ShowMapMode.NEAREST;
                     break;
@@ -149,17 +123,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 case 4:
                     showMapMode = ShowMapMode.RECOMMENDED_USERS;
                     break;
+                default:
+                    showMapMode = ShowMapMode.ALL;
             }
 
             if (showMapMode == ShowMapMode.NEAREST) {
-                lastKnownLocation = extras.getParcelable("lastLocation");
-                Log.d(TAG, "Get lastKnownLocation for nearest: " + lastKnownLocation.getLatitude() + ", " + lastKnownLocation.getLongitude() + ")");
+                lastKnownLocation = extras.getParcelable(LAST_LOCATION_STR);
+                Log.d(TAG, "Get lastKnownLocation for nearest: "
+                        + lastKnownLocation.getLatitude()
+                        + ", "
+                        + lastKnownLocation.getLongitude() + ")");
             }
 
         }
 
-        // Retrieve the content view that renders the map.
-        ru.nsu.fit.wheretogo.databinding.ActivityMapBinding binding = ActivityMapBinding.inflate(getLayoutInflater());
+
+        ru.nsu.fit.wheretogo.databinding.ActivityMapBinding binding =
+                ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         mapSlidingPane = findViewById(R.id.mapSlidingPane);
@@ -167,54 +147,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapSlidingPane.addPanelSlideListener(new SlidingPaneLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(@NonNull View panel, float slideOffset) {
+                //do nothing
             }
 
             @Override
             public void onPanelOpened(@NonNull View panel) {
+                Log.d(TAG, "Открыта панель выбора категорий");
             }
 
             @Override
             public void onPanelClosed(@NonNull View panel) {
+                Log.d(TAG, "Категории выбраны, переход на карту");
                 sendPlacesRequest();
             }
         });
         filtersLayout = findViewById(R.id.filtersLayout);
 
 
-        // Construct a PlacesClient
         Places.initialize(getApplicationContext(), getString(R.string.google_maps_key));
-        // The entry point to the Places API.
         Places.createClient(this);
 
-        // Construct a FusedLocationProviderClient.
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Build the map.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
 
-        //Buttons init
-        ImageButton recommenderButton = (ImageButton) findViewById(R.id.for_you_btn);
+        ImageButton recommenderButton = findViewById(R.id.for_you_btn);
 
         if (showMapMode != ShowMapMode.ALL) {
             recommenderButton.setImageResource(R.drawable.back_from_rec_map);
         }
 
-        ImageButton favoritesButton = (ImageButton) findViewById(R.id.favorites_btn);
-        ImageButton visitedButton = (ImageButton) findViewById(R.id.visited_btn_map);
-        ImageButton filters = (ImageButton) findViewById(R.id.filters_btn);
-        ImageButton userPrefs = (ImageButton) findViewById(R.id.user_settings_btn);
+        ImageButton favoritesButton = findViewById(R.id.favorites_btn);
+        ImageButton visitedButton = findViewById(R.id.visited_btn_map);
+        ImageButton filters = findViewById(R.id.filters_btn);
+        ImageButton userPrefs = findViewById(R.id.user_settings_btn);
 
-        //Buttons listeners
         if (showMapMode != ShowMapMode.ALL) {
-            recommenderButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    onBackPressed();
-                }
-            });
+            recommenderButton.setOnClickListener(view -> onBackPressed());
             userPrefs.setVisibility(View.GONE);
         } else {
             userPrefs.setOnClickListener(this::openUserPrefs);
@@ -250,8 +222,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         if (map != null) {
-            Log.d(TAG, "Save LastKnownLocation");
-            outState.putParcelable(KEY_CAMERA_POSITION, map.getCameraPosition());
+            Log.d(TAG, "Сохранение последней локации и положения экрана");
             outState.putParcelable(KEY_LOCATION, lastKnownLocation);
         }
         super.onSaveInstanceState(outState);
@@ -267,25 +238,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.map = map;
 
         try {
-            this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(), R.raw.map_without_labels_style));
-            Log.d(TAG, "Load configuration file successfully");
+            this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(),
+                    R.raw.map_without_labels_style));
+            Log.d(TAG, "Стиль карты загружен успешно");
         } catch (Exception e) {
-            Log.e(TAG, "Cannot load JSON file to configure map");
+            Log.e(TAG, "Не удалось загрузить данные стиля карты из файла JSON");
         }
 
-        // Use a custom info window adapter to handle multiple lines of text in the
-        // info window contents.
         this.map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
             @Override
-            // Return null here, so that getInfoContents() is called next.
             public View getInfoWindow(@NonNull Marker arg0) {
                 return null;
             }
 
             @Override
             public View getInfoContents(@NonNull Marker marker) {
-                // Inflate the layouts for the info window, title and snippet.
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
                         (FrameLayout) findViewById(R.id.map), false);
 
@@ -299,33 +267,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        // Prompt the user for permission.
         getLocationPermission();
-
-        // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
-
-        // Get the current location of the device and set the position of the map.
         getDeviceLocation();
-
         sendPlacesRequest();
     }
 
-    // Отправляет запрос на получение мест,
-    // там же происходит вызов отображения маркеров при получении ответа
-    //Дополнительно сделан отбор мест, расположенных близко к пользователю, на основе его координат(решили не использовать при открытии экрана)
     private void sendPlacesRequest() {
-        PlaceListService placeService = ServiceGenerator.createService(PlaceListService.class);
+        RecommenderService recommenderService = ServiceGenerator.createService(RecommenderService.class);
 
         if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
         }
 
-        //В зависимости от режима отображения будет загружен тот или иной список мест
-        Call<PlaceList> placeCall;
+        Log.d(TAG, "Список выбранных категорий: "
+                + categories.values().stream().map(c -> c.name).collect(Collectors.toList()));
+
+        Call<List<Place>> placesCall;
         switch (showMapMode) {
             case NEAREST:
-                placeCall = placeService.getNearestPlacesByCategory(
+                placesCall = recommenderService.getNearestPlacesByCategory(
                         lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude(),
                         1.0,
@@ -334,64 +295,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         categories.entrySet().stream()
                                 .filter(entry -> entry.getValue().chosen)
                                 .map(Map.Entry::getKey)
-                                .collect(Collectors.toList()),
-                        1, 0);
+                                .collect(Collectors.toList()));
                 break;
             case RECOMMENDED_VISITED:
-                placeCall = placeService.getRecommendByVisited(
-                        1,
-                        0
-                );
+                placesCall = recommenderService.getRecommendByVisited();
                 break;
             case RECOMMENDED_SCORED:
-                placeCall = placeService.getRecommendByScores(
-                        1,
-                        0
-                );
+                placesCall = recommenderService.getRecommendByScores();
                 break;
             case RECOMMENDED_USERS:
-                placeCall = placeService.getRecommendByUsers(
-                        1,
-                        0
-                );
+                placesCall = recommenderService.getRecommendByUsers();
                 break;
             default:
-                placeCall = placeService.getPlaceList(
+                placesCall = recommenderService.getPlaceList(
                         categories.entrySet().stream()
                                 .filter(entry -> entry.getValue().chosen)
                                 .map(Map.Entry::getKey)
-                                .collect(Collectors.toList()),
-                        1, 0);
+                                .collect(Collectors.toList()));
                 break;
         }
 
-        placeCall.enqueue(new Callback<PlaceList>() {
+        placesCall.enqueue(new Callback<List<Place>>() {
             @Override
-            public void onResponse(@NonNull Call<PlaceList> call,
-                                   @NonNull Response<PlaceList> response) {
-                PlaceList placeList = response.body();
+            public void onResponse(@NonNull Call<List<Place>> call,
+                                   @NonNull Response<List<Place>> response) {
+                List<Place> placeList = response.body();
                 places.clear();
                 if (placeList != null) {
-                    places.addAll(placeList.getList());
+                    places.addAll(placeList);
                 }
                 updateMapMarkers();
             }
 
             @Override
-            public void onFailure(@NonNull Call<PlaceList> call, @NonNull Throwable t) {
-                Log.d(TAG, t.getMessage());
+            public void onFailure(@NonNull Call<List<Place>> call, @NonNull Throwable t) {
+                Log.e(TAG, t.getMessage());
             }
         });
     }
 
-    /**
-     * Gets the current location of the device, and positions the map's camera.
-     */
     private void getDeviceLocation() {
-        /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
-         */
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         try {
@@ -406,7 +349,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                     locationResult.addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
                             if (lastKnownLocation != null) {
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -415,15 +357,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             }
                         } else {
-                            Log.d(TAG, "Current location is null. Using defaults.");
-                            Log.e(TAG, "Exception: %s", task.getException());
+                            Log.d(TAG, "Не удалось получить местоположение, используем позицию по умолчанию");
                             map.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                             map.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     });
                 } else {
-                    Log.d(TAG, "No gps access, set default location");
+                    Log.d(TAG, "Нет доступа к GPS, используется место по умолчанию.");
                     map.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                     map.getUiSettings().setMyLocationButtonEnabled(false);
@@ -435,15 +376,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Prompts the user for permission to use the device location.
-     */
     private void getLocationPermission() {
-        /*
-         * Request location permission, so that we can get the location of the
-         * device. The result of the permission request is handled by a callback,
-         * onRequestPermissionsResult.
-         */
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -455,28 +388,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    /**
-     * Handles the result of the request for location permissions.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         locationPermissionGranted = false;
-        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
-            // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                locationPermissionGranted = true;
-                updateLocationUI();
-            }
+        if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION && (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            locationPermissionGranted = true;
+            updateLocationUI();
         }
     }
 
-    /**
-     * Updates the map's UI settings based on whether the user has granted location permission.
-     */
     private void updateLocationUI() {
         if (map == null) {
             return;
@@ -496,13 +420,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     private void updateMapMarkers() {
         if (map != null) {
             if (clusterManager == null) {
                 clusterManager = new ClusterManager<>(this.getApplicationContext(), map);
                 clusterManager.setOnClusterItemClickListener(item -> {
-                    //Выбранное место
                     selectedPlace = item;
                     openShortPlaceInfo();
                     return false;
@@ -517,21 +439,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 clusterManager.setRenderer(clusterManagerRenderer);
             }
 
-            int placeNum = 0;
             clusterManager.clearItems();
             clusterMarkers.clear();
             clusterManager.cluster();
             for (Place place : places) {
-                Log.d(TAG, "addMapMarkers: location: "
+                Log.d(TAG, "Добавлен маркер на карту. Позиция:[ "
                         + place.getLatitude().toString()
-                        + place.getLongitude().toString());
+                        + place.getLongitude().toString() + "]");
                 try {
-                    PictureLoader.loadPlaceThumbnail(this, place, placeNum,
+                    PictureLoader.loadPlaceThumbnail(this, place,
                             clusterMarkers, clusterManager);
-
-                    placeNum++;
-                } catch (NullPointerException e) {
-                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage());
+                } catch (Exception e) {
+                    Log.e(TAG, "Ошибка при добавлении маркера:\n" + e.getMessage());
                 }
             }
         }
@@ -558,14 +477,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         bottomSheetView.findViewById(R.id.visited_btn).setOnClickListener(this::addVisitedPlace);
 
-        //Кнопка добавления места в избранные
         ImageButton liked = bottomSheetView.findViewById(R.id.favour_btn);
         liked.setOnClickListener(view -> {
             liked.setActivated(true);
             addFavoritePlace(view);
         });
 
-        //Кнопка добавления места в посещенное
         ImageButton visited = bottomSheetView.findViewById(R.id.visited_btn);
         visited.setOnClickListener(view -> {
             visited.setActivated(true);
@@ -605,22 +522,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
                 }
-
             }
 
             @Override
             public void onFailure(@NonNull Call<Place> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
-        //Проверка отображения значков избранного и посещенного
         Call<Boolean> visitedCheckCall = placeService.findVisitedById(item.getPlace().getId());
         visitedCheckCall.enqueue(new Callback<Boolean>() {
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    if (response.body()) {
+                    if (Boolean.TRUE.equals(response.body())) {
                         visited.setImageResource(R.drawable.add_to_visited);
                     } else {
                         visited.setImageResource(R.drawable.unknown);
@@ -630,7 +545,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -639,7 +554,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    if (response.body()) {
+                    if (Boolean.TRUE.equals(response.body())) {
                         favourite.setImageResource(R.drawable.add_to_favour);
                     } else {
                         favourite.setImageResource(R.drawable.add_to_favour_not_active);
@@ -649,7 +564,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -662,14 +577,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
                 if (response.code() == 200 && response.body() != null) {
-                    Long userMark = response.body().getScore();
-                    placeScore.setRating((float) userMark);
+                    Long userMark = response.body().getScoreValue();
+                    placeScore.setRating(userMark);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
 
@@ -684,26 +599,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
                     if (response.code() == 200 && response.body() != null) {
-                        ratingBar.setRating(response.body().getScore());
-                        Call<Boolean> placeInVisited = ServiceGenerator.createService(UserService.class).isPlaceInUserVisited(selectedPlace.getId());
+                        ratingBar.setRating(response.body().getScoreValue());
+                        Call<Boolean> placeInVisited = ServiceGenerator
+                                .createService(UserService.class)
+                                .isPlaceInUserVisited(selectedPlace.getId());
                         placeInVisited.enqueue(new Callback<Boolean>() {
                             @Override
-                            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
-                                if (response.code() == 200 && response.body() != null) {
-                                    if (!response.body()) {
-                                        addVisitedPlace(view);
-                                    }
+                            public void onResponse(
+                                    @NonNull Call<Boolean> call,
+                                    @NonNull Response<Boolean> response) {
+                                if (response.code() == 200 && response.body() != null
+                                        && (Boolean.FALSE.equals(response.body()))) {
+                                    addVisitedPlace(view);
                                 }
                             }
 
                             @Override
                             public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
-
+                                Log.e(TAG, t.getMessage());
                             }
                         });
-                    } else if (response.code() == 400) {
-
-                    } else {
+                    } else if (response.code() != 400) {
                         Toast.makeText(context, R.string.unexpectedErrorMsg,
                                 Toast.LENGTH_SHORT).show();
                     }
@@ -711,7 +627,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 @Override
                 public void onFailure(@NonNull Call<Score> call, @NonNull Throwable t) {
-
+                    Log.e(TAG, t.getMessage());
                 }
             });
         });
@@ -725,7 +641,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void openRecommenders(View view) {
 //        locationUpdateThread.quit();
         Intent intent = new Intent(this, ForYouActivity.class);
-        intent.putExtra("lastLocation", lastKnownLocation);
+        intent.putExtra(LAST_LOCATION_STR, lastKnownLocation);
         startActivity(intent);
     }
 
@@ -736,12 +652,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void openFullPlaceInfo(View view) {
         Intent intent = new Intent(this, PlaceActivity.class);
-
         intent.putExtra("id", selectedPlace.getId().toString());
         intent.putExtra("title", selectedPlace.getTitle());
         intent.putExtra("desc", selectedPlace.getPlace().getDescription());
         intent.putExtra("link", selectedPlace.getPlace().getThumbnailLink());
-
         startActivity(intent);
     }
 
@@ -758,10 +672,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(context, "Добавлено в избранное",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
-                    //Вызываем метод удаления места
                     deleteFavouritePlace(selectedPlace.getId());
-                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
-                    //и делаем ее неактивной
                     ImageButton favour = view.findViewById(R.id.favour_btn);
                     favour.setImageResource(R.drawable.add_to_favour_not_active);
                 } else {
@@ -772,7 +683,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -790,12 +701,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText(context, "Добавлено в посещенное",
                             Toast.LENGTH_SHORT).show();
                 } else if (response.code() == 400) {
-//                    //Вызываем метод удаления места
-//                    deleteVisitedPlace(selectedPlace.getId());
-//                    //При повторной поптыке нажатия на активную кнопку мы удаляем место из списка
-//                    //и делаем ее неактивной
-//                    ImageButton visited = view.findViewById(R.id.visited_btn);
-//                    visited.setImageResource(R.drawable.unknown);
+                    deleteVisitedPlace(selectedPlace.getId());
+                    ImageButton visited = view.findViewById(R.id.visited_btn);
+                    visited.setImageResource(R.drawable.unknown);
                 } else {
                     Toast.makeText(context, R.string.unexpectedErrorMsg,
                             Toast.LENGTH_SHORT).show();
@@ -804,7 +712,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -827,7 +735,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -850,7 +758,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                Log.e(TAG, t.getMessage());
             }
         });
     }
@@ -869,7 +777,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categoryIds.forEach(id -> {
                 CategoryNameChosen categoryNameChosen = categories.get(id);
                 assert categoryNameChosen != null;
-                filtersLayout.addView(categoryView(id, categoryNameChosen.name, categoryNameChosen.chosen));
+                filtersLayout.addView(
+                        categoryView(id, categoryNameChosen.name, categoryNameChosen.chosen));
             });
         }, mapSlidingPane::close);
         mapSlidingPane.open();
@@ -881,7 +790,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         checkBox.setText(name);
         checkBox.setTextSize(20);
         checkBox.setPadding(10, 10, 10, 10);
-        checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> categories.put(id, new CategoryNameChosen(name, isChecked)));
+        checkBox.setOnCheckedChangeListener((buttonView, isChecked)
+                -> categories.put(id, new CategoryNameChosen(name, isChecked)));
         return checkBox;
     }
 
@@ -896,22 +806,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onResponse(@NonNull Call<List<Category>> call,
                                    @NonNull Response<List<Category>> response) {
-                assert response.body() != null;
-                response.body().forEach(category -> {
-                    if (firstFilling.value) {
-                        categories.put(category.getId(), new CategoryNameChosen(category.getName(), true));
-                    } else {
-                        categories.putIfAbsent(category.getId(), new CategoryNameChosen(category.getName(), true));
+                if (response.body() == null) {
+                    Log.e(TAG, "Тело запроса категорий пустое");
+                    if (onFail != null) {
+                        onFail.run();
                     }
-                });
-                if (onSuccess != null) {
-                    onSuccess.run();
+                } else {
+                    response.body().forEach(category -> {
+                        if (firstFilling.value) {
+                            categories.put(category.getId(),
+                                    new CategoryNameChosen(category.getName(), true));
+                        } else {
+                            categories.putIfAbsent(category.getId(),
+                                    new CategoryNameChosen(category.getName(), true));
+                        }
+                    });
+                    if (onSuccess != null) {
+                        onSuccess.run();
+                    }
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<List<Category>> call, @NonNull Throwable t) {
-                Log.w("Categories", "Could not load categories (" + t.getMessage() + ")");
+                Log.e(TAG, "Could not load categories (" + t.getMessage() + ")");
                 if (onFail != null) {
                     onFail.run();
                 }
@@ -920,7 +838,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private static class BooleanWrapper {
-        public boolean value;
+        private boolean value;
 
         public BooleanWrapper(boolean value) {
             this.value = value;
@@ -928,8 +846,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private static class CategoryNameChosen {
-        public String name;
-        public boolean chosen;
+        private final String name;
+        private boolean chosen;
 
         public CategoryNameChosen(String name, boolean chosen) {
             this.name = name;
@@ -940,32 +858,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
         if (showMapMode != ShowMapMode.ALL) {
-            //Close recommender map and open recommenders
             finish();
             Intent intent = new Intent(this, ForYouActivity.class);
-            intent.putExtra("lastLocation", lastKnownLocation);
+            intent.putExtra(LAST_LOCATION_STR, lastKnownLocation);
             startActivity(intent);
         }
     }
 
     @Override
     protected void onStop() {
-//        Toast.makeText(this.getApplicationContext(), "Where To Go: Запись истории перемещений включена. Чтобы отключить, закройте свернутое приложение.",
-//                Toast.LENGTH_LONG).show();
-        Log.d(TAG, "Stop activity map");
+        Log.d(TAG, "Завершение работы карты");
         super.onStop();
     }
 
 
     @Override
     protected void onDestroy() {
-//        Intent serviceIntent = new Intent(this, LocationTrackerService.class);
-//        stopService(serviceIntent);
-//        Toast.makeText(this.getApplicationContext(), "Запись истории перемещений отключена. Она включится при следующем запуске.",
-//                Toast.LENGTH_LONG).show();
-        Log.d(TAG, "Destroy activity map");
+        Log.d(TAG, "Очистка страницы с картой");
         super.onDestroy();
     }
 }

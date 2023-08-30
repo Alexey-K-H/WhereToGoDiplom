@@ -7,7 +7,6 @@ import javax.validation.constraints.NotNull;
 /**
  * Базовая модель DTO
  */
-
 @Getter
 public abstract class BaseDTO {
 

@@ -1,10 +1,7 @@
 package ru.nsu.fit.wheretogo.service.score;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.dto.user.ScoreDTO;
 import ru.nsu.fit.wheretogo.dto.user.UserDTO;
@@ -60,7 +57,8 @@ public class ScoreServiceImpl implements ScoreService {
                     double newValue = (value - oldValue);
                     userCoefficientMainRepository.updateCoefficientWithoutIncrement(newValue, category.getId(), userId);
                 } else {
-                    userCoefficientMainRepository.updateCoefficientWithIncrement(value.doubleValue(), category.getId(), userId);
+                    userCoefficientMainRepository.updateCoefficientWithIncrement(
+                            value.doubleValue(), category.getId(), userId);
                 }
 
             } else {
@@ -92,38 +90,24 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     @Transactional(readOnly = true)
-    public PagedListDTO<ScoreDTO> getByUser(UserDTO userDto, int page, int size) {
-        var pageRequest = PageRequest.of(page, size);
-        Page<Score> scores = scoreRepository.findByUserId(User.getFromDTO(userDto).getId(), pageRequest);
-        List<ScoreDTO> userScoresDtos = scores.toList()
+    public List<ScoreDTO> getByUser(UserDTO userDto) {
+        List<Score> scores = scoreRepository.findByUserId(User.getFromDTO(userDto).getId());
+
+        return scores
                 .stream()
                 .map(ScoreDTO::getFromEntity)
                 .toList();
-
-        var listDto = new PagedListDTO<ScoreDTO>();
-        listDto.setList(userScoresDtos);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(scores.getTotalPages());
-
-        return listDto;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public PagedListDTO<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto, int page, int size) {
-        var pageRequest = PageRequest.of(page, size);
-        Page<Score> scores = scoreRepository.findByPlaceId(Place.getFromDTO(placeDto).getId(), pageRequest);
-        List<ScoreDTO> userScoresDtos = scores.toList()
+    public List<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto) {
+        List<Score> scores = scoreRepository.findByPlaceId(Place.getFromDTO(placeDto).getId());
+
+        return scores
                 .stream()
                 .map(ScoreDTO::getFromEntity)
                 .toList();
-
-        var listDto = new PagedListDTO<ScoreDTO>();
-        listDto.setList(userScoresDtos);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(scores.getTotalPages());
-
-        return listDto;
     }
 
     @Override

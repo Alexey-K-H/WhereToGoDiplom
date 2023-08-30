@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VisitedActivity">
+    tools:context=".activities.VisitedActivity">
 
     <TextView
         android:id="@+id/name_label"
@@ -24,7 +24,7 @@
         app:layout_constraintBottom_toTopOf="@+id/visited_recycler"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/visited" />
+        tools:text="@string/visited_text" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/visited_recycler"

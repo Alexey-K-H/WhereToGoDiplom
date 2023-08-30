@@ -15,12 +15,12 @@ public class Score {
 
     @SerializedName("score")
     @Expose
-    private Long score;
+    private Long scoreValue;
 
-    public Score(Long userId, Long placeId, Long score) {
+    public Score(Long userId, Long placeId, Long scoreValue) {
         this.userId = userId;
         this.placeId = placeId;
-        this.score = score;
+        this.scoreValue = scoreValue;
     }
 
     public Long getUserId() {
@@ -39,11 +39,11 @@ public class Score {
         this.placeId = placeId;
     }
 
-    public Long getScore() {
-        return score;
+    public Long getScoreValue() {
+        return scoreValue;
     }
 
-    public void setScore(Long score) {
-        this.score = score;
+    public void setScoreValue(Long scoreValue) {
+        this.scoreValue = scoreValue;
     }
 }

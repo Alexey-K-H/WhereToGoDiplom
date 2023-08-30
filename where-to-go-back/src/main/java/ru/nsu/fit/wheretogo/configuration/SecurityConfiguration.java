@@ -1,6 +1,5 @@
 package ru.nsu.fit.wheretogo.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -13,10 +12,13 @@ import ru.nsu.fit.wheretogo.service.AuthService;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final AuthService authService;
+
+    public SecurityConfiguration(AuthService authService) {
+        this.authService = authService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

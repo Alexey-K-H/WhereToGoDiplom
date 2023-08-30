@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.model.service;
+package ru.nsu.fit.wheretogo.service;
 
 import retrofit2.Call;
 import retrofit2.http.POST;
@@ -7,7 +7,11 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import ru.nsu.fit.wheretogo.model.entity.User;
 
+/**
+ * Сервис по работе с пользователями
+ */
 public interface UserService {
+
     @POST("/user/register")
     Call<User> registerUser(
             @Query("email") String email,

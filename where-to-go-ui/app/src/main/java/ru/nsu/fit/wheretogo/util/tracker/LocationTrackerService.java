@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.model.service.location_track;
+package ru.nsu.fit.wheretogo.util.tracker;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -22,72 +22,72 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.LocationHistoryActivity;
+import ru.nsu.fit.wheretogo.activities.LocationHistoryActivity;
 import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
-import ru.nsu.fit.wheretogo.model.service.StayPointService;
+import ru.nsu.fit.wheretogo.service.StayPointService;
 
 public class LocationTrackerService extends Service {
     private static final String TAG = "LocationTracker";
 
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 15 * 60 * 1000;//15 minutes
+    /**
+     * Временной интервал обновления местоположения пользователя (мс)
+     */
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = (15 * 60 * 1000);
+    /**
+     * Радиус области вокруг геоточки
+     */
+    private static final double AREA_RADIUS = 200.00;
     private boolean locationPermissionGranted;
 
     private LocationRequest locationRequest;
-    private final HandlerThread locationUpdateThread = new HandlerThread("LocationTracker");
+    private final HandlerThread locationUpdateThread = new HandlerThread(TAG);
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
-        public void onLocationResult(LocationResult locationResult) {
-            //Получаем текущее метосположение пользователя
-            if (locationResult != null) {
-                //Сравниваем его с предыдущим местоположением
-                if (mLocation == null) {
-                    mLocation = locationResult.getLastLocation();
-                }
-                double distance = locationResult.getLastLocation().distanceTo(mLocation);
-                //Если расстояние между ними меньше 200м, то прибавляем к счетчику время
-                if (distance <= 200.00) {
-                    Log.d(TAG, "Find point inside 2 kilometers area");
-                    countSameFindings += 1;
-                } else {
-                    //Сбрасываем счетчик
-                    countSameFindings = 0;
-                    //Обновляем местоположение
-                    mLocation = locationResult.getLastLocation();
-                }
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            if (mLocation == null) {
+                mLocation = locationResult.getLastLocation();
+            }
+            double distance = Objects.requireNonNull(locationResult.getLastLocation()).distanceTo(mLocation);
+            if (distance <= AREA_RADIUS) {
+                Log.d(TAG, "Найдена геоточка дальше " + AREA_RADIUS + " от текущей");
+                countSameFindings += 1;
+            } else {
+                countSameFindings = 0;
+                mLocation = locationResult.getLastLocation();
+            }
 
-                //Если счетчик дважды увеличился в промежутке 15 мин, то мы нашли stay-point
-                if (countSameFindings == 2) {
-                    Log.d(TAG, "Find new stay-point candidate");
-                    countSameFindings = 0;
+            if (countSameFindings == 2) {
+                Log.d(TAG, "Найден кандидат на новую точку останова");
+                countSameFindings = 0;
 
-                    //Добавляем его в базу данных
-                    Call<String> call = ServiceGenerator.createService(StayPointService.class).addStayPoint(
-                            mLocation.getLatitude(),
-                            mLocation.getLongitude());
+                Call<String> call = ServiceGenerator.createService(StayPointService.class).addStayPoint(
+                        mLocation.getLatitude(),
+                        mLocation.getLongitude());
 
-                    call.enqueue(new Callback<String>() {
-                        @Override
-                        public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                            Log.d(TAG, "Add new stay point");
-                        }
+                call.enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                        Log.d(TAG, "Успешно добавлена новая точка останова");
+                    }
 
-                        @Override
-                        public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                    @Override
+                    public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                        Log.e(TAG, t.getMessage());
+                    }
+                });
 
-                        }
-                    });
-
-                }
             }
         }
     };
 
-    //Заглшука для фиксирования stay-point-ов
     private long countSameFindings = 0;
 
     private Location mLocation;
@@ -97,9 +97,9 @@ public class LocationTrackerService extends Service {
         if (intent != null) {
             String action = intent.getAction();
             if (action != null) {
-                if (action.equals(Constants.TRACKER_SERVICE_START)) {
+                if (action.equals(TrackerConstants.TRACKER_SERVICE_START)) {
                     startLocationService();
-                } else if (action.equals(Constants.TRACKER_SERVICE_STOP)) {
+                } else if (action.equals(TrackerConstants.TRACKER_SERVICE_STOP)) {
                     stopLocationService();
                 }
             }
@@ -129,7 +129,7 @@ public class LocationTrackerService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "WhereToGo: Запись истории перемещений отключена.");
+        Log.d(TAG, "Запись истории перемещений отключена.");
         super.onDestroy();
     }
 
@@ -167,9 +167,8 @@ public class LocationTrackerService extends Service {
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        //Configure updates of location
         locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
 
         getLocationPermission();
@@ -177,12 +176,12 @@ public class LocationTrackerService extends Service {
             locationUpdateThread.start();
         }
 
-        startForeground(Constants.LOCATION_SERVICE_ID, builder.build());
+        startForeground(TrackerConstants.LOCATION_SERVICE_ID, builder.build());
     }
 
     private void stopLocationService() {
         LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(locationCallback);
-        stopForeground(true);
+        stopForeground(STOP_FOREGROUND_REMOVE);
         stopSelf();
         locationUpdateThread.quit();
     }

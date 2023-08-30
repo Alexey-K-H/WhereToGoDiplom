@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FavouritesActivity">
+    tools:context=".activities.FavouritesActivity">
 
     <TextView
         android:id="@+id/name_label"
-        android:layout_width="0dp"
-        android:layout_height="49dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="168dp"
-        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="76dp"
+        android:layout_marginEnd="132dp"
+        android:layout_marginBottom="12dp"
         android:fontFamily="casual"
         android:includeFontPadding="false"
         android:text="@string/favourite_text"

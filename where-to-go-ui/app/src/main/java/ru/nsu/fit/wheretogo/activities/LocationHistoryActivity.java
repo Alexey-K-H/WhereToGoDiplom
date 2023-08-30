@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo;
+package ru.nsu.fit.wheretogo.activities;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -18,11 +18,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import ru.nsu.fit.wheretogo.map.MapsActivity;
-import ru.nsu.fit.wheretogo.model.service.location_track.Constants;
-import ru.nsu.fit.wheretogo.model.service.location_track.LocationTrackerService;
+import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
+import ru.nsu.fit.wheretogo.util.tracker.LocationTrackerService;
 
 public class LocationHistoryActivity extends AppCompatActivity {
+
     private static final String TAG = LocationHistoryActivity.class.getSimpleName();
     private ImageButton locationTrackerSwitcher;
     private static final int REQUEST_CODE_LOCATION_PERMISSION = 1;
@@ -44,7 +45,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
                 advise = true;
             }
             if (from != null && from.equals("notification")) {
-                Log.d(TAG, "get from Notification");
+                Log.d(TAG, "Переход из уведомления в системном теере");
                 skipBtn.setVisibility(View.GONE);
             }
         } else {
@@ -52,19 +53,14 @@ public class LocationHistoryActivity extends AppCompatActivity {
         }
 
         locationTrackerSwitcher = (ImageButton) findViewById(R.id.location_history_switcher);
-
-        //Проверка того, что сервис мониторинга запущен
         if (isServiceRunning()) {
-            Log.d(TAG, "Location service history working");
+            Log.d(TAG, "Трекер перемещений работает");
             locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history);
         } else {
-            Log.d(TAG, "Location service history not working");
+            Log.d(TAG, "Трекер перемещений не активен");
             locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history_not_active);
         }
-
-        //Устаналвиваем Listener
         locationTrackerSwitcher.setOnClickListener(this::switchLocationTracker);
-
     }
 
     @Override
@@ -95,7 +91,8 @@ public class LocationHistoryActivity extends AppCompatActivity {
                 );
             } else {
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    Toast.makeText(this, "GPS отключен, запись истории невозможна. Включите GPS в настройках устройства", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "GPS отключен, запись истории невозможна." +
+                            " Включите GPS в настройках устройства", Toast.LENGTH_LONG).show();
                 } else {
                     startLocationTracker();
                     if (advise) {
@@ -110,7 +107,7 @@ public class LocationHistoryActivity extends AppCompatActivity {
 
     private void startLocationTracker() {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
-        intent.setAction(Constants.TRACKER_SERVICE_START);
+        intent.setAction(TrackerConstants.TRACKER_SERVICE_START);
         startService(intent);
         Toast.makeText(this, "Запись истории перемещений включена", Toast.LENGTH_SHORT).show();
         locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history);
@@ -119,20 +116,20 @@ public class LocationHistoryActivity extends AppCompatActivity {
 
     private void stopLocationTracker() {
         Intent intent = new Intent(getApplicationContext(), LocationTrackerService.class);
-        intent.setAction(Constants.TRACKER_SERVICE_STOP);
+        intent.setAction(TrackerConstants.TRACKER_SERVICE_STOP);
         startService(intent);
         Toast.makeText(this, "Запись истории перемещений отключена", Toast.LENGTH_SHORT).show();
         locationTrackerSwitcher.setImageResource(R.drawable.start_stop_location_history_not_active);
         Log.d(TAG, "Запись истории перемещений отключена");
     }
 
+    @SuppressWarnings("deprecation")
     private boolean isServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (LocationTrackerService.class.getName().equals(service.service.getClassName())) {
-                if (service.foreground) {
+            if (LocationTrackerService.class.getName().equals(service.service.getClassName())
+                    && (service.foreground)) {
                     return true;
-                }
             }
         }
         return false;

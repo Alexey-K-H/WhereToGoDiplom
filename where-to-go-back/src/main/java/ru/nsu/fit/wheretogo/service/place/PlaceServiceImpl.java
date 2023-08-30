@@ -1,9 +1,6 @@
 package ru.nsu.fit.wheretogo.service.place;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.nsu.fit.wheretogo.dto.PagedListDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
@@ -52,53 +49,32 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getNearestPlacesToPoint(
+    public List<PlaceBriefDTO> getNearestPlacesToPoint(
             double myLat,
             double myLon,
             double startDist,
             double maxDist,
-            int limit,
-            int page,
-            int size
+            int limit
     ) {
-        var pageRequest = PageRequest.of(page, size);
-        Page<Place> places = placeRepository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit, pageRequest);
-        List<PlaceBriefDTO> nearestPlaceDtos = places.toList()
+        List<Place> places = placeRepository.findNearestPlaces(myLat, myLon, startDist, maxDist, limit);
+        return places
                 .stream()
                 .map(PlaceBriefDTO::getFromEntity)
                 .toList();
-
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(nearestPlaceDtos);
-        listDto.setTotalPages(places.getTotalPages());
-        listDto.setPageNum(page);
-
-        return listDto;
     }
 
     @Transactional
-    public PagedListDTO<PlaceBriefDTO> getPlaces(
-            String categoryIds,
-            int page,
-            int size
+    public List<PlaceBriefDTO> getPlaces(
+            String categoryIds
     ) {
-        var pageRequest = PageRequest.of(page, size);
-        Page<Place> places = placeRepository.getPlaces(
-                categoryIds,
-                pageRequest
+        List<Place> places = placeRepository.getPlaces(
+                categoryIds
         );
 
-        List<PlaceBriefDTO> placeBriefDTOS = places.toList()
+        return places
                 .stream()
                 .map(PlaceBriefDTO::getFromEntity)
                 .toList();
-
-        var listDto = new PagedListDTO<PlaceBriefDTO>();
-        listDto.setList(placeBriefDTOS);
-        listDto.setPageNum(page);
-        listDto.setTotalPages(places.getTotalPages());
-
-        return listDto;
     }
 
     @Transactional
