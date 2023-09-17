@@ -1,7 +1,13 @@
 plugins {
     id 'com.android.application'
+    id 'org.sonarqube'
 }
 
+Properties localProperties = new Properties()
+File file = project.rootProject.file('local.properties')
+if (file.exists()) {
+    localProperties.load(file.newDataInputStream())
+}
 
 android {
     compileSdk 33
@@ -32,13 +38,12 @@ android {
     namespace 'ru.nsu.fit.wheretogo'
 }
 
-apply plugin: "org.sonarqube"
 sonarqube {
     properties {
         property "sonar.projectName", "WhereToGo Mobile"
         property "sonar.projectKey", "where_to_go_ui"
         property "sonar.host.url", "http://localhost:9081"
-        property "sonar.login", localProperties.getProperty('sonar.token')
+        property "sonar.token", localProperties.getProperty('sonar.token.value')
     }
 }
 
