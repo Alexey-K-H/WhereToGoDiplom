@@ -1,7 +1,7 @@
 package ru.nsu.fit.wheretogo.dto.place;
 
 import lombok.Getter;
-import ru.nsu.fit.wheretogo.common.Coordinates;
+import ru.nsu.fit.wheretogo.entity.place.Coordinates;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 
 import java.util.List;
