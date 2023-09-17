@@ -3,7 +3,7 @@ package ru.nsu.fit.wheretogo.repository.place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.nsu.fit.wheretogo.common.Coordinates;
+import ru.nsu.fit.wheretogo.entity.place.Coordinates;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 
 import java.util.List;

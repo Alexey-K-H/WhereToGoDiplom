@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.common;
+package ru.nsu.fit.wheretogo.entity.place;
 
 import lombok.Data;
 

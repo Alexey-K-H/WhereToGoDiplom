@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import ru.nsu.fit.wheretogo.common.Coordinates;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
