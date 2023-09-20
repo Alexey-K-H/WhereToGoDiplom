@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.entity.user.coefficient.sub;
+package ru.nsu.fit.wheretogo.entity.user.coefficient;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,13 +13,13 @@ import java.util.Objects;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class UserCoefficientSubId implements Serializable {
+public class UserCoefficientId implements Serializable {
 
     @Column(name = "USER_ID")
     private Long user;
 
-    @Column(name = "SUBCATEGORY_ID")
-    private Integer subcategory;
+    @Column(name = "CATEGORY_ID")
+    private Long category;
 
     @Override
     public int hashCode() {
@@ -27,8 +27,8 @@ public class UserCoefficientSubId implements Serializable {
         if (user != null) {
             result = 31 * result + user.hashCode();
         }
-        if (subcategory != null) {
-            result = 31 * result + subcategory.hashCode();
+        if (category != null) {
+            result = 31 * result + category.hashCode();
         }
         return result;
     }
@@ -43,10 +43,10 @@ public class UserCoefficientSubId implements Serializable {
             return true;
         }
 
-        if (!(obj instanceof UserCoefficientSubId other)) {
+        if (!(obj instanceof UserCoefficientId other)) {
             return false;
         }
 
-        return Objects.equals(this.user, other.user) && Objects.equals(this.subcategory, other.subcategory);
+        return Objects.equals(this.user, other.user) && Objects.equals(this.category, other.category);
     }
 }

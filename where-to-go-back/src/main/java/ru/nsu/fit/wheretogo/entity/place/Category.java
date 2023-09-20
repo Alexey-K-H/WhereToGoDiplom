@@ -33,9 +33,9 @@ public class Category {
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Subcategory> subcategories;
+    @Column(name = "CATEGORY_PATH", nullable = false, columnDefinition = "ltree")
+    private String categoryPath;
+
 
     public Category(String name) {
         this.name = name;

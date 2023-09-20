@@ -70,14 +70,6 @@ public class Place {
     )
     private List<Category> categories;
 
-    @ManyToMany
-    @JoinTable(
-            name = "T_PLACE_SUBCATEGORY",
-            joinColumns = @JoinColumn(name = "PLACE_ID"),
-            inverseJoinColumns = @JoinColumn(name = "SUBCATEGORY_ID")
-    )
-    private List<Subcategory> subcategories;
-
     @OneToMany(mappedBy = "place", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Score> placeScores;
