@@ -7,7 +7,7 @@ import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.user.User;
-import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMain;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOne;
@@ -164,10 +164,10 @@ public class RecommenderServiceImpl implements RecommenderService {
     public List<PlaceBriefDTO> getContentBasedRecommendations() {
         List<Category> categoryList = categoryRepository.findAll();
 
-        List<UserCoefficientMain> userCoefficientMains = userCoefficientMainRepository
+        List<UserCoefficient> userCoefficients = userCoefficientMainRepository
                 .getAllByUserId(userRepository.findByEmail(SecurityContextHelper.email())
                         .orElseThrow().getId());
-        Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficientMains, categoryList);
+        Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficients, categoryList);
 
         List<Place> notVisitedPlacesPage = placeRepository.findNotVisitedByUser(
                 userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getId());

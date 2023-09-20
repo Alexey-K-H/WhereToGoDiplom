@@ -10,8 +10,8 @@ import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.score.ScoreId;
 import ru.nsu.fit.wheretogo.entity.user.User;
-import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMain;
-import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMainId;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficientId;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
@@ -62,8 +62,8 @@ public class ScoreServiceImpl implements ScoreService {
                 }
 
             } else {
-                userCoefficientMainRepository.save(new UserCoefficientMain()
-                        .setCoefficientId(new UserCoefficientMainId().setUser(userId).setCategory(category.getId()))
+                userCoefficientMainRepository.save(new UserCoefficient()
+                        .setCoefficientId(new UserCoefficientId().setUser(userId).setCategory(category.getId()))
                         .setUser(new User().setId(userId))
                         .setCategory(category)
                         .setPlacesCount(1L)

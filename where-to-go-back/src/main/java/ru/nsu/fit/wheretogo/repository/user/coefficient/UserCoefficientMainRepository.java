@@ -5,13 +5,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.nsu.fit.wheretogo.entity.place.Category;
-import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMain;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
 
 import java.util.List;
 
-public interface UserCoefficientMainRepository extends JpaRepository<UserCoefficientMain, Long> {
+public interface UserCoefficientMainRepository extends JpaRepository<UserCoefficient, Long> {
 
-    List<UserCoefficientMain> getAllByUserId(Long userId);
+    List<UserCoefficient> getAllByUserId(Long userId);
 
     boolean existsByCategory(Category category);
 
