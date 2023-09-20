@@ -10,7 +10,7 @@ import ru.nsu.fit.wheretogo.dto.user.UserDTO;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.entity.place.StayPoint;
 import ru.nsu.fit.wheretogo.entity.score.Score;
-import ru.nsu.fit.wheretogo.entity.user.coefficient.main.UserCoefficientMain;
+import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -77,7 +77,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<UserCoefficientMain> userVector;
+    private List<UserCoefficient> userVector;
 
     public User(String email, String password, String username, Instant createdAt) {
         this.email = email;

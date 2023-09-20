@@ -1,10 +1,10 @@
-package ru.nsu.fit.wheretogo.entity.user.coefficient.sub;
+package ru.nsu.fit.wheretogo.entity.user.coefficient;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import ru.nsu.fit.wheretogo.entity.place.Subcategory;
+import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.user.User;
 
 import javax.persistence.Column;
@@ -17,14 +17,14 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "T_USER_COEFFICIENT_SUB")
+@Table(name = "T_USER_COEFFICIENT")
 @Getter
 @Setter
 @NoArgsConstructor
 @Accessors(chain = true)
-public class UserCoefficientSub {
+public class UserCoefficient {
     @EmbeddedId
-    private UserCoefficientSubId id;
+    UserCoefficientId coefficientId;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", nullable = false)
@@ -32,13 +32,14 @@ public class UserCoefficientSub {
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "SUBCATEGORY_ID", nullable = false)
-    @MapsId("subcategory")
-    private Subcategory subcategory;
+    @JoinColumn(name = "CATEGORY_ID", nullable = false)
+    @MapsId("category")
+    private Category category;
 
     @Column(name = "COEFFICIENT", nullable = false)
     private Double coefficient;
 
     @Column(name = "COUNT_PLACES", nullable = false)
     private Long placesCount;
+
 }
