@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo.dto.user;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.user.User;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.time.Instant;
 
 @Getter
+@Setter
 public class UserDTO extends BaseDTO {
 
     @NotNull
@@ -32,17 +34,5 @@ public class UserDTO extends BaseDTO {
         dto.setCreatedAt(user.getCreatedAt());
 
         return dto;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 }

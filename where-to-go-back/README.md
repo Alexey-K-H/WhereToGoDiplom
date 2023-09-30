@@ -32,7 +32,7 @@
 
 Для проверки тестового покрытия кода необходимо провести сборку проекта:
 
-        mvn clean install
+        mvn clean package
 
 А затем вызвать sonar с помощью:
 
@@ -40,7 +40,7 @@
 
 Также можно использовать комбинированную команду:
 
-        mvn clean install sonar:sonar
+        mvn clean package sonar:sonar
 
 ### Docker-контейнер:
 
