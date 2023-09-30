@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo.dto.place;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.entity.place.Coordinates;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 
@@ -8,6 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Getter
+@Setter
 public class PlaceDescriptionDTO extends PlaceDTO {
 
     private String name;
@@ -16,6 +18,7 @@ public class PlaceDescriptionDTO extends PlaceDTO {
     private String thumbnail;
     private Instant uploadedAt;
     private List<CategoryDTO> categories;
+    private Integer duration;
 
     public static PlaceDescriptionDTO getFromEntity(Place entity) {
         if (entity == null) {
@@ -32,31 +35,8 @@ public class PlaceDescriptionDTO extends PlaceDTO {
         dto.setThumbnail(entity.getThumbnail());
         dto.setUploadedAt(entity.getUploadedAt());
         dto.setCategories(categories);
+        dto.setDuration(entity.getDuration());
 
         return dto;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public void setUploadedAt(Instant uploadedAt) {
-        this.uploadedAt = uploadedAt;
-    }
-
-    public void setCategories(List<CategoryDTO> categories) {
-        this.categories = categories;
     }
 }

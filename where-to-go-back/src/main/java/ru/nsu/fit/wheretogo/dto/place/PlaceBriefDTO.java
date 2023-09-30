@@ -1,18 +1,21 @@
 package ru.nsu.fit.wheretogo.dto.place;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.entity.place.Coordinates;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 
 import java.util.List;
 
 @Getter
+@Setter
 public class PlaceBriefDTO extends PlaceDTO {
 
     private String name;
     private Coordinates coordinates;
     private String thumbnailLink;
     private List<CategoryDTO> categories;
+    private Integer duration;
 
     public static PlaceBriefDTO getFromEntity(Place entity) {
         if (entity == null) {
@@ -27,23 +30,8 @@ public class PlaceBriefDTO extends PlaceDTO {
         dto.setCoordinates(entity.getCoordinates());
         dto.setThumbnailLink(entity.getThumbnail());
         dto.setCategories(categories);
+        dto.setDuration(entity.getDuration());
 
         return dto;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCoordinates(Coordinates coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public void setThumbnailLink(String thumbnailLink) {
-        this.thumbnailLink = thumbnailLink;
-    }
-
-    public void setCategories(List<CategoryDTO> categories) {
-        this.categories = categories;
     }
 }

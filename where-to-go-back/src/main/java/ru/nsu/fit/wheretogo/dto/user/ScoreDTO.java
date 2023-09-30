@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo.dto.user;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 @Getter
+@Setter
 public class ScoreDTO extends BaseDTO {
 
     private Long author;
@@ -28,17 +30,5 @@ public class ScoreDTO extends BaseDTO {
         dto.setScore(score.getScoreValue());
 
         return dto;
-    }
-
-    public void setAuthor(Long author) {
-        this.author = author;
-    }
-
-    public void setPlace(Long place) {
-        this.place = place;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
     }
 }

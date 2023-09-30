@@ -56,6 +56,9 @@ public class Place {
     @Column(name = "UPLOADED_AT", nullable = false)
     private Instant uploadedAt;
 
+    @Column(name = "DURATION", nullable = false)
+    private Integer duration;
+
 
     @PrePersist
     public void setUploadDate() {
