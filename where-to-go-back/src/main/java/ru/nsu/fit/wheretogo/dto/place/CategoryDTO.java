@@ -1,6 +1,7 @@
 package ru.nsu.fit.wheretogo.dto.place;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
+@Setter
 public class CategoryDTO extends BaseDTO {
 
     @NotNull(message = "Enter category name")

@@ -7,7 +7,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-
 public class Place {
 
     @SerializedName("id")
@@ -28,6 +27,9 @@ public class Place {
     @SerializedName("uploadedAt")
     @Expose
     private String uploadedAt;
+    @SerializedName("duration")
+    @Expose
+    private Integer duration;
     @SerializedName("categories")
     @Expose
     private List<Category> categories;
@@ -114,6 +116,14 @@ public class Place {
 
     public void setLongitude(Double longitude) {
         this.coordinates.setLatitude(longitude);
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 
     @NonNull

@@ -1,10 +1,12 @@
 package ru.nsu.fit.wheretogo.dto.user;
 
 import lombok.Getter;
+import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.place.StayPoint;
 
 @Getter
+@Setter
 public class StayPointDTO extends BaseDTO {
 
     private double latitude;
@@ -23,17 +25,5 @@ public class StayPointDTO extends BaseDTO {
         dto.setUserId(stayPoint.getUser().getId());
 
         return dto;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }
