@@ -1,16 +1,13 @@
 server:
   port: 8080
 spring:
-  datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5435/where2go}
-    username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     show-sql: false
   mvc:
-    path match:
+    path_match:
       matching-strategy: ant_path_matcher
+  config:
+    import: file:local/db.properties
