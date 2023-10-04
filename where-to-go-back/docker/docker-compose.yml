@@ -5,14 +5,14 @@ services:
   app:
     image: 'where-to-go-nsk:release'
     build:
-      context: .
+      context: ..
     container_name: where-to-go-nsk-app
     depends_on:
       - db
     ports:
       - "8080:8080"
     env_file:
-      - src/main/resources/properties.env
+      - ../src/main/resources/local/properties.env
 
   db:
     container_name: where-to-go-postgres-db
