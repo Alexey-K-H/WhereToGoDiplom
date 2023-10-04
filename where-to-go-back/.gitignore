@@ -34,3 +34,5 @@ build/
 
 ### database ###
 db/db-data/*
+
+/src/main/resources/local/*
