@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 spring:
   jpa:
     hibernate:
@@ -10,4 +10,4 @@ spring:
     path_match:
       matching-strategy: ant_path_matcher
   config:
-    import: file:local/db.properties
+    import: file:./src/main/resources/db.properties

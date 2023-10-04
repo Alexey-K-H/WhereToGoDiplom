@@ -42,17 +42,25 @@
 
         mvn clean package sonar:sonar
 
-### Docker-контейнер:
+### Docker-контейнеры:
 
-Сборка контейнера:
+Сборка контейнеров выполняется в два этапа:
 
-        docker-compose up -d
+#### Сборка проекта WhereToGo
 
-Пересобрать контейнер при изменении *.jar файла:
+        cd where-to-go-nsk/docker/ && docker-compose up -d
+
+#### Сборка сервера OpenRouteService
+
+        cd where-to-go-nsk/docker/ors/ && docker-compose up -d
+
+Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf
+
+Пересобрать контейнер при изменении *.jar файла приложения:
 
         docker-compose build app
         docker-compose up -d
 
 ### Swagger-UI
 
-Посмотреть сведения об API: [Swagger-UI](http://localhost:8080/swagger-ui/)
+Посмотреть сведения об API: [Swagger-UI](http://localhost:8081/swagger-ui/)

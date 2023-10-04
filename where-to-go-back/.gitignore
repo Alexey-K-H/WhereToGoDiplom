@@ -35,4 +35,8 @@ build/
 ### database ###
 db/db-data/*
 
-/src/main/resources/local/*
+/src/main/resources/db.properties
+/src/main/resources/properties.env
+
+/docker/ors/resources/*
+/docker/ors/docker/*
