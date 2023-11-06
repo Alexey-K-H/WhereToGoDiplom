@@ -16,13 +16,13 @@ import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
  * Генератор сервисов retrofit для обращения к серверу
  * URL сервера задается в параметре BASE_URL
  * <ul>
- *     <li>Локальная сеть: http://10.0.2.2:8080/</li>
- *     <li>При развернутом сервере: http://192.168.1.103:8080/</li>
+ *     <li>Локальная сеть: http://10.0.2.2:8081/</li>
+ *     <li>При развернутом сервере: http://192.168.1.103:8081/</li>
  * </ul>
  */
 public class ServiceGenerator {
     private static final String TAG = ServiceGenerator.class.getSimpleName();
-    private static final String BASE_URL = "http://10.0.2.2:8080/";
+    private static final String BASE_URL = "http://10.0.2.2:8081/";
 
     private ServiceGenerator() {}
 
