@@ -44,6 +44,33 @@
 
 ### Docker-контейнеры:
 
+Предварительно необходимо настроить локально окружение для запуска докер контейнеров. Необходимо сформировать два файла:
+
+**db.properties**:
+
+        spring.datasource.url=${POSTGRES_URL:jdbc:postgresql://localhost:5435/where2go}
+        spring.datasource.username=${POSTGRES_USER:<username>}
+        spring.datasource.password=${POSTGRES_PASSWORD:<password>}
+        spring.datasource.driver-class-name=org.postgresql.Driver
+
+**properties.env**:
+
+        SPRING_DATASOURCE_URL=jdbc:postgresql://db/where2go
+        SPRING_DATASOURCE_USERNAME=<username>
+        SPRING_DATASOURCE_PASSWORD=<password>
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+        SPRING_DATA_JDBC_REPOSITORIES_ENABLED=false
+        SPRING_JPA_SHOW_SQL=false
+        SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+        SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQL9Dialect
+        SERVER_PORT=8081
+
+Оба файла необходимо поместить в директорию: _**where-to-go-back/src/main/resources/**_ 
+(директорию **_resources_** предварительно необходимо создать)
+
+Секреты для базы данных назначаются самостоятельно в зависимости от созданной БД, в случае локального запуска можно
+взять секреты из [docker-compose.yml](docker/docker-compose.yml) файла.
+
 Сборка контейнеров выполняется в два этапа:
 
 #### Сборка проекта WhereToGo
@@ -55,6 +82,16 @@
         cd where-to-go-nsk/docker/ors/ && docker-compose up -d
 
 Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf
+После первичной настройки в файле **_docker/ors/docker/conf/ors-config.json_** необходимо найти директиву профилей
+и внести туда еще два профиля помимо "car":
+
+    "profiles": {
+          "active": [
+            "car", "bike-regular", "walking"
+          ],
+        ...
+
+#### Обновление контейнера приложения
 
 Пересобрать контейнер при изменении *.jar файла приложения:
 
