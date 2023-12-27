@@ -33,6 +33,7 @@ public class ForYouActivity extends AppCompatActivity {
     private ImageButton recommendByScoredBtn;
     private ImageButton recommendByOthersBtn;
     private ImageButton recommendByGPSBtn;
+    private ImageButton recommendPath;
     private Location lastLocation;
 
     @Override
@@ -51,6 +52,7 @@ public class ForYouActivity extends AppCompatActivity {
         recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
         recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
         recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
+        recommendPath = (ImageButton) findViewById(R.id.make_path_btn);
 
         Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
         checkStayPoints.enqueue(new Callback<Boolean>() {
@@ -138,6 +140,7 @@ public class ForYouActivity extends AppCompatActivity {
             recommendByGPSBtn.setOnClickListener(this::openNearestRecommender);
         }
 
+        recommendPath.setOnClickListener(this::openPathRecommender);
     }
 
     public void openNearestRecommender(View view) {
@@ -174,6 +177,11 @@ public class ForYouActivity extends AppCompatActivity {
         intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.RECOMMENDED_USERS.ordinal());
         intent.putExtra(LAST_LOCATION_STRING, lastLocation);
         startActivity(intent);
+    }
+
+    public void openPathRecommender(View view) {
+        Log.d(TAG, "Open path settings for recommendation");
+        recommendPath.setImageResource(R.drawable.make_path_btn_selected);
     }
 
     //Блокирует кнопку вызова рекомендации в случае, если не хватает данных
