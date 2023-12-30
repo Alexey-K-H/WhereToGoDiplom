@@ -138,11 +138,11 @@ public class LocationTrackerService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         Intent resultIntent = new Intent(this, LocationHistoryActivity.class);
         resultIntent.putExtra("from", "notification");
-        @SuppressLint("UnspecifiedImmutableFlag") PendingIntent pendingIntent = PendingIntent.getActivity(
+        PendingIntent pendingIntent = PendingIntent.getActivity(
                 getApplicationContext(),
                 0,
                 resultIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_MUTABLE
         );
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getApplicationContext(),
