@@ -83,11 +83,11 @@
 
 Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf
 После первичной настройки в файле **_docker/ors/docker/conf/ors-config.json_** необходимо найти директиву профилей
-и внести туда еще два профиля помимо "car":
+и внести туда еще один профиль помимо "car":
 
     "profiles": {
           "active": [
-            "car", "bike-regular", "walking"
+            "car", "walking"
           ],
         ...
 
