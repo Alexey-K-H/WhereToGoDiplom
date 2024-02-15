@@ -65,8 +65,7 @@
         SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQL9Dialect
         SERVER_PORT=8081
 
-Оба файла необходимо поместить в директорию: _**where-to-go-back/src/main/resources/**_ 
-(директорию **_resources_** предварительно необходимо создать)
+Оба файла необходимо поместить в директорию: _**where-to-go-back/src/main/resources/**_
 
 Секреты для базы данных назначаются самостоятельно в зависимости от созданной БД, в случае локального запуска можно
 взять секреты из [docker-compose.yml](docker/docker-compose.yml) файла.
@@ -81,7 +80,8 @@
 
         cd where-to-go-nsk/docker/ors/ && docker-compose up -d
 
-Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf
+Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf,
+а затем поместить его в директорию **_where-to-go-nsk/docker/ors/resources_** (предварительно ее нужно создать).
 После первичной настройки в файле **_docker/ors/docker/conf/ors-config.json_** необходимо найти директиву профилей
 и внести туда еще один профиль помимо "car":
 
