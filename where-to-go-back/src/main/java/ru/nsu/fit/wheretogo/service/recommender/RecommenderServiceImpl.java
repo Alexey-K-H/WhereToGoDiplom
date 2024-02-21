@@ -10,7 +10,7 @@ import ru.nsu.fit.wheretogo.entity.user.User;
 import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
-import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOne;
+import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOneRecommender;
 import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
@@ -187,7 +187,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 
         prepareCollaborativeDataFromScoreList(data, scoreRepository.findAll());
 
-        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData = SlopeOneRecommender.slopeOne(data, placeList);
 
         return new ArrayList<>(
                 (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
@@ -209,7 +209,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 
         prepareCollaborativeDataFromScoreList(data, scoreList);
 
-        Map<User, HashMap<Place, Double>> projectedData = SlopeOne.slopeOne(data, placeList);
+        Map<User, HashMap<Place, Double>> projectedData = SlopeOneRecommender.slopeOne(data, placeList);
 
         return new ArrayList<>(
                 (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());

@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.recommenders.cbf;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.place.Place;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 public final class CBFRecommender {
     private static final int TOP_RECOMMENDATIONS = 5;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CBFRecommender.class);
 
     private CBFRecommender() {
     }
@@ -39,7 +42,11 @@ public final class CBFRecommender {
         Map<PlaceBriefDTO, Double> placeCoefficients = new HashMap<>();
         for (Place notVisitedPlace : notVisitedPlacesPage) {
             Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(notVisitedPlace, categoryList);
-//            System.out.println("Add coefficient:" + CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList) + ", PLACE:" + notVisitedPlace.getName());
+
+            LOGGER.debug("Add coefficient:{}, PLACE:{}",
+                    CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList),
+                    notVisitedPlace.getName());
+
             placeCoefficients.put(
                     PlaceBriefDTO.getFromEntity(notVisitedPlace),
                     CBFRecommender.getPlaceCoefficient(userVector, currItemVector, categoryList)
@@ -47,7 +54,7 @@ public final class CBFRecommender {
         }
 
         for (Map.Entry<PlaceBriefDTO, Double> entry : placeCoefficients.entrySet()) {
-            System.out.println("PLACE:" + entry.getKey().getName() + "/COEFFICIENT:" + entry.getValue());
+            LOGGER.debug("PLACE:{}/COEFFICIENT:{}", entry.getKey().getName(), entry.getValue());
         }
 
         Map<PlaceBriefDTO, Double> sortedCoefficients = placeCoefficients.entrySet()

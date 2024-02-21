@@ -11,3 +11,9 @@ spring:
       matching-strategy: ant_path_matcher
   config:
     import: ./db.properties
+logging:
+  level:
+    ru:
+      nsu:
+        fit:
+          wheretogo: DEBUG

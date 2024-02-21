@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.invoker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -16,6 +18,8 @@ import java.util.List;
 @Component
 public class OpenRouteServiceInvokerImplLocal implements OpenRouteServiceInvoker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenRouteServiceInvokerImplLocal.class);
+
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String ORS_BASE_URL = "http://localhost:8080";
     private static final String HEALTH_CHECK = "/ors/v2/health";
@@ -26,9 +30,12 @@ public class OpenRouteServiceInvokerImplLocal implements OpenRouteServiceInvoker
     @Override
     public String health() {
         var url = ORS_BASE_URL + HEALTH_CHECK;
+
+        LOGGER.debug("Check ORS health");
         var result = restTemplate.exchange(url, HttpMethod.GET, null, HealthCheck.class);
 
         if (result.getBody() != null) {
+            LOGGER.debug("ORS health:{}", result.getBody().getStatus());
             return result.getBody().getStatus();
         }
 

@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class SlopeOne {
+public final class SlopeOneRecommender {
     private static final int TOP_RECOMMENDATIONS = 5;
 
-    private SlopeOne() {
+    private SlopeOneRecommender() {
     }
 
     private static final Map<Place, Map<Place, Double>> diff = new HashMap<>();
