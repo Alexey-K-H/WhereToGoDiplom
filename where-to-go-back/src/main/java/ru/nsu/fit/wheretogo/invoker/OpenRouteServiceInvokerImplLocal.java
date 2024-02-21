@@ -45,7 +45,10 @@ public class OpenRouteServiceInvokerImplLocal implements OpenRouteServiceInvoker
     @Override
     public ORSDirectionsDto getDirectionDriving() {
         var url = ORS_BASE_URL + DIRECTION_DRIVING_CAR_URL;
-        var request = new DirectionRequest(List.of(List.of("83.62234", "54.56074"), List.of("82.71999","54.97187")));
+        var request = DirectionRequest
+                .builder()
+                .coordinates(List.of(List.of("83.62234", "54.56074"), List.of("82.71999","54.97187")))
+                .build();
 
         var result = restTemplate.exchange(
                 url,
