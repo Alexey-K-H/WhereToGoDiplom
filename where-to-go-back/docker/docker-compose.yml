@@ -3,9 +3,12 @@ version: '3.7'
 name: where-to-go-nsk
 services:
   app:
-    image: 'where-to-go-nsk:release'
+    networks:
+      - where-to-go-nsk
+    image: 'where-to-go-nsk:1.0.0'
     build:
       context: ..
+      dockerfile: /docker/Dockerfile
     container_name: where-to-go-nsk-app
     depends_on:
       - db
@@ -15,6 +18,8 @@ services:
       - ../src/main/resources/properties.env
 
   db:
+    networks:
+      - where-to-go-nsk
     container_name: where-to-go-postgres-db
     image: postgres:latest
     ports:
@@ -27,3 +32,6 @@ services:
       - database:/var/lib/postgresql/data
 volumes:
   database:
+networks:
+  where-to-go-nsk:
+    name: where-to-go-nsk

@@ -10,4 +10,4 @@ spring:
     path_match:
       matching-strategy: ant_path_matcher
   config:
-    import: file:./src/main/resources/db.properties
+    import: ./db.properties

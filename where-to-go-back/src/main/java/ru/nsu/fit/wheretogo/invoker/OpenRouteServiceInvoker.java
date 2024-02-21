@@ -1,15 +1,9 @@
-package ru.nsu.fit.wheretogo.service.openroute;
+package ru.nsu.fit.wheretogo.invoker;
 
 import ru.nsu.fit.wheretogo.dto.route.ORSDirectionsDto;
 
-/**
- * Сервис по работе с OpenRoute сервером
- */
-public interface OpenRouteService {
-
+public interface OpenRouteServiceInvoker {
     String health();
-
     ORSDirectionsDto getDirectionDriving();
-
     ORSDirectionsDto getDirectionWalking();
 }
