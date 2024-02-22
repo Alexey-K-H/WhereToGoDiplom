@@ -4,8 +4,10 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
 
 /**
  * Сервис по работе с рекомендациями
@@ -67,4 +69,12 @@ public interface RecommenderService {
      */
     @GET("/recommend/collaborative_filter")
     Call<List<Place>> getRecommendByUsers();
+
+    /**
+     * Получение маршрута-рекомендации для способа передвижения "машина"
+     *
+     * @return маршрут
+     */
+    @POST("/recommend/route/driving")
+    Call<RouteRecommendResponse> getRouteDriving();
 }

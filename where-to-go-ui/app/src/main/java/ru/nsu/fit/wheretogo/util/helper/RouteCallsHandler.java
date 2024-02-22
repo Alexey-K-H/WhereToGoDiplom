@@ -5,18 +5,19 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.nsu.fit.wheretogo.model.entity.ors.OrsDirectionResponse;
+import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
 
 public class RouteCallsHandler {
 
-    private RouteCallsHandler() {}
+    private RouteCallsHandler() {
+    }
 
-    public static List<LatLng> decodePolyline(OrsDirectionResponse response) {
-        List<List<String>> geometry = response.getFeatures().get(0).getGeometry().getCoordinates();
+    public static List<LatLng> decodePolyline(RouteRecommendResponse response) {
+        List<List<String>> geometry = response.getDirection().getFeatures().get(0).getGeometry().getCoordinates();
         List<LatLng> polyLineCoordinates = new ArrayList<>();
 
-        for(List<String> latLngCoordinate : geometry) {
-            LatLng latLng = new LatLng(
+        for (List<String> latLngCoordinate : geometry) {
+            var latLng = new LatLng(
                     (Double.parseDouble(latLngCoordinate.get(1))),
                     (Double.parseDouble(latLngCoordinate.get(0))));
 

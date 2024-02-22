@@ -63,10 +63,9 @@ import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
 import ru.nsu.fit.wheretogo.model.entity.Score;
-import ru.nsu.fit.wheretogo.model.entity.ors.OrsDirectionResponse;
 import ru.nsu.fit.wheretogo.service.CategoryService;
-import ru.nsu.fit.wheretogo.service.ORSService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.RecommenderService;
 import ru.nsu.fit.wheretogo.service.ScoreService;
@@ -102,7 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     BroadcastReceiver broadcastReceiver;
 
-    private final Callback<List<Place>> placesCallsCallback = new Callback<List<Place>>() {
+    private final Callback<List<Place>> placesCallsCallback = new Callback<>() {
         @Override
         public void onResponse(@NonNull Call<List<Place>> call, Response<List<Place>> response) {
             Log.d(TAG, "Получен успешный ответ на запрос списка мест:" + response);
@@ -120,17 +119,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-    private final Callback<OrsDirectionResponse> routeCallsCallback = new Callback<OrsDirectionResponse>() {
+    private final Callback<RouteRecommendResponse> routeCallsCallback = new Callback<>() {
         @Override
-        public void onResponse(@NonNull Call<OrsDirectionResponse> call, @NonNull Response<OrsDirectionResponse> response) {
+        public void onResponse(@NonNull Call<RouteRecommendResponse> call, @NonNull Response<RouteRecommendResponse> response) {
             Log.d(TAG, "Получен успешный ответ на запрос маршрута");
-            OrsDirectionResponse route = response.body();
+            RouteRecommendResponse route = response.body();
             places.clear();
 
-            if (route != null && route.getFeatures() != null) {
+            if (route != null && route.getRoutePlaces() != null) {
+                Log.d(TAG, "Получены ключевые геоточки маршрута:\n" + route.getRoutePlaces());
+                Log.d(TAG, "Всего точек для посещения:" + route.getRoutePlaces().size());
+
+                var placeList = route.getRoutePlaces();
+                if (placeList != null) {
+                    places.addAll(placeList);
+                }
+                updateMapMarkers();
+            }
+
+            if (route != null && route.getDirection().getFeatures() != null) {
                 Log.d(TAG, "Получен маршрут со следующими свойствами:\n" +
-                        "Дистанция:" + route.getFeatures().get(0).getProperties().getSummary().getDistance() +
-                        "\nВремя передвижения:" + route.getFeatures().get(0).getProperties().getSummary().getDuration());
+                        "Дистанция:" + route.getDirection().getFeatures().get(0).getProperties().getSummary().getDistance() +
+                        "\nВремя передвижения:" + route.getDirection().getFeatures().get(0).getProperties().getSummary().getDuration());
 
                 List<LatLng> geometry = RouteCallsHandler.decodePolyline(route);
                 Log.d(TAG, "Количество геоточек:" + geometry.size());
@@ -139,10 +149,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.d(TAG, "Не найдены данные пути");
                 showNotification("При получении данных произошла ошибка. Попробуйте повторить попытку позже");
             }
+
+
         }
 
         @Override
-        public void onFailure(@NonNull Call<OrsDirectionResponse> call, @NonNull Throwable t) {
+        public void onFailure(@NonNull Call<RouteRecommendResponse> call, @NonNull Throwable t) {
             Log.d(TAG, "При получении данных произошла ошибка:" + t.getMessage());
         }
     };
@@ -322,7 +334,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void sendPlacesRequest() {
         RecommenderService recommenderService = ServiceGenerator.createService(RecommenderService.class);
-        ORSService routeService = ServiceGenerator.createService(ORSService.class);
 
         if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
@@ -332,39 +343,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + categories.values().stream().map(c -> c.name).collect(Collectors.toList()));
 
         Call<List<Place>> placesCall = null;
-        Call<OrsDirectionResponse> routeCall = null;
+        Call<RouteRecommendResponse> routeCall = null;
         switch (showMapMode) {
-            case NEAREST:
-                placesCall = recommenderService.getNearestPlacesByCategory(
-                        lastKnownLocation.getLatitude(),
-                        lastKnownLocation.getLongitude(),
-                        1.0,
-                        2.0,
-                        5,
-                        categories.entrySet().stream()
-                                .filter(entry -> entry.getValue().chosen)
-                                .map(Map.Entry::getKey)
-                                .collect(Collectors.toList()));
-                break;
-            case RECOMMENDED_VISITED:
-                placesCall = recommenderService.getRecommendByVisited();
-                break;
-            case RECOMMENDED_SCORED:
-                placesCall = recommenderService.getRecommendByScores();
-                break;
-            case RECOMMENDED_USERS:
-                placesCall = recommenderService.getRecommendByUsers();
-                break;
-            case RECOMMENDED_ROUTE:
-                routeCall = routeService.getRouteByDriving();
-                break;
-            default:
-                placesCall = recommenderService.getPlaceList(
-                        categories.entrySet().stream()
-                                .filter(entry -> entry.getValue().chosen)
-                                .map(Map.Entry::getKey)
-                                .collect(Collectors.toList()));
-                break;
+            case NEAREST -> placesCall = recommenderService.getNearestPlacesByCategory(
+                    lastKnownLocation.getLatitude(),
+                    lastKnownLocation.getLongitude(),
+                    1.0,
+                    2.0,
+                    5,
+                    categories.entrySet().stream()
+                            .filter(entry -> entry.getValue().chosen)
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.toList()));
+            case RECOMMENDED_VISITED -> placesCall = recommenderService.getRecommendByVisited();
+            case RECOMMENDED_SCORED -> placesCall = recommenderService.getRecommendByScores();
+            case RECOMMENDED_USERS -> placesCall = recommenderService.getRecommendByUsers();
+            case RECOMMENDED_ROUTE -> routeCall = recommenderService.getRouteDriving();
+            default -> placesCall = recommenderService.getPlaceList(
+                    categories.entrySet().stream()
+                            .filter(entry -> entry.getValue().chosen)
+                            .map(Map.Entry::getKey)
+                            .collect(Collectors.toList()));
         }
 
         if (placesCall != null) {
