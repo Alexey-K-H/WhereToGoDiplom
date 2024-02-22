@@ -87,4 +87,18 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     List<Place> findNotVisitedByUser(
             @Param("_user_id") Long userId
     );
+
+    /**
+     * Поиск мест, по заданным координатам
+     *
+     * @param latValues список широт (в виде строки через запятую)
+     * @param lonValues список долго (в виде строки через запятую)
+     * @return список мест
+     */
+    @Query(value = "SELECT * FROM GET_PLACES_BY_COORDS(:_lat_values, :_lon_values)", nativeQuery = true)
+    List<Place> findAllByLatLong(
+            @Param("_lat_values") String latValues,
+            @Param("_lon_values") String lonValues
+    );
+
 }

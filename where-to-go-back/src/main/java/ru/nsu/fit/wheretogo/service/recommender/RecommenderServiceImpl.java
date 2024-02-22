@@ -1,7 +1,12 @@
 package ru.nsu.fit.wheretogo.service.recommender;
 
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
+import ru.nsu.fit.wheretogo.dto.route.RouteRecommendResponse;
+import ru.nsu.fit.wheretogo.dto.route.model.LatLong;
 import ru.nsu.fit.wheretogo.dto.user.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.place.Place;
@@ -16,6 +21,8 @@ import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.user.UserRepository;
 import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
+import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
+import ru.nsu.fit.wheretogo.utils.LatLongSequences;
 import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
 
 import javax.transaction.Transactional;
@@ -28,26 +35,17 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 
 @Service
+@RequiredArgsConstructor
 public class RecommenderServiceImpl implements RecommenderService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecommenderServiceImpl.class);
+
     private final PlaceRepository placeRepository;
+    private final OpenRouteService openRouteService;
     private final UserRepository userRepository;
     private final UserCoefficientMainRepository userCoefficientMainRepository;
     private final CategoryRepository categoryRepository;
     private final ScoreRepository scoreRepository;
-
-    public RecommenderServiceImpl(
-            PlaceRepository placeRepository,
-            UserRepository userRepository,
-            UserCoefficientMainRepository userCoefficientMainRepository,
-            CategoryRepository categoryRepository,
-            ScoreRepository scoreRepository) {
-        this.placeRepository = placeRepository;
-        this.userRepository = userRepository;
-        this.userCoefficientMainRepository = userCoefficientMainRepository;
-        this.categoryRepository = categoryRepository;
-        this.scoreRepository = scoreRepository;
-    }
 
     @Override
     @Transactional
@@ -132,7 +130,7 @@ public class RecommenderServiceImpl implements RecommenderService {
     public List<PlaceBriefDTO> getNearestPlacesByVisited() {
         List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow().getVisitedPlaces().stream().map(
-                PlaceBriefDTO::getFromEntity).toList();
+                        PlaceBriefDTO::getFromEntity).toList();
 
         List<Long> isolatorIds = new ArrayList<>();
         for (PlaceBriefDTO place : visitedPlaces) {
@@ -215,6 +213,53 @@ public class RecommenderServiceImpl implements RecommenderService {
                 (projectedData.get(user)).keySet().stream().map(PlaceBriefDTO::getFromEntity).toList());
     }
 
+    @Override
+    public RouteRecommendResponse getRouteRecommendationDriving() {
+
+        var keyPoints = List.of(
+                LatLong.builder().latitude("54.56074").longitude("83.62234").build(),
+                LatLong.builder().latitude("54.97187").longitude("82.71999").build()
+        );
+
+        var orsResponse = openRouteService.getDirectionDriving(keyPoints);
+        var coordinateSequences = getCoordinateSequences(keyPoints);
+
+        LOGGER.debug("Последовательности координат:\nШироты:{}\nДолготы:{}",
+                coordinateSequences.getLatitudes(),
+                coordinateSequences.getLongitudes());
+
+        var keyPlacesResponse = placeRepository.findAllByLatLong(
+                coordinateSequences.getLatitudes(),
+                coordinateSequences.getLongitudes());
+
+        return RouteRecommendResponse
+                .builder()
+                .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
+                .direction(orsResponse)
+                .build();
+    }
+
+    @Override
+    public RouteRecommendResponse getRouteRecommendationWalking() {
+
+        var keyPoints = List.of(
+                LatLong.builder().latitude("54.56074").longitude("83.62234").build(),
+                LatLong.builder().latitude("54.97187").longitude("82.71999").build()
+        );
+
+        var orsResponse = openRouteService.getDirectionWalking(keyPoints);
+        var coordinateSequences = getCoordinateSequences(keyPoints);
+        var keyPlacesResponse = placeRepository.findAllByLatLong(
+                coordinateSequences.getLatitudes(),
+                coordinateSequences.getLongitudes());
+
+        return RouteRecommendResponse
+                .builder()
+                .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
+                .direction(orsResponse)
+                .build();
+    }
+
     private void prepareCollaborativeDataFromScoreList(Map<User, HashMap<Place, Double>> data, List<Score> scoreList) {
         for (Score score : scoreList) {
             if (data.containsKey(score.getUser())) {
@@ -243,5 +288,24 @@ public class RecommenderServiceImpl implements RecommenderService {
             isolatorsVisited.add(recPlace.getId());
         }
         return isolatorsVisited.stream().map(String::valueOf).collect(Collectors.joining(","));
+    }
+
+    private LatLongSequences getCoordinateSequences(List<LatLong> keyPoints) {
+        var latSequence = new StringBuilder();
+        var lonSequence = new StringBuilder();
+
+        for (var pointCoordinates : keyPoints) {
+            latSequence.append(pointCoordinates.getLatitude()).append(",");
+            lonSequence.append(pointCoordinates.getLongitude()).append(",");
+        }
+
+        latSequence.deleteCharAt(latSequence.lastIndexOf(","));
+        lonSequence.deleteCharAt(lonSequence.lastIndexOf(","));
+
+        return LatLongSequences
+                .builder()
+                .latitudes(latSequence.toString())
+                .longitudes(lonSequence.toString())
+                .build();
     }
 }

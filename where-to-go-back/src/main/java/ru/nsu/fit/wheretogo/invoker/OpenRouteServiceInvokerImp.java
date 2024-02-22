@@ -11,7 +11,9 @@ import org.springframework.web.client.RestTemplate;
 import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
 import ru.nsu.fit.wheretogo.dto.route.model.DirectionRequest;
 import ru.nsu.fit.wheretogo.dto.route.model.HealthCheck;
+import ru.nsu.fit.wheretogo.dto.route.model.LatLong;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -46,34 +48,41 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
     }
 
     @Override
-    public ORSDirectionResponse getDirectionDriving() {
+    public ORSDirectionResponse getDirectionDriving(List<LatLong> keyPlacesCoordinates) {
         var url = orsBaseUrl + DIRECTION_DRIVING_CAR_URL;
+
+        var keyPoints = fillKeyGeoPoints(keyPlacesCoordinates);
+
         var request = DirectionRequest
                 .builder()
-                .coordinates(List.of(List.of("83.62234", "54.56074"), List.of("82.71999","54.97187")))
+                .coordinates(keyPoints)
                 .build();
 
         LOGGER.debug("Отправка запроса на получение маршрута, тело запроса:{}", request);
-        var result = restTemplate.exchange(
+        var orsResponse = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 new HttpEntity<>(request),
                 ORSDirectionResponse.class);
 
-        if (result.getStatusCode().equals(HttpStatus.OK) && result.getBody() != null) {
-            LOGGER.debug("Получен ответ от ORS, тело ответа:{}", result);
-            return result.getBody();
+        if (orsResponse.getStatusCode().equals(HttpStatus.OK) && orsResponse.getBody() != null) {
+            LOGGER.debug("Получен ответ от ORS, тело ответа:{}", orsResponse);
+            return orsResponse.getBody();
         }
 
         return null;
     }
 
     @Override
-    public ORSDirectionResponse getDirectionWalking() {
+    public ORSDirectionResponse getDirectionWalking(List<LatLong> keyPlacesCoordinates) {
         var url = orsBaseUrl + DIRECTION_WALKING_URL;
+
+//        var keyPlacesCoordinates = List.of(List.of("83.62234", "54.56074"), List.of("82.71999", "54.97187"));
+        var keyPoints = fillKeyGeoPoints(keyPlacesCoordinates);
+
         var request = DirectionRequest
                 .builder()
-                .coordinates(List.of(List.of("83.62234", "54.56074"), List.of("82.71999","54.97187")))
+                .coordinates(keyPoints)
                 .build();
 
         var result = restTemplate.exchange(
@@ -87,6 +96,15 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
         }
 
         return null;
+    }
+
+    private List<List<String>> fillKeyGeoPoints(List<LatLong> coordinates) {
+        var result = new ArrayList<List<String>>();
+        for (var pointCoordinates : coordinates) {
+            result.add(List.of(pointCoordinates.getLongitude(), pointCoordinates.getLatitude()));
+        }
+
+        return result;
     }
 
 }
