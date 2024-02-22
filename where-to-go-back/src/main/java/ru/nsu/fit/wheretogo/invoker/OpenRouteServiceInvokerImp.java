@@ -53,6 +53,7 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
                 .coordinates(List.of(List.of("83.62234", "54.56074"), List.of("82.71999","54.97187")))
                 .build();
 
+        LOGGER.debug("Отправка запроса на получение маршрута, тело запроса:{}", request);
         var result = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
@@ -60,6 +61,7 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
                 ORSDirectionResponse.class);
 
         if (result.getStatusCode().equals(HttpStatus.OK) && result.getBody() != null) {
+            LOGGER.debug("Получен ответ от ORS, тело ответа:{}", result);
             return result.getBody();
         }
 
