@@ -38,9 +38,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.OnMapsSdkInitializedCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -126,17 +126,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             RouteRecommendResponse route = response.body();
             places.clear();
 
-            if (route != null && route.getRoutePlaces() != null) {
-                Log.d(TAG, "Получены ключевые геоточки маршрута:\n" + route.getRoutePlaces());
-                Log.d(TAG, "Всего точек для посещения:" + route.getRoutePlaces().size());
-
-                var placeList = route.getRoutePlaces();
-                if (placeList != null) {
-                    places.addAll(placeList);
-                }
-                updateMapMarkers();
-            }
-
             if (route != null && route.getDirection().getFeatures() != null) {
                 Log.d(TAG, "Получен маршрут со следующими свойствами:\n" +
                         "Дистанция:" + route.getDirection().getFeatures().get(0).getProperties().getSummary().getDistance() +
@@ -150,7 +139,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 showNotification("При получении данных произошла ошибка. Попробуйте повторить попытку позже");
             }
 
+            if (route != null && route.getRoutePlaces() != null) {
+                Log.d(TAG, "Получены ключевые геоточки маршрута:\n" + route.getRoutePlaces());
+                Log.d(TAG, "Всего точек для посещения:" + route.getRoutePlaces().size());
 
+                var placeList = route.getRoutePlaces();
+                if (placeList != null) {
+                    places.addAll(placeList);
+                }
+                updateMapMarkers();
+                correctZoom(places);
+            }
         }
 
         @Override
@@ -265,7 +264,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                if (action!= null && action.equals("logout")) {
+                if (action != null && action.equals("logout")) {
                     finish();
                 }
             }
@@ -463,6 +462,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateMapMarkers() {
         if (map != null) {
+            var builder = LatLngBounds.builder();
+
             if (clusterManager == null) {
                 clusterManager = new ClusterManager<>(this.getApplicationContext(), map);
                 clusterManager.setOnClusterItemClickListener(item -> {
@@ -483,13 +484,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             clusterManager.clearItems();
             clusterMarkers.clear();
             clusterManager.cluster();
+
+
             for (Place place : places) {
-                Log.d(TAG, "Добавлен маркер на карту. Позиция:[ "
-                        + place.getLatitude().toString()
-                        + place.getLongitude().toString() + "]");
                 try {
+                    builder.include(new LatLng(place.getLatitude(), place.getLongitude()));
                     PictureLoader.loadPlaceThumbnail(this, place,
                             clusterMarkers, clusterManager);
+                    Log.d(TAG, "Добавлен маркер на карту. Позиция:[ "
+                            + place.getLatitude().toString()
+                            + place.getLongitude().toString() + "]");
                 } catch (Exception e) {
                     Log.e(TAG, "Ошибка при добавлении маркера:\n" + e.getMessage());
                 }
@@ -506,8 +510,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .visible(true);
 
         Log.d(TAG, "Отображение пути на карте");
-        Polyline polyline = map.addPolyline(lineOptions);
+        var polyline = map.addPolyline(lineOptions);
         Log.d(TAG, String.valueOf(polyline.isVisible()));
+    }
+
+    private void correctZoom(List<Place> places) {
+        var builder = LatLngBounds.builder();
+
+        for (var place : places) {
+            builder.include(new LatLng(place.getLatitude(), place.getLongitude()));
+        }
+
+        var bounds = builder.build();
+
+        var zoomWidth = getResources().getDisplayMetrics().widthPixels;
+        var zoomHeight = getResources().getDisplayMetrics().heightPixels;
+        var zoomPadding = (int) (zoomWidth * 0.10);
+
+        Log.d(TAG, "Корректировка зума карты");
+        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomWidth, zoomHeight, zoomPadding));
+
     }
 
     private void openShortPlaceInfo() {
