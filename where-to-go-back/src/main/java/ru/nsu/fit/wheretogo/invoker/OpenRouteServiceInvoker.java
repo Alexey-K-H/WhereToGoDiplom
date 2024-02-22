@@ -1,6 +1,6 @@
 package ru.nsu.fit.wheretogo.invoker;
 
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionsDto;
+import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
 
 /**
  * Инвокер для Open Route Service
@@ -19,12 +19,12 @@ public interface OpenRouteServiceInvoker {
      *
      * @return путь
      */
-    ORSDirectionsDto getDirectionDriving();
+    ORSDirectionResponse getDirectionDriving();
 
     /**
      * Получить путь, используя способ передвижения "машина"
      *
      * @return путь
      */
-    ORSDirectionsDto getDirectionWalking();
+    ORSDirectionResponse getDirectionWalking();
 }

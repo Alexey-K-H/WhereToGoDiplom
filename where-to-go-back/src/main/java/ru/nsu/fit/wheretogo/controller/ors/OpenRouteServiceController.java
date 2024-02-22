@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionsDto;
+import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
 import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
 
 @RestController
@@ -23,13 +23,13 @@ public class OpenRouteServiceController {
     }
 
     @PostMapping("/route/driving")
-    public ResponseEntity<ORSDirectionsDto> getRouteDriving() {
+    public ResponseEntity<ORSDirectionResponse> getRouteDriving() {
         return new ResponseEntity<>(openRouteService.getDirectionDriving(), HttpStatus.OK);
     }
 
     @PostMapping("/route/walking")
-    public ResponseEntity<ORSDirectionsDto> getRouteWalking() {
-        return new ResponseEntity<>(new ORSDirectionsDto(), HttpStatus.OK);
+    public ResponseEntity<ORSDirectionResponse> getRouteWalking() {
+        return new ResponseEntity<>(openRouteService.getDirectionWalking(), HttpStatus.OK);
     }
 
 }

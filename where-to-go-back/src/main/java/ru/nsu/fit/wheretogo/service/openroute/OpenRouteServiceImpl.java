@@ -2,7 +2,7 @@ package ru.nsu.fit.wheretogo.service.openroute;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionsDto;
+import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
 import ru.nsu.fit.wheretogo.invoker.OpenRouteServiceInvoker;
 
 @RequiredArgsConstructor
@@ -17,12 +17,12 @@ public class OpenRouteServiceImpl implements OpenRouteService {
     }
 
     @Override
-    public ORSDirectionsDto getDirectionDriving() {
+    public ORSDirectionResponse getDirectionDriving() {
         return openRouteServiceInvoker.getDirectionDriving();
     }
 
     @Override
-    public ORSDirectionsDto getDirectionWalking() {
-        return null;
+    public ORSDirectionResponse getDirectionWalking() {
+        return openRouteServiceInvoker.getDirectionWalking();
     }
 }

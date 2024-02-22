@@ -1,6 +1,6 @@
 package ru.nsu.fit.wheretogo.service.openroute;
 
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionsDto;
+import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
 
 /**
  * Сервис по работе с OpenRoute сервером
@@ -9,7 +9,7 @@ public interface OpenRouteService {
 
     String health();
 
-    ORSDirectionsDto getDirectionDriving();
+    ORSDirectionResponse getDirectionDriving();
 
-    ORSDirectionsDto getDirectionWalking();
+    ORSDirectionResponse getDirectionWalking();
 }

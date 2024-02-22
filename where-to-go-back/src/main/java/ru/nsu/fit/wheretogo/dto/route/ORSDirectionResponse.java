@@ -6,6 +6,6 @@ import ru.nsu.fit.wheretogo.dto.route.model.Feature;
 import java.util.List;
 
 @Data
-public class ORSDirectionsDto {
+public class ORSDirectionResponse {
     private List<Feature> features;
 }
