@@ -502,7 +502,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         PolylineOptions lineOptions = new PolylineOptions()
                 .addAll(geometry)
                 .width(10f)
-                .color(Color.RED)
+                .color(Color.BLUE)
                 .geodesic(true)
                 .visible(true);
 

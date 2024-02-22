@@ -1,9 +1,5 @@
 package ru.nsu.fit.wheretogo.util.helper;
 
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
