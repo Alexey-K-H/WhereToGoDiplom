@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -39,6 +40,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -61,7 +64,9 @@ import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.model.entity.Category;
 import ru.nsu.fit.wheretogo.model.entity.Place;
 import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.entity.ors.OrsDirectionResponse;
 import ru.nsu.fit.wheretogo.service.CategoryService;
+import ru.nsu.fit.wheretogo.service.ORSService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.RecommenderService;
 import ru.nsu.fit.wheretogo.service.ScoreService;
@@ -69,6 +74,7 @@ import ru.nsu.fit.wheretogo.service.UserService;
 import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.util.helper.RouteCallsHandler;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMapsSdkInitializedCallback {
 
@@ -94,6 +100,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LinearLayout filtersLayout;
     private ShowMapMode showMapMode;
 
+    BroadcastReceiver broadcastReceiver;
+
+    private final Callback<List<Place>> placesCallsCallback = new Callback<List<Place>>() {
+        @Override
+        public void onResponse(@NonNull Call<List<Place>> call, Response<List<Place>> response) {
+            Log.d(TAG, "Получен успешный ответ на запрос списка мест:" + response);
+            List<Place> placeList = response.body();
+            places.clear();
+            if (placeList != null) {
+                places.addAll(placeList);
+            }
+            updateMapMarkers();
+        }
+
+        @Override
+        public void onFailure(@NonNull Call<List<Place>> call, @NonNull Throwable t) {
+            Log.d(TAG, "При получении данных произошла ошибка:" + t.getMessage());
+        }
+    };
+
+    private final Callback<OrsDirectionResponse> routeCallsCallback = new Callback<OrsDirectionResponse>() {
+        @Override
+        public void onResponse(@NonNull Call<OrsDirectionResponse> call, @NonNull Response<OrsDirectionResponse> response) {
+            Log.d(TAG, "Получен успешный ответ на запрос маршрута");
+            OrsDirectionResponse route = response.body();
+            places.clear();
+
+            if (route != null && route.getFeatures() != null) {
+                Log.d(TAG, "Получен маршрут со следующими свойствами:\n" +
+                        "Дистанция:" + route.getFeatures().get(0).getProperties().getSummary().getDistance() +
+                        "\nВремя передвижения:" + route.getFeatures().get(0).getProperties().getSummary().getDuration());
+
+                List<LatLng> geometry = RouteCallsHandler.decodePolyline(route);
+                Log.d(TAG, "Количество геоточек:" + geometry.size());
+                drawRoute(geometry);
+            } else {
+                Log.d(TAG, "Не найдены данные пути");
+                showNotification("При получении данных произошла ошибка. Попробуйте повторить попытку позже");
+            }
+        }
+
+        @Override
+        public void onFailure(@NonNull Call<OrsDirectionResponse> call, @NonNull Throwable t) {
+            Log.d(TAG, "При получении данных произошла ошибка:" + t.getMessage());
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,37 +156,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getCategories(null, null);
 
         if (savedInstanceState != null) {
-            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            Log.d(TAG, String.format("Last location [lat:%s, lon:%s]",
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION, Location.class);
+            Log.d(TAG, String.format("Последняя известная геопозиция [lat:%s, lon:%s]",
                     lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
         }
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            Log.d(TAG, "Нет дополнительных параметров, используется модуль отображения ALL");
+            Log.d(TAG, "Нет дополнительных параметров, используется модуль отображения \"ALL\"");
             showMapMode = ShowMapMode.ALL;
         } else {
-            int mode = extras.getInt("show_map_mode");
-            switch (mode) {
-                case 1:
-                    showMapMode = ShowMapMode.NEAREST;
-                    break;
-                case 2:
-                    showMapMode = ShowMapMode.RECOMMENDED_VISITED;
-                    break;
-                case 3:
-                    showMapMode = ShowMapMode.RECOMMENDED_SCORED;
-                    break;
-                case 4:
-                    showMapMode = ShowMapMode.RECOMMENDED_USERS;
-                    break;
-                default:
-                    showMapMode = ShowMapMode.ALL;
+            String mode = extras.getString("show_map_mode");
+            if (mode == null) {
+                showMapMode = ShowMapMode.ALL;
             }
 
+            showMapMode = ShowMapMode.valueOf(mode);
+
             if (showMapMode == ShowMapMode.NEAREST) {
-                lastKnownLocation = extras.getParcelable(LAST_LOCATION_STR);
-                Log.d(TAG, "Get lastKnownLocation for nearest: "
+                lastKnownLocation = extras.getParcelable(LAST_LOCATION_STR, Location.class);
+                Log.d(TAG, "Последняя известная геопозиция: "
                         + lastKnownLocation.getLatitude()
                         + ", "
                         + lastKnownLocation.getLongitude() + ")");
@@ -206,15 +249,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             filters.setOnClickListener(this::openFilters);
         }
 
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
-                if (action.equals("logout")) {
+                if (action!= null && action.equals("logout")) {
                     finish();
                 }
             }
         };
+
         registerReceiver(broadcastReceiver, new IntentFilter("logout"));
     }
 
@@ -278,6 +322,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void sendPlacesRequest() {
         RecommenderService recommenderService = ServiceGenerator.createService(RecommenderService.class);
+        ORSService routeService = ServiceGenerator.createService(ORSService.class);
 
         if (categories.values().stream().noneMatch(categoryNameChosen -> categoryNameChosen.chosen)) {
             categories.forEach((id, categoryNameChosen) -> categoryNameChosen.chosen = true);
@@ -286,7 +331,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Список выбранных категорий: "
                 + categories.values().stream().map(c -> c.name).collect(Collectors.toList()));
 
-        Call<List<Place>> placesCall;
+        Call<List<Place>> placesCall = null;
+        Call<OrsDirectionResponse> routeCall = null;
         switch (showMapMode) {
             case NEAREST:
                 placesCall = recommenderService.getNearestPlacesByCategory(
@@ -309,6 +355,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case RECOMMENDED_USERS:
                 placesCall = recommenderService.getRecommendByUsers();
                 break;
+            case RECOMMENDED_ROUTE:
+                routeCall = routeService.getRouteByDriving();
+                break;
             default:
                 placesCall = recommenderService.getPlaceList(
                         categories.entrySet().stream()
@@ -318,23 +367,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
 
-        placesCall.enqueue(new Callback<List<Place>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Place>> call,
-                                   @NonNull Response<List<Place>> response) {
-                List<Place> placeList = response.body();
-                places.clear();
-                if (placeList != null) {
-                    places.addAll(placeList);
-                }
-                updateMapMarkers();
-            }
+        if (placesCall != null) {
+            placesCall.enqueue(placesCallsCallback);
+        }
 
-            @Override
-            public void onFailure(@NonNull Call<List<Place>> call, @NonNull Throwable t) {
-                Log.e(TAG, t.getMessage());
-            }
-        });
+        if (routeCall != null) {
+            routeCall.enqueue(routeCallsCallback);
+        }
     }
 
     private void getDeviceLocation() {
@@ -342,7 +381,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         try {
             if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                Log.d(TAG, "GPS unavailable, set default location");
+                Log.d(TAG, "GPS недоступен, выставлено значение по умолчанию");
                 map.moveCamera(CameraUpdateFactory
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
@@ -419,7 +458,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getLocationPermission();
             }
         } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
+            Log.e("Ошибка при обновлении ui: %s", e.getMessage());
         }
     }
 
@@ -457,6 +496,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         }
+    }
+
+    private void drawRoute(List<LatLng> geometry) {
+        PolylineOptions lineOptions = new PolylineOptions()
+                .addAll(geometry)
+                .width(10f)
+                .color(Color.RED)
+                .geodesic(true)
+                .visible(true);
+
+        Log.d(TAG, "Отображение пути на карте");
+        Polyline polyline = map.addPolyline(lineOptions);
+        Log.d(TAG, String.valueOf(polyline.isVisible()));
     }
 
     private void openShortPlaceInfo() {
@@ -890,7 +942,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onDestroy() {
-        Log.d(TAG, "Очистка страницы с картой");
+        Log.d(TAG, "Уничтожение страницы с картой");
+
+        if (broadcastReceiver != null) {
+            unregisterReceiver(broadcastReceiver);
+        }
+
         super.onDestroy();
+    }
+
+    private void showNotification(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 }

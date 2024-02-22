@@ -8,6 +8,7 @@ package ru.nsu.fit.wheretogo.model;
  *     <li>RECOMMENDED_VISITED - отображение мест-рекомендаций на основе посещенных пользователем мест</li>
  *     <li>RECOMMENDED_SCORED - отображение мест-рекомендаций на основе оценок пользователя</li>
  *     <li>RECOMMENDED_USERS - отображение мест-рекомендаций на основе оценок других пользователей</li>
+ *     <li>RECOMMENDED_ROUTE - отображение путей-рекомендаций</li>
  * </ul>
  */
 public enum ShowMapMode {
@@ -15,5 +16,6 @@ public enum ShowMapMode {
     NEAREST,
     RECOMMENDED_VISITED,
     RECOMMENDED_SCORED,
-    RECOMMENDED_USERS
+    RECOMMENDED_USERS,
+    RECOMMENDED_ROUTE
 }
