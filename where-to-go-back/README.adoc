@@ -1,26 +1,34 @@
-# WhereToGo.NSK Backend
+= WhereToGo.NSK Backend
 
 Серверная часть приложения WhereToGo.NSK
 
-## Общая информация
+== Общая информация
 
-### Основные сервисы
+=== Основные сервисы
 
 * Пользователи
 * Места
 * Категории
 * Рекомендации
 
-## Техническая информация
+== Техническая информация
 
-### Технологический стек
+=== Технологический стек
 
 * Java 17.0.8
 * SpringBoot 2.7.5
 * docker-compose 3.7
 * Apache Maven 3.8.6
 
-### Сборка проекта
+=== Используемый софт
+
+* Intellij IDEA CE
+* Android Studio
+* Docker-desktop
+* Postman
+* pgAdmin Postgres
+
+=== Сборка проекта
 
         mvn clean package
 
@@ -28,7 +36,7 @@
 
         java -jar /path/to/*.jar
 
-### Sonar
+=== Sonar
 
 Для проверки тестового покрытия кода необходимо провести сборку проекта:
 
@@ -42,9 +50,12 @@
 
         mvn clean package sonar:sonar
 
-### Docker-контейнеры:
+=== Docker-контейнеры:
 
-Предварительно необходимо настроить локально окружение для запуска докер контейнеров. Необходимо сформировать два файла:
+Предварительно необходимо настроить локально окружение для запуска докер контейнеров.
+Необходимо установить docker на локальное ПО. Для windows систем можно установить Docker-desktop.
+
+Необходимо сформировать два файла:
 
 **db.properties**:
 
@@ -72,11 +83,11 @@
 
 Сборка контейнеров выполняется в два этапа:
 
-#### Сборка проекта WhereToGo
+==== Сборка проекта WhereToGo
 
         cd where-to-go-nsk/docker/ && docker-compose up -d
 
-#### Сборка сервера OpenRouteService
+==== Сборка сервера OpenRouteService
 
         cd where-to-go-nsk/docker/ors/ && docker-compose up -d
 
@@ -91,13 +102,13 @@
           ],
         ...
 
-#### Обновление контейнера приложения
+==== Обновление контейнера приложения
 
 Пересобрать контейнер при изменении *.jar файла приложения:
 
         docker-compose build app
         docker-compose up -d
 
-### Swagger-UI
+=== Swagger-UI
 
-Посмотреть сведения об API: [Swagger-UI](http://localhost:8081/swagger-ui/)
+Посмотреть документацию API: http://localhost:8081/swagger-ui/[Swagger-UI]
