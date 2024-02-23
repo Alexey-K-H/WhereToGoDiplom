@@ -42,6 +42,7 @@ public class GeneticAlgorithmRecommender {
     private final PopulationBuilder populationBuilder;
     private final CrossoverOperator crossoverOperator;
     private final MutationOperator mutationOperator;
+    private final FitnessFunction fitnessFunction;
 
     public RouteRecommenderResponse execute(RouteRecommenderRequest request) {
 
@@ -71,11 +72,11 @@ public class GeneticAlgorithmRecommender {
             population = populationUnion(population, nextGeneration);
             LOGGER.debug("Объединение родителей и потомков:{}", population);
 
-            population = FitnessFunction.selection(population);
+            population = fitnessFunction.selection(population);
             LOGGER.debug("Поколение после селекции:{}", population);
         }
 
-        var bestPath = FitnessFunction.findTheBest(population);
+        var bestPath = fitnessFunction.findTheBest(population);
         LOGGER.debug("Лучший путь:{}", bestPath);
 
         return buildFromIndividual(bestPath);

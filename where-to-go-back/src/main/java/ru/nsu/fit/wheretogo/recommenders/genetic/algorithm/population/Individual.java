@@ -8,4 +8,5 @@ import java.util.List;
 @Data
 public class Individual {
     private List<PlaceBriefDTO> routePlaces;
+    private Double summaryMoveDuration;
 }
