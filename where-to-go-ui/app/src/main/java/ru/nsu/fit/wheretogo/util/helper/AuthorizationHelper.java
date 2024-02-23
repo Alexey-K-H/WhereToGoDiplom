@@ -10,7 +10,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
-import ru.nsu.fit.wheretogo.model.entity.User;
+import ru.nsu.fit.wheretogo.model.user.User;
 import ru.nsu.fit.wheretogo.service.UserService;
 
 public class AuthorizationHelper {

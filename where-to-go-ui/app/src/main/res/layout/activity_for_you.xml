@@ -105,6 +105,7 @@
 
         <ImageButton
             android:id="@+id/by_scored_btn"
+            android:clickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/imageView5"
@@ -117,10 +118,11 @@
             app:layout_constraintEnd_toEndOf="@+id/imageView5"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/imageView5"
-            app:srcCompat="@drawable/btn_by_prefs" />
+            app:srcCompat="@drawable/not_available_recommend" />
 
         <ImageButton
             android:id="@+id/by_others_btn"
+            android:clickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/imageView2"
@@ -133,10 +135,11 @@
             app:layout_constraintEnd_toEndOf="@+id/imageView2"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/imageView2"
-            app:srcCompat="@drawable/btn_by_users" />
+            app:srcCompat="@drawable/not_available_recommend" />
 
         <ImageButton
             android:id="@+id/by_visited_btn"
+            android:clickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/imageView4"
@@ -149,10 +152,11 @@
             app:layout_constraintEnd_toEndOf="@+id/imageView4"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/imageView4"
-            app:srcCompat="@drawable/btn_by_places" />
+            app:srcCompat="@drawable/not_available_recommend" />
 
         <ImageButton
             android:id="@+id/by_gps_btn"
+            android:clickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -161,7 +165,7 @@
             app:layout_constraintEnd_toEndOf="@+id/imageView3"
             app:layout_constraintHorizontal_bias="0.504"
             app:layout_constraintStart_toStartOf="@+id/imageView3"
-            app:srcCompat="@drawable/nearest_rec_btn" />
+            app:srcCompat="@drawable/not_available_recommend" />
 
         <ImageButton
             android:id="@+id/make_path_btn"

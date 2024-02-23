@@ -3,11 +3,13 @@ package ru.nsu.fit.wheretogo.service;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-import ru.nsu.fit.wheretogo.model.entity.Place;
-import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
+import ru.nsu.fit.wheretogo.model.place.Place;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderRequest;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
 
 /**
  * Сервис по работе с рекомендациями
@@ -75,6 +77,6 @@ public interface RecommenderService {
      *
      * @return маршрут
      */
-    @POST("/recommend/route/driving")
-    Call<RouteRecommendResponse> getRouteDriving();
+    @POST("/recommend/route")
+    Call<RouteRecommenderResponse> getRouteRecommendation(@Body RouteRecommenderRequest request);
 }

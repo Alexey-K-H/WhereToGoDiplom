@@ -6,7 +6,7 @@ import ru.nsu.fit.wheretogo.dto.user.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.place.StayPoint;
 import ru.nsu.fit.wheretogo.repository.user.StayPointRepository;
 import ru.nsu.fit.wheretogo.repository.user.UserRepository;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
+import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 
 import java.time.Instant;
 import java.util.Comparator;

@@ -5,7 +5,7 @@ import retrofit2.http.GET;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.user.Score;
 
 /**
  * Сервис по работе с оценками

@@ -5,17 +5,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
-import ru.nsu.fit.wheretogo.dto.route.RouteRecommendResponse;
-import ru.nsu.fit.wheretogo.dto.route.model.LatLong;
 import ru.nsu.fit.wheretogo.dto.user.StayPointDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 import ru.nsu.fit.wheretogo.entity.user.User;
 import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
+import ru.nsu.fit.wheretogo.model.ors.ORSDirectionResponse;
+import ru.nsu.fit.wheretogo.model.ors.direction.LatLong;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderRequest;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
 import ru.nsu.fit.wheretogo.recommenders.cbf.CBFRecommender;
 import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.cf.SlopeOneRecommender;
+import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.GeneticAlgorithmRecommender;
 import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
@@ -23,7 +26,8 @@ import ru.nsu.fit.wheretogo.repository.user.UserRepository;
 import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
 import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
 import ru.nsu.fit.wheretogo.utils.LatLongSequences;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
+import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
+import ru.nsu.fit.wheretogo.utils.helpers.nearest.search.NearestSearchHelper;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -46,6 +50,9 @@ public class RecommenderServiceImpl implements RecommenderService {
     private final UserCoefficientMainRepository userCoefficientMainRepository;
     private final CategoryRepository categoryRepository;
     private final ScoreRepository scoreRepository;
+    private final GeneticAlgorithmRecommender geneticAlgorithmRecommender;
+
+    private final NearestSearchHelper nearestSearchHelper;
 
     @Override
     @Transactional
@@ -214,17 +221,55 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    public RouteRecommendResponse getRouteRecommendationDriving() {
+    public RouteRecommenderResponse getRouteRecommendation(RouteRecommenderRequest request) {
 
-        var keyPoints = List.of(
-                LatLong.builder().latitude("54.56074").longitude("83.62234").build(),
-                LatLong.builder().latitude("54.97187").longitude("82.71999").build()
+        LOGGER.debug("Получен запрос на получение пути-рекомендации:{}", request);
+
+        var startPlace = nearestSearchHelper.findNearestPlaces2Point(
+                LatLong
+                        .builder()
+                        .latitude(request.getCurrentUserLocation().getLatitude())
+                        .longitude(request.getCurrentUserLocation().getLongitude())
+                        .build(),
+                1
         );
 
-        var orsResponse = openRouteService.getDirectionDriving(keyPoints);
+        LOGGER.debug("Координаты ближайшего стартового места:{}", startPlace.get(0));
+
+        var geneticAlgResponse = geneticAlgorithmRecommender.execute(request);
+
+        LOGGER.debug("Результат работы алгоритма:{}", geneticAlgResponse);
+
+        var keyPoints = new ArrayList<>(List.of(
+                LatLong
+                        .builder()
+                        .latitude(startPlace.get(0).getLatitude())
+                        .longitude(startPlace.get(0).getLongitude())
+                        .build(),
+                LatLong
+                        .builder()
+                        .latitude("54.97187")
+                        .longitude("82.71999")
+                        .build(),
+                LatLong
+                        .builder()
+                        .latitude("54.56074")
+                        .longitude("83.62234")
+                        .build()
+        ));
+
+        ORSDirectionResponse orsResponse = null;
+
+        switch (request.getMode()) {
+            case WALKING -> orsResponse = openRouteService.getDirectionWalking(keyPoints);
+            case DRIVING -> orsResponse = openRouteService.getDirectionDriving(keyPoints);
+        }
+
+        keyPoints.add(startPlace.get(0));
+
         var coordinateSequences = getCoordinateSequences(keyPoints);
 
-        LOGGER.debug("Последовательности координат:\nШироты:{}\nДолготы:{}",
+        LOGGER.debug("Последовательности координат: Широты:[{}] Долготы:[{}]",
                 coordinateSequences.getLatitudes(),
                 coordinateSequences.getLongitudes());
 
@@ -232,28 +277,7 @@ public class RecommenderServiceImpl implements RecommenderService {
                 coordinateSequences.getLatitudes(),
                 coordinateSequences.getLongitudes());
 
-        return RouteRecommendResponse
-                .builder()
-                .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
-                .direction(orsResponse)
-                .build();
-    }
-
-    @Override
-    public RouteRecommendResponse getRouteRecommendationWalking() {
-
-        var keyPoints = List.of(
-                LatLong.builder().latitude("54.56074").longitude("83.62234").build(),
-                LatLong.builder().latitude("54.97187").longitude("82.71999").build()
-        );
-
-        var orsResponse = openRouteService.getDirectionWalking(keyPoints);
-        var coordinateSequences = getCoordinateSequences(keyPoints);
-        var keyPlacesResponse = placeRepository.findAllByLatLong(
-                coordinateSequences.getLatitudes(),
-                coordinateSequences.getLongitudes());
-
-        return RouteRecommendResponse
+        return RouteRecommenderResponse
                 .builder()
                 .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
                 .direction(orsResponse)

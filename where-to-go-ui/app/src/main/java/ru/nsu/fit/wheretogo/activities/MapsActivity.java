@@ -61,10 +61,13 @@ import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
-import ru.nsu.fit.wheretogo.model.entity.Category;
-import ru.nsu.fit.wheretogo.model.entity.Place;
-import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
-import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.ors.ORSMode;
+import ru.nsu.fit.wheretogo.model.place.Category;
+import ru.nsu.fit.wheretogo.model.place.Place;
+import ru.nsu.fit.wheretogo.model.recommender.LatLonData;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderRequest;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
+import ru.nsu.fit.wheretogo.model.user.Score;
 import ru.nsu.fit.wheretogo.service.CategoryService;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.RecommenderService;
@@ -82,6 +85,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final String KEY_LOCATION = "location";
     private static final String LAST_LOCATION_STR = "lastLocation";
+    private static final String ERROR_UI = "При получении данных произошла ошибка. Попробуйте повторить попытку позже";
 
     private final LatLng defaultLocation = new LatLng(55.008883, 82.938344);
     private final ArrayList<Place> places = new ArrayList<>();
@@ -98,8 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SlidingPaneLayout mapSlidingPane;
     private LinearLayout filtersLayout;
     private ShowMapMode showMapMode;
-
-    BroadcastReceiver broadcastReceiver;
+    private BroadcastReceiver broadcastReceiver;
 
     private final Callback<List<Place>> placesCallsCallback = new Callback<>() {
         @Override
@@ -119,11 +122,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-    private final Callback<RouteRecommendResponse> routeCallsCallback = new Callback<>() {
+    private final Callback<RouteRecommenderResponse> routeCallsCallback = new Callback<>() {
         @Override
-        public void onResponse(@NonNull Call<RouteRecommendResponse> call, @NonNull Response<RouteRecommendResponse> response) {
+        public void onResponse(@NonNull Call<RouteRecommenderResponse> call, @NonNull Response<RouteRecommenderResponse> response) {
             Log.d(TAG, "Получен успешный ответ на запрос маршрута");
-            RouteRecommendResponse route = response.body();
+            RouteRecommenderResponse route = response.body();
             places.clear();
 
             if (route != null && route.getDirection().getFeatures() != null) {
@@ -136,7 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 drawRoute(geometry);
             } else {
                 Log.d(TAG, "Не найдены данные пути");
-                showNotification("При получении данных произошла ошибка. Попробуйте повторить попытку позже");
+                showNotification();
             }
 
             if (route != null && route.getRoutePlaces() != null) {
@@ -153,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         @Override
-        public void onFailure(@NonNull Call<RouteRecommendResponse> call, @NonNull Throwable t) {
+        public void onFailure(@NonNull Call<RouteRecommenderResponse> call, @NonNull Throwable t) {
             Log.d(TAG, "При получении данных произошла ошибка:" + t.getMessage());
         }
     };
@@ -177,7 +180,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, "Нет дополнительных параметров, используется модуль отображения \"ALL\"");
             showMapMode = ShowMapMode.ALL;
         } else {
-            String mode = extras.getString("show_map_mode");
+            var mode = extras.getString("show_map_mode");
             if (mode == null) {
                 showMapMode = ShowMapMode.ALL;
             }
@@ -195,8 +198,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        ru.nsu.fit.wheretogo.databinding.ActivityMapBinding binding =
-                ActivityMapBinding.inflate(getLayoutInflater());
+       var binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         mapSlidingPane = findViewById(R.id.mapSlidingPane);
@@ -270,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
-        registerReceiver(broadcastReceiver, new IntentFilter("logout"));
+        registerReceiver(broadcastReceiver, new IntentFilter("logout"), Context.RECEIVER_NOT_EXPORTED);
     }
 
 
@@ -295,13 +297,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull GoogleMap map) {
         this.map = map;
 
-        try {
-            this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(),
-                    R.raw.map_without_labels_style));
-            Log.d(TAG, "Стиль карты загружен успешно");
-        } catch (Exception e) {
-            Log.e(TAG, "Не удалось загрузить данные стиля карты из файла JSON");
-        }
+        setMapStyle();
 
         this.map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
@@ -342,7 +338,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + categories.values().stream().map(c -> c.name).collect(Collectors.toList()));
 
         Call<List<Place>> placesCall = null;
-        Call<RouteRecommendResponse> routeCall = null;
+        Call<RouteRecommenderResponse> routeCall = null;
         switch (showMapMode) {
             case NEAREST -> placesCall = recommenderService.getNearestPlacesByCategory(
                     lastKnownLocation.getLatitude(),
@@ -357,7 +353,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case RECOMMENDED_VISITED -> placesCall = recommenderService.getRecommendByVisited();
             case RECOMMENDED_SCORED -> placesCall = recommenderService.getRecommendByScores();
             case RECOMMENDED_USERS -> placesCall = recommenderService.getRecommendByUsers();
-            case RECOMMENDED_ROUTE -> routeCall = recommenderService.getRouteDriving();
+            case RECOMMENDED_ROUTE -> {
+                var latitude = defaultLocation.latitude;
+                var longitude = defaultLocation.longitude;
+
+                if (lastKnownLocation != null) {
+                    latitude = lastKnownLocation.getLatitude();
+                    longitude = lastKnownLocation.getLongitude();
+                }
+
+                var request = new RouteRecommenderRequest(
+                        2,
+                        new LatLonData(
+                                String.valueOf(latitude),
+                                String.valueOf(longitude)),
+                        ORSMode.DRIVING
+                );
+
+                routeCall = recommenderService.getRouteRecommendation(request);
+            }
             default -> placesCall = recommenderService.getPlaceList(
                     categories.entrySet().stream()
                             .filter(entry -> entry.getValue().chosen)
@@ -383,18 +397,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 map.moveCamera(CameraUpdateFactory
                         .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                 map.getUiSettings().setMyLocationButtonEnabled(false);
-//                sendPlacesRequest();
             } else {
                 if (locationPermissionGranted) {
                     Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
                     locationResult.addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
                             lastKnownLocation = task.getResult();
+                            Log.d(TAG, "Получено текущее местоположение пользователя:["
+                                    + lastKnownLocation.getLatitude() + " " + lastKnownLocation.getLongitude() + "]");
                             if (lastKnownLocation != null) {
                                 map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-
                             }
                         } else {
                             Log.d(TAG, "Не удалось получить местоположение, используем позицию по умолчанию");
@@ -408,7 +422,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     map.moveCamera(CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                     map.getUiSettings().setMyLocationButtonEnabled(false);
-//                    sendPlacesRequest();
                 }
             }
         } catch (SecurityException e) {
@@ -533,7 +546,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void openShortPlaceInfo() {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+        var bottomSheetDialog = new BottomSheetDialog(
                 MapsActivity.this, R.style.ButtonSheetDialogTheme
         );
         View bottomSheetView = LayoutInflater.from(getApplicationContext())
@@ -710,24 +723,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void openFavourites(View view) {
-        Intent intent = new Intent(this, FavouritesActivity.class);
+        var intent = new Intent(this, FavouritesActivity.class);
         startActivity(intent);
     }
 
     public void openRecommenders(View view) {
 //        locationUpdateThread.quit();
-        Intent intent = new Intent(this, ForYouActivity.class);
+        var intent = new Intent(this, RecommenderActivity.class);
         intent.putExtra(LAST_LOCATION_STR, lastKnownLocation);
         startActivity(intent);
     }
 
     private void openUserPrefs(View view) {
-        Intent intent = new Intent(this, AccountActivity.class);
+        var intent = new Intent(this, AccountActivity.class);
         startActivity(intent);
     }
 
     public void openFullPlaceInfo(View view) {
-        Intent intent = new Intent(this, PlaceActivity.class);
+        var intent = new Intent(this, PlaceActivity.class);
         intent.putExtra("id", selectedPlace.getId().toString());
         intent.putExtra("title", selectedPlace.getTitle());
         intent.putExtra("desc", selectedPlace.getPlace().getDescription());
@@ -840,7 +853,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void openVisited(View view) {
-        Intent intent = new Intent(this, VisitedActivity.class);
+        var intent = new Intent(this, VisitedActivity.class);
         startActivity(intent);
     }
 
@@ -851,7 +864,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             categories.forEach((id, categoryNameChosen) -> categoryIds.add(id));
             categoryIds.sort(Integer::compareTo);
             categoryIds.forEach(id -> {
-                CategoryNameChosen categoryNameChosen = categories.get(id);
+                var categoryNameChosen = categories.get(id);
                 assert categoryNameChosen != null;
                 filtersLayout.addView(
                         categoryView(id, categoryNameChosen.name, categoryNameChosen.chosen));
@@ -861,7 +874,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private View categoryView(int id, String name, boolean checked) {
-        CheckBox checkBox = new CheckBox(this);
+        var checkBox = new CheckBox(this);
         checkBox.setChecked(checked);
         checkBox.setText(name);
         checkBox.setTextSize(20);
@@ -872,7 +885,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getCategories(@Nullable Runnable onSuccess, @Nullable Runnable onFail) {
-        BooleanWrapper firstFilling = new BooleanWrapper(false);
+        var firstFilling = new BooleanWrapper(false);
         if (categories == null) {
             categories = new HashMap<>();
             firstFilling.value = true;
@@ -916,12 +929,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapsSdkInitialized(@NonNull MapsInitializer.Renderer renderer) {
         switch (renderer) {
-            case LATEST:
-                Log.d(TAG, "The latest version of the renderer is used.");
-                break;
-            case LEGACY:
-                Log.d(TAG, "The legacy version of the renderer is used.");
-                break;
+            case LATEST -> Log.d(TAG, "The latest version of the renderer is used.");
+            case LEGACY -> Log.d(TAG, "The legacy version of the renderer is used.");
         }
     }
 
@@ -948,7 +957,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onBackPressed();
         if (showMapMode != ShowMapMode.ALL) {
             finish();
-            Intent intent = new Intent(this, ForYouActivity.class);
+            var intent = new Intent(this, RecommenderActivity.class);
             intent.putExtra(LAST_LOCATION_STR, lastKnownLocation);
             startActivity(intent);
         }
@@ -972,7 +981,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
     }
 
-    private void showNotification(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+    private void showNotification() {
+        Toast.makeText(this, ERROR_UI, Toast.LENGTH_LONG).show();
+    }
+
+    private void setMapStyle() {
+        try {
+            this.map.setMapStyle(MapStyleOptions.loadRawResourceStyle(this.getApplicationContext(),
+                    R.raw.map_without_labels_style));
+            Log.d(TAG, "Стиль карты загружен успешно");
+        } catch (Exception e) {
+            Log.e(TAG, "Не удалось загрузить данные стиля карты из файла JSON");
+        }
     }
 }

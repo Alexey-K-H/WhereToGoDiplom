@@ -11,7 +11,7 @@ import ru.nsu.fit.wheretogo.exception.user.EmailAlreadyRegistered;
 import ru.nsu.fit.wheretogo.exception.user.UserNotFoundException;
 import ru.nsu.fit.wheretogo.exception.user.UsernameAlreadyRegistered;
 import ru.nsu.fit.wheretogo.repository.user.UserRepository;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
+import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 
 import java.time.Instant;
 import java.util.List;

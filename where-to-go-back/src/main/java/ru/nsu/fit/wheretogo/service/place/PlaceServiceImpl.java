@@ -92,6 +92,11 @@ public class PlaceServiceImpl implements PlaceService {
         placeRepository.findById(placeId).ifPresent(currPlace -> currPlace.getCategories().add(category));
     }
 
+    @Override
+    public List<PlaceBriefDTO> getAllPlaces() {
+        return placeRepository.findAll().stream().map(PlaceBriefDTO::getFromEntity).toList();
+    }
+
     private void validatePlace(PlaceDescriptionDTO place) {
         if (placeRepository.existsByNameOrDescriptionOrCoordinates(
                 place.getName(),

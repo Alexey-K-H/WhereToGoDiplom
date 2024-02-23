@@ -5,14 +5,14 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.nsu.fit.wheretogo.model.entity.RouteRecommendResponse;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
 
 public class RouteCallsHandler {
 
     private RouteCallsHandler() {
     }
 
-    public static List<LatLng> decodePolyline(RouteRecommendResponse response) {
+    public static List<LatLng> decodePolyline(RouteRecommenderResponse response) {
         List<List<String>> geometry = response.getDirection().getFeatures().get(0).getGeometry().getCoordinates();
         List<LatLng> polyLineCoordinates = new ArrayList<>();
 

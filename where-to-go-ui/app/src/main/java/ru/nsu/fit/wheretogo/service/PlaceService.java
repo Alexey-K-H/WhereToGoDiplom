@@ -7,7 +7,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
-import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.place.Place;
 
 /**
  * Сервис по работе с местами

@@ -69,5 +69,10 @@ public interface PlaceService {
      */
     void addPlaceCategory(Long placeId, Long categoryId);
 
-
+    /**
+     * Получить список всех мест в базе данных
+     *
+     * @return список мест
+     */
+    List<PlaceBriefDTO> getAllPlaces();
 }

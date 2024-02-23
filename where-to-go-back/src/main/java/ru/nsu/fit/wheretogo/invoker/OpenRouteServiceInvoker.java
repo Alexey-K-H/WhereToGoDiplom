@@ -1,7 +1,9 @@
 package ru.nsu.fit.wheretogo.invoker;
 
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
-import ru.nsu.fit.wheretogo.dto.route.model.LatLong;
+import ru.nsu.fit.wheretogo.model.ors.ORSDirectionResponse;
+import ru.nsu.fit.wheretogo.model.ors.ORSMatrixRequest;
+import ru.nsu.fit.wheretogo.model.ors.ORSMatrixResponse;
+import ru.nsu.fit.wheretogo.model.ors.direction.LatLong;
 
 import java.util.List;
 
@@ -32,4 +34,12 @@ public interface OpenRouteServiceInvoker {
      * @return путь
      */
     ORSDirectionResponse getDirectionWalking(List<LatLong> keyPlacesCoordinates);
+
+    /**
+     * Получить матрицу временных затрат мест
+     *
+     * @param request данные запроса
+     * @return матрица
+     */
+    ORSMatrixResponse getPlacesDurationMatrix(ORSMatrixRequest request);
 }

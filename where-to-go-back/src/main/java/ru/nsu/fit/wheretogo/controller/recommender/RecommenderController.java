@@ -3,11 +3,16 @@ package ru.nsu.fit.wheretogo.controller.recommender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
-import ru.nsu.fit.wheretogo.dto.route.RouteRecommendResponse;
-import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderRequest;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
 import ru.nsu.fit.wheretogo.service.place.CategoryService;
 import ru.nsu.fit.wheretogo.service.recommender.RecommenderService;
 import ru.nsu.fit.wheretogo.service.score.ScoreService;
@@ -28,7 +33,6 @@ public class RecommenderController {
     private final StayPointService stayPointService;
     private final ScoreService scoreService;
     private final UserService userService;
-    private final OpenRouteService openRouteService;
 
     @GetMapping("/nearest/category")
     public ResponseEntity<List<PlaceBriefDTO>> getNearestPlaces(
@@ -91,13 +95,10 @@ public class RecommenderController {
         }
     }
 
-    @PostMapping("/route/driving")
-    public ResponseEntity<RouteRecommendResponse> getRouteDriving() {
-        return new ResponseEntity<>(recommenderService.getRouteRecommendationDriving(), HttpStatus.OK);
+    @PostMapping("/route")
+    public ResponseEntity<RouteRecommenderResponse> getRouteRecommendation(
+            @RequestBody() RouteRecommenderRequest request) {
+        return new ResponseEntity<>(recommenderService.getRouteRecommendation(request), HttpStatus.OK);
     }
 
-    @PostMapping("/route/walking")
-    public ResponseEntity<RouteRecommendResponse> getRouteWalking() {
-        return new ResponseEntity<>(recommenderService.getRouteRecommendationWalking(), HttpStatus.OK);
-    }
 }

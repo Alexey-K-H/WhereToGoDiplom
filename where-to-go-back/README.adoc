@@ -85,11 +85,11 @@
 
 ==== Сборка проекта WhereToGo
 
-        cd where-to-go-nsk/docker/ && docker-compose up -d
+    cd where-to-go-nsk/docker/ && docker-compose up -d
 
 ==== Сборка сервера OpenRouteService
 
-        cd where-to-go-nsk/docker/ors/ && docker-compose up -d
+    cd where-to-go-nsk/docker/ors/ && docker-compose up -d
 
 Для сервиса openroute необходимо загрузить карту Сибирского федерального округа отсюда: http://download.geofabrik.de/russia/siberian-fed-district-latest.osm.pbf,
 а затем поместить его в директорию **_where-to-go-nsk/docker/ors/resources_** (предварительно ее нужно создать).
@@ -106,9 +106,18 @@
 
 Пересобрать контейнер при изменении *.jar файла приложения:
 
-        docker-compose build app
-        docker-compose up -d
+    docker-compose build app
+    docker-compose up -d
+
+Либо выполнить единую команду (терминал windows OS):
+
+    mvn clean package ; cd docker ; docker-compose build app ; docker-compose up -d ; cd ..
 
 === Swagger-UI
 
 Посмотреть документацию API: http://localhost:8081/swagger-ui/[Swagger-UI]
+
+=== Локальный запуск
+
+Для локального запуска сервера необходимо предварительно запустить контейнер ORS и базу Postgres.
+Приложение необходимо запускать с ключом ``--spring.profiles.active=dev ``

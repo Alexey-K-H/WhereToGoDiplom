@@ -12,7 +12,7 @@ import ru.nsu.fit.wheretogo.dto.user.UserDTO;
 import ru.nsu.fit.wheretogo.exception.user.EmailAlreadyRegistered;
 import ru.nsu.fit.wheretogo.exception.user.UsernameAlreadyRegistered;
 import ru.nsu.fit.wheretogo.service.user.UserService;
-import ru.nsu.fit.wheretogo.utils.SecurityContextHelper;
+import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 
 @RestController
 @RequestMapping("/user")

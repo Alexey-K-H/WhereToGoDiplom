@@ -1,7 +1,8 @@
 package ru.nsu.fit.wheretogo.service.recommender;
 
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
-import ru.nsu.fit.wheretogo.dto.route.RouteRecommendResponse;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderRequest;
+import ru.nsu.fit.wheretogo.model.recommender.RouteRecommenderResponse;
 
 import java.util.List;
 
@@ -66,16 +67,10 @@ public interface RecommenderService {
     List<PlaceBriefDTO> getCollaborativeRecommendationsByFavourites();
 
     /**
-     * Получение маршрута-рекомендации (машина)
+     * Получение маршрута-рекомендации
      *
+     * @param request данные запроса
      * @return маршрут
      */
-    RouteRecommendResponse getRouteRecommendationDriving();
-
-    /**
-     * Получение маршрута-рекомендации (пешком)
-     *
-     * @return маршрут
-     */
-    RouteRecommendResponse getRouteRecommendationWalking();
+    RouteRecommenderResponse getRouteRecommendation(RouteRecommenderRequest request);
 }

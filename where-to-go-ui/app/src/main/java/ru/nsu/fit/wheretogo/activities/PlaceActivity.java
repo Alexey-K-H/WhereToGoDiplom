@@ -25,7 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
-import ru.nsu.fit.wheretogo.model.entity.Score;
+import ru.nsu.fit.wheretogo.model.user.Score;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.service.ScoreService;
 import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;

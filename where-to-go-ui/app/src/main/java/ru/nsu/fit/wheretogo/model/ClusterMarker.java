@@ -10,7 +10,7 @@ import com.google.maps.android.clustering.ClusterItem;
 
 import java.io.Serializable;
 
-import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.place.Place;
 
 public class ClusterMarker implements Serializable, ClusterItem {
 

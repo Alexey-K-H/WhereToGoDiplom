@@ -33,7 +33,7 @@
             android:name=".activities.AccountActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ForYouActivity"
+            android:name=".activities.RecommenderActivity"
             android:exported="false" />
         <activity
             android:name=".activities.PlaceActivity"
@@ -73,7 +73,7 @@
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".activities.OpenActivity"
+            android:name=".activities.loading.OpenActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

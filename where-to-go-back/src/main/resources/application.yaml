@@ -26,3 +26,6 @@ ru:
       wheretogo:
         ors:
           base_url: "http://ors-app:8080"
+        genetic:
+          max_population_size: 5
+          max_generations_size: 15

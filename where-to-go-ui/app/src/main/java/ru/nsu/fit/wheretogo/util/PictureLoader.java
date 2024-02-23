@@ -19,7 +19,7 @@ import java.util.List;
 import ru.nsu.fit.wheretogo.activities.RecyclerViewAdapter;
 import ru.nsu.fit.wheretogo.activities.MapsActivity;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
-import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.place.Place;
 
 public class PictureLoader {
     private static final String TAG = MapsActivity.class.getSimpleName();

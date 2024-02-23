@@ -8,10 +8,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.nsu.fit.wheretogo.dto.route.ORSDirectionResponse;
-import ru.nsu.fit.wheretogo.dto.route.model.DirectionRequest;
-import ru.nsu.fit.wheretogo.dto.route.model.HealthCheck;
-import ru.nsu.fit.wheretogo.dto.route.model.LatLong;
+import ru.nsu.fit.wheretogo.model.ors.ORSDirectionRequest;
+import ru.nsu.fit.wheretogo.model.ors.ORSDirectionResponse;
+import ru.nsu.fit.wheretogo.model.ors.ORSMatrixRequest;
+import ru.nsu.fit.wheretogo.model.ors.ORSMatrixResponse;
+import ru.nsu.fit.wheretogo.model.ors.common.OrsMode;
+import ru.nsu.fit.wheretogo.model.ors.direction.LatLong;
+import ru.nsu.fit.wheretogo.model.ors.health.HealthCheck;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
     private static final String NOT_READY_STR = "not ready";
     private static final String DIRECTION_DRIVING_CAR_URL = "/ors/v2/directions/driving-car/geojson";
     private static final String DIRECTION_WALKING_URL = "/ors/v2/directions/foot-walking/geojson";
+    private static final String MATRIX_URL = "/ors/v2/matrix/";
 
     @Override
     public String health() {
@@ -53,7 +57,7 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
 
         var keyPoints = fillKeyGeoPoints(keyPlacesCoordinates);
 
-        var request = DirectionRequest
+        var request = ORSDirectionRequest
                 .builder()
                 .coordinates(keyPoints)
                 .build();
@@ -77,10 +81,9 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
     public ORSDirectionResponse getDirectionWalking(List<LatLong> keyPlacesCoordinates) {
         var url = orsBaseUrl + DIRECTION_WALKING_URL;
 
-//        var keyPlacesCoordinates = List.of(List.of("83.62234", "54.56074"), List.of("82.71999", "54.97187"));
         var keyPoints = fillKeyGeoPoints(keyPlacesCoordinates);
 
-        var request = DirectionRequest
+        var request = ORSDirectionRequest
                 .builder()
                 .coordinates(keyPoints)
                 .build();
@@ -98,6 +101,24 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
         return null;
     }
 
+    @Override
+    public ORSMatrixResponse getPlacesDurationMatrix(ORSMatrixRequest request) {
+        var url = orsBaseUrl + MATRIX_URL + request.getProfile();
+
+        var result = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                new HttpEntity<>(request),
+                ORSMatrixResponse.class
+        );
+
+        if (result.getStatusCode().equals(HttpStatus.OK) && result.getBody() != null) {
+            return result.getBody();
+        }
+
+        return null;
+    }
+
     private List<List<String>> fillKeyGeoPoints(List<LatLong> coordinates) {
         var result = new ArrayList<List<String>>();
         for (var pointCoordinates : coordinates) {
@@ -105,6 +126,17 @@ public class OpenRouteServiceInvokerImp implements OpenRouteServiceInvoker {
         }
 
         return result;
+    }
+
+    private String getProfileName(OrsMode mode) {
+        switch (mode) {
+            case WALKING -> {
+                return "foot-walking";
+            }
+            default -> {
+                return "driving-car";
+            }
+        }
     }
 
 }

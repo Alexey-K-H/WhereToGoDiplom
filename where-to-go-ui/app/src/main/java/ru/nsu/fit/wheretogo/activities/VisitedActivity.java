@@ -17,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.R;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
-import ru.nsu.fit.wheretogo.model.entity.Place;
+import ru.nsu.fit.wheretogo.model.place.Place;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 
