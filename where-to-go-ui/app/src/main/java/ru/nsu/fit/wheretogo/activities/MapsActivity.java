@@ -684,7 +684,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             selectedPlace.getId(),
                             (int) v);
 
-            call.enqueue(new Callback<Score>() {
+            call.enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<Score> call, @NonNull Response<Score> response) {
                     if (response.code() == 200 && response.body() != null) {

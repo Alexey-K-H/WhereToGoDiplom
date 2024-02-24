@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.service.score;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
@@ -14,23 +16,25 @@ import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficient;
 import ru.nsu.fit.wheretogo.entity.user.coefficient.UserCoefficientId;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
-import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
+import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientRepository;
 
 import java.util.List;
 
 @Service
 public class ScoreServiceImpl implements ScoreService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScoreServiceImpl.class);
+
     private final ScoreRepository scoreRepository;
-    private final UserCoefficientMainRepository userCoefficientMainRepository;
+    private final UserCoefficientRepository userCoefficientRepository;
     private final PlaceRepository placeRepository;
 
     public ScoreServiceImpl(
             ScoreRepository scoreRepository,
-            UserCoefficientMainRepository userCoefficientMainRepository,
+            UserCoefficientRepository userCoefficientRepository,
             PlaceRepository placeRepository) {
         this.scoreRepository = scoreRepository;
-        this.userCoefficientMainRepository = userCoefficientMainRepository;
+        this.userCoefficientRepository = userCoefficientRepository;
         this.placeRepository = placeRepository;
     }
 
@@ -43,34 +47,53 @@ public class ScoreServiceImpl implements ScoreService {
             oldValue = currScore.getScoreValue();
         }
 
-        Score score = scoreRepository.save(new Score()
-                .setId(new ScoreId().setUser(userId).setPlace(placeId))
-                .setUser(new User().setId(userId))
-                .setPlace(new Place().setId(placeId))
-                .setScoreValue(value));
+        if (oldValue != value) {
+            Score score = scoreRepository.save(new Score()
+                    .setId(new ScoreId().setUser(userId).setPlace(placeId))
+                    .setUser(new User().setId(userId))
+                    .setPlace(new Place().setId(placeId))
+                    .setScoreValue(value));
 
-        List<Category> placeCategories = placeRepository.findById(placeId).orElseThrow().getCategories();
+            List<Category> placeCategories = placeRepository.findById(placeId).orElseThrow().getCategories();
 
-        for (Category category : placeCategories) {
-            if (userCoefficientMainRepository.existsByCategory(category)) {
-                if (oldValue != 0) {
-                    double newValue = (value - oldValue);
-                    userCoefficientMainRepository.updateCoefficientWithoutIncrement(newValue, category.getId(), userId);
+            for (Category category : placeCategories) {
+                if (userCoefficientRepository.existsByCategoryAndUserId(category, userId)) {
+                    var userCoefficient = userCoefficientRepository.findByUserIdAndCategoryId(userId, category.getId()).orElseThrow();
+
+                    LOGGER.debug("Значение коэффициента категории:{}", userCoefficient.getCoefficient());
+
+                    if (oldValue != 0) {
+                        LOGGER.debug("Обновление коэффициента без инкремента");
+                        var newValue = value - oldValue;
+                        userCoefficient.setCoefficient(
+                                ((userCoefficient.getCoefficient() * userCoefficient.getPlacesCount()) + newValue)
+                                        / (userCoefficient.getPlacesCount())
+                        );
+
+                        userCoefficientRepository.save(userCoefficient);
+                    } else {
+                        LOGGER.debug("Обновление коэффициента с инкрементом");
+                        userCoefficient.setCoefficient(
+                                ((userCoefficient.getCoefficient() * userCoefficient.getPlacesCount()) + value)
+                                        / (userCoefficient.getPlacesCount() + 1)
+                        );
+                        userCoefficient.setPlacesCount(userCoefficient.getPlacesCount() + 1);
+
+                        userCoefficientRepository.save(userCoefficient);
+                    }
                 } else {
-                    userCoefficientMainRepository.updateCoefficientWithIncrement(
-                            value.doubleValue(), category.getId(), userId);
+                    userCoefficientRepository.save(new UserCoefficient()
+                            .setCoefficientId(new UserCoefficientId().setUser(userId).setCategory(category.getId()))
+                            .setUser(new User().setId(userId))
+                            .setCategory(category)
+                            .setPlacesCount(1L)
+                            .setCoefficient(value.doubleValue()));
                 }
-
-            } else {
-                userCoefficientMainRepository.save(new UserCoefficient()
-                        .setCoefficientId(new UserCoefficientId().setUser(userId).setCategory(category.getId()))
-                        .setUser(new User().setId(userId))
-                        .setCategory(category)
-                        .setPlacesCount(1L)
-                        .setCoefficient(value.doubleValue()));
             }
+            return ScoreDTO.getFromEntity(score);
         }
-        return ScoreDTO.getFromEntity(score);
+
+        return null;
     }
 
     @Override

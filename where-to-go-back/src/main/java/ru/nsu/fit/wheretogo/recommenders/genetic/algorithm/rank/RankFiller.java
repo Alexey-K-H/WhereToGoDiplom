@@ -12,7 +12,7 @@ import ru.nsu.fit.wheretogo.recommenders.cbf.UserVectorBuilder;
 import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.population.Individual;
 import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.user.UserRepository;
-import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
+import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientRepository;
 import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 
 import java.util.List;
@@ -25,12 +25,12 @@ public class RankFiller {
 
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final UserCoefficientMainRepository userCoefficientMainRepository;
+    private final UserCoefficientRepository userCoefficientRepository;
 
     public void updateRoutesAttractionCoefficients(List<Individual> population) {
         List<Category> categoryList = categoryRepository.findAll();
 
-        List<UserCoefficient> userCoefficients = userCoefficientMainRepository
+        List<UserCoefficient> userCoefficients = userCoefficientRepository
                 .getAllByUserId(userRepository.findByEmail(SecurityContextHelper.email())
                         .orElseThrow().getId());
 

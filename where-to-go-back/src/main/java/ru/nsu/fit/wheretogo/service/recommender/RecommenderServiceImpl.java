@@ -23,7 +23,7 @@ import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 import ru.nsu.fit.wheretogo.repository.score.ScoreRepository;
 import ru.nsu.fit.wheretogo.repository.user.UserRepository;
-import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientMainRepository;
+import ru.nsu.fit.wheretogo.repository.user.coefficient.UserCoefficientRepository;
 import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
 import ru.nsu.fit.wheretogo.utils.LatLongSequences;
 import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
@@ -47,7 +47,7 @@ public class RecommenderServiceImpl implements RecommenderService {
     private final PlaceRepository placeRepository;
     private final OpenRouteService openRouteService;
     private final UserRepository userRepository;
-    private final UserCoefficientMainRepository userCoefficientMainRepository;
+    private final UserCoefficientRepository userCoefficientRepository;
     private final CategoryRepository categoryRepository;
     private final ScoreRepository scoreRepository;
     private final GeneticAlgorithmRecommender geneticAlgorithmRecommender;
@@ -169,7 +169,7 @@ public class RecommenderServiceImpl implements RecommenderService {
     public List<PlaceBriefDTO> getContentBasedRecommendations() {
         List<Category> categoryList = categoryRepository.findAll();
 
-        List<UserCoefficient> userCoefficients = userCoefficientMainRepository
+        List<UserCoefficient> userCoefficients = userCoefficientRepository
                 .getAllByUserId(userRepository.findByEmail(SecurityContextHelper.email())
                         .orElseThrow().getId());
         Map<Category, Double> userVector = UserVectorBuilder.getUserVector(userCoefficients, categoryList);
