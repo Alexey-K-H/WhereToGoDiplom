@@ -14,10 +14,10 @@ public class FitnessFunction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FitnessFunction.class);
 
-    @Value("${ru.nsu.fit.wheretogo.genetic.attraction_coefficient}")
+    @Value("${ru.nsu.fit.wheretogo.genetic.selection.attraction_coefficient}")
     private Double attractionCoefficient;
 
-    @Value("${ru.nsu.fit.wheretogo.genetic.duration_coefficient}")
+    @Value("${ru.nsu.fit.wheretogo.genetic.selection.duration_coefficient}")
     private Double durationCoefficient;
 
     public List<Individual> selection(List<Individual> population) {
