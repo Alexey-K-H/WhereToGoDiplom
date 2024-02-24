@@ -363,7 +363,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 var request = new RouteRecommenderRequest(
-                        2,
+                        300,
                         new LatLonData(
                                 String.valueOf(latitude),
                                 String.valueOf(longitude)),
