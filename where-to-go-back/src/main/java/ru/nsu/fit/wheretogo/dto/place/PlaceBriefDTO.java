@@ -34,4 +34,20 @@ public class PlaceBriefDTO extends PlaceDTO {
 
         return dto;
     }
+
+    public static PlaceBriefDTO getFromFullDescription(PlaceDescriptionDTO fullDto) {
+        if (fullDto == null) {
+            return null;
+        }
+
+        var dto = new PlaceBriefDTO();
+        dto.setId(fullDto.getId());
+        dto.setName(fullDto.getName());
+        dto.setCoordinates(fullDto.getCoordinates());
+        dto.setThumbnailLink(fullDto.getThumbnail());
+        dto.setCategories(fullDto.getCategories());
+        dto.setDuration(fullDto.getDuration());
+
+        return dto;
+    }
 }

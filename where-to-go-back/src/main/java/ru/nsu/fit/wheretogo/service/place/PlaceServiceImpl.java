@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.service.place;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Service
 public class PlaceServiceImpl implements PlaceService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlaceServiceImpl.class);
 
     private final PlaceRepository placeRepository;
     private final CategoryRepository categoryRepository;

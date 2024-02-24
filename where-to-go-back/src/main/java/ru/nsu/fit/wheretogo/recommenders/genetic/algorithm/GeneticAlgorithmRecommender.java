@@ -50,6 +50,8 @@ public class GeneticAlgorithmRecommender {
                 maxPopulationSize,
                 maxGenerationsSize);
 
+        LOGGER.debug("Временное ограничение пользователя:{}", request.getTimeLimit());
+
         if (DurationMatrix.getMatrix() == null) {
             DurationMatrix.setMatrix(buildDurationMatrix(request.getCurrentUserLocation(), request.getMode()));
         }
@@ -57,7 +59,7 @@ public class GeneticAlgorithmRecommender {
         LOGGER.debug("Матрица временных затрат:\n{}", MatrixHelper.printDurationsMatrix());
         LOGGER.debug("Количество мест в матрице:{}", DurationMatrix.getMatrix().size());
 
-        var population = populationBuilder.buildPopulation();
+        var population = populationBuilder.buildPopulation(maxPopulationSize, request.getTimeLimit());
 
         for (var generationNumber = 0; generationNumber < maxGenerationsSize; generationNumber++) {
             LOGGER.debug("Поколение:{}", generationNumber);
@@ -67,6 +69,7 @@ public class GeneticAlgorithmRecommender {
                             population
                     )
             );
+
             LOGGER.debug("Новое поколение:{}", nextGeneration);
 
             population = populationUnion(population, nextGeneration);
