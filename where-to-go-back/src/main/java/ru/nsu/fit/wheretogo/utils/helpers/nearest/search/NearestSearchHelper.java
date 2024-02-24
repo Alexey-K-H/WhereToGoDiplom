@@ -16,5 +16,5 @@ public interface NearestSearchHelper {
      * @param limit максимальное число мест, которое необходимо
      * @return список мест
      */
-    List<LatLong> findNearestPlaces2Point(LatLong point, Integer limit);
+    List<LatLong> findNearestPlaces2Point(LatLong point, Integer limit, double startRange, double maxRange);
 }

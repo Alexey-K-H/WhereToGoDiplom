@@ -35,11 +35,6 @@ public final class ItemVectorBuilder {
             }
         }
 
-        for (Map.Entry<Category, Double> entry : itemVector.entrySet()) {
-            LOGGER.debug("Категория:{}, Значение:{}", entry.getKey().getCategoryPath(), entry.getValue());
-        }
-
-
         return itemVector;
     }
 }

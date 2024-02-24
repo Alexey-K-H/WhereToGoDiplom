@@ -231,7 +231,9 @@ public class RecommenderServiceImpl implements RecommenderService {
                         .latitude(request.getCurrentUserLocation().getLatitude())
                         .longitude(request.getCurrentUserLocation().getLongitude())
                         .build(),
-                1
+                1,
+                1.0,
+                5.0
         );
 
         LOGGER.debug("Координаты ближайшего стартового места:{}", startPlace.get(0));

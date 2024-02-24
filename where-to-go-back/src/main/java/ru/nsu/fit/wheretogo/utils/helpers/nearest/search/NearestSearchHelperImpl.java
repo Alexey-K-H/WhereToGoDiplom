@@ -20,14 +20,14 @@ public class NearestSearchHelperImpl implements NearestSearchHelper {
     private final PlaceRepository placeRepository;
 
     @Override
-    public List<LatLong> findNearestPlaces2Point(LatLong point, Integer limit) {
+    public List<LatLong> findNearestPlaces2Point(LatLong point, Integer limit, double startRange, double maxRange) {
 
         try {
             var nearestPlaces = placeRepository.findNearestPlaces(
                     Double.valueOf(point.getLatitude()),
                     Double.valueOf(point.getLongitude()),
-                    1.0,
-                    20.0,
+                    startRange,
+                    maxRange,
                     limit
             );
 

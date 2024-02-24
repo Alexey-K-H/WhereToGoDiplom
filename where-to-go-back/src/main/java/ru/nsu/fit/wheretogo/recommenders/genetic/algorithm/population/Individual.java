@@ -9,19 +9,16 @@ import java.util.List;
 @Data
 public class Individual {
     private List<PlaceBriefDTO> routePlaces = new ArrayList<>();
+    private List<Integer> movementsDurations = new ArrayList<>();
     private Integer summaryStayDuration = 0;
     private Integer summaryMoveDuration = 0;
     private Double summaryAttractionCoefficient;
 
     public void addPlace(PlaceBriefDTO place, int moveDuration) {
         this.routePlaces.add(place);
+        this.movementsDurations.add(moveDuration);
         this.summaryStayDuration += place.getDuration();
         this.summaryMoveDuration += moveDuration;
-    }
-
-    public Double calculateAttractionCoefficient() {
-
-        return 0.0;
     }
 
     public Integer calculateFullDuration() {

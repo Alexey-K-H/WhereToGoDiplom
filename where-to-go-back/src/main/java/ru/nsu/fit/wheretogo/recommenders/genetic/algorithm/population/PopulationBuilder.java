@@ -16,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public final class PopulationBuilder {
     private static final Logger LOGGER = LoggerFactory.getLogger(PopulationBuilder.class);
+    private static final double STAY_TIME_PART = 0.75;
+    private static final double MOVE_TIME_PART = 0.25;
 
     private final PlaceService placeService;
 
@@ -70,7 +72,9 @@ public final class PopulationBuilder {
             usedIndexes.add(0L);
 
             LOGGER.debug("Наполнение маршрута:{}", individual);
-            while (individual.calculateFullDuration() <= timeLimit) {
+            while (individual.calculateFullDuration() <= timeLimit
+                    && (double) individual.getSummaryMoveDuration() <= timeLimit * MOVE_TIME_PART
+                    && (double) individual.getSummaryStayDuration() <= timeLimit * STAY_TIME_PART) {
                 var currPlaceIndex = individual.getRoutePlaces().get(index).getId().intValue();
                 LOGGER.debug("Текущая позиция в списке маршрута:{}", currPlaceIndex);
                 usedIndexes.add((long) currPlaceIndex);
@@ -87,7 +91,9 @@ public final class PopulationBuilder {
 
                 if ((individual.calculateFullDuration()
                         + (placeData.getDuration() + (nextNearPlaceMatrixData.get(0).getDuration() / 60)))
-                        > timeLimit) {
+                        > timeLimit
+                        || (individual.getSummaryStayDuration() + placeData.getDuration() > timeLimit * STAY_TIME_PART)
+                        || (individual.getSummaryMoveDuration() + ((double) nextNearPlaceMatrixData.get(0).getDuration() / 60) > timeLimit * MOVE_TIME_PART)) {
                     break;
                 }
 

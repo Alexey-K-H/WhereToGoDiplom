@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.operators;
+package ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.operators.mutation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
