@@ -16,7 +16,7 @@ public interface UserCoefficientMainRepository extends JpaRepository<UserCoeffic
     boolean existsByCategory(Category category);
 
     @Modifying
-    @Query(value = "UPDATE T_USER_COEFFICIENT_MAIN " +
+    @Query(value = "UPDATE T_USER_COEFFICIENT " +
             "SET COEFFICIENT = ((COEFFICIENT) + (:_new_score/COUNT_PLACES))*(COUNT_PLACES/(COUNT_PLACES+1))," +
             " COUNT_PLACES = COUNT_PLACES + 1 " +
             "WHERE CATEGORY_ID = :_category_id AND USER_ID = :_user_id", nativeQuery = true)
@@ -27,7 +27,7 @@ public interface UserCoefficientMainRepository extends JpaRepository<UserCoeffic
     );
 
     @Modifying
-    @Query(value = "UPDATE T_USER_COEFFICIENT_MAIN SET COEFFICIENT = ((COEFFICIENT) + (:_new_score/COUNT_PLACES))" +
+    @Query(value = "UPDATE T_USER_COEFFICIENT SET COEFFICIENT = ((COEFFICIENT) + (:_new_score/COUNT_PLACES))" +
             "WHERE CATEGORY_ID = :_category_id and USER_ID = :_user_id", nativeQuery = true)
     void updateCoefficientWithoutIncrement(
             @Param("_new_score") Double newScore,

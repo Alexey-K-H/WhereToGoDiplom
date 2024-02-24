@@ -16,6 +16,7 @@ import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.operators.CrossoverOp
 import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.operators.MutationOperator;
 import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.population.Individual;
 import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.population.PopulationBuilder;
+import ru.nsu.fit.wheretogo.recommenders.genetic.algorithm.rank.RankFiller;
 import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
 import ru.nsu.fit.wheretogo.service.place.PlaceService;
 import ru.nsu.fit.wheretogo.utils.helpers.matrix.MatrixHelper;
@@ -43,6 +44,7 @@ public class GeneticAlgorithmRecommender {
     private final CrossoverOperator crossoverOperator;
     private final MutationOperator mutationOperator;
     private final FitnessFunction fitnessFunction;
+    private final RankFiller rankFiller;
 
     public RouteRecommenderResponse execute(RouteRecommenderRequest request) {
 
@@ -60,6 +62,10 @@ public class GeneticAlgorithmRecommender {
         LOGGER.debug("Количество мест в матрице:{}", DurationMatrix.getMatrix().size());
 
         var population = populationBuilder.buildPopulation(maxPopulationSize, request.getTimeLimit());
+
+        LOGGER.debug("Вычисление рангов маршрутов...");
+        rankFiller.updateRoutesAttractionCoefficients(population);
+        LOGGER.debug("Популяция с рангами:\n{}", population);
 
         for (var generationNumber = 0; generationNumber < maxGenerationsSize; generationNumber++) {
             LOGGER.debug("Поколение:{}", generationNumber);

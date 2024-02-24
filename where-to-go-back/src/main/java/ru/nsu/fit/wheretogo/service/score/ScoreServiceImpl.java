@@ -102,7 +102,7 @@ public class ScoreServiceImpl implements ScoreService {
     @Override
     @Transactional(readOnly = true)
     public List<ScoreDTO> getByPlace(PlaceDescriptionDTO placeDto) {
-        List<Score> scores = scoreRepository.findByPlaceId(Place.getFromDTO(placeDto).getId());
+        List<Score> scores = scoreRepository.findByPlaceId(Place.getFromFullDTO(placeDto).getId());
 
         return scores
                 .stream()

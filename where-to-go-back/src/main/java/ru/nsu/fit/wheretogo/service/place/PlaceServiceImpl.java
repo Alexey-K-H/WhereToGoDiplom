@@ -32,7 +32,7 @@ public class PlaceServiceImpl implements PlaceService {
     @Transactional
     public void addPlace(PlaceDescriptionDTO place) {
         validatePlace(place);
-        placeRepository.save(Place.getFromDTO(place));
+        placeRepository.save(Place.getFromFullDTO(place));
     }
 
     @Override

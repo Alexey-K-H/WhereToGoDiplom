@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
+import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
 
@@ -77,7 +78,7 @@ public class Place {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Score> placeScores;
 
-    public static Place getFromDTO(PlaceDescriptionDTO dto) {
+    public static Place getFromFullDTO(PlaceDescriptionDTO dto) {
         List<Category> categories = new ArrayList<>();
         if (dto.getCategories() != null) {
             for (CategoryDTO category : dto.getCategories()) {
@@ -90,6 +91,21 @@ public class Place {
                 .setDescription(dto.getDescription())
                 .setCoordinates(dto.getCoordinates())
                 .setThumbnail(dto.getThumbnail())
+                .setCategories(categories);
+    }
+
+    public static Place getFromBriefDTO(PlaceBriefDTO dto) {
+        List<Category> categories = new ArrayList<>();
+        if (dto.getCategories() != null) {
+            for (CategoryDTO category : dto.getCategories()) {
+                categories.add(Category.getFromDTO(category));
+            }
+        }
+        return new Place()
+                .setId(dto.getId())
+                .setName(dto.getName())
+                .setCoordinates(dto.getCoordinates())
+                .setThumbnail(dto.getThumbnailLink())
                 .setCategories(categories);
     }
 
