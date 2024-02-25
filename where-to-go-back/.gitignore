@@ -40,3 +40,4 @@ db/db-data/*
 
 /docker/ors/resources/*
 /docker/ors/docker/*
+/tripadvisor/*
