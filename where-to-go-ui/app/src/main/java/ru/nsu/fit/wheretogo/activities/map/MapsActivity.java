@@ -258,8 +258,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         visitedButton.setOnClickListener(this::openVisited);
 
         if (showMapMode != ShowMapMode.ALL && showMapMode != ShowMapMode.NEAREST) {
-            filters.setEnabled(false);
-            filters.setVisibility(View.INVISIBLE);
+            if (showMapMode == ShowMapMode.RECOMMENDED_ROUTE) {
+                filters.setImageResource(R.drawable.settings_btn_route);
+            } else {
+                filters.setEnabled(false);
+                filters.setVisibility(View.INVISIBLE);
+            }
         } else {
             filters.setOnClickListener(this::openFilters);
         }
