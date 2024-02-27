@@ -9,10 +9,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.activities.AuthorizationActivity;
-import ru.nsu.fit.wheretogo.activities.MapsActivity;
-import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.activities.auth.AuthorizationActivity;
+import ru.nsu.fit.wheretogo.activities.map.MapsActivity;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class OpenActivity extends AppCompatActivity {
 

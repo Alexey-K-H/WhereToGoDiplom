@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.activities.map.MapsActivity;
 
 public class AuthorizationActivity extends AppCompatActivity {
 
@@ -18,18 +19,18 @@ public class AuthorizationActivity extends AppCompatActivity {
     }
 
     public void openLogin(View view) {
-        Intent intent = new Intent(this, LoginActivity.class);
+        var intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
     public void openRegister(View view) {
-        Intent intent = new Intent(this, RegistrationActivity.class);
+        var intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
     }
 
     private void openMap() {
         finish();
-        Intent intent = new Intent(this, MapsActivity.class);
+        var intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 

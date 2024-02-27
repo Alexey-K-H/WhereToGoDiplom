@@ -28,6 +28,7 @@ import ru.nsu.fit.wheretogo.service.openroute.OpenRouteService;
 import ru.nsu.fit.wheretogo.utils.LatLongSequences;
 import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 import ru.nsu.fit.wheretogo.utils.helpers.nearest.search.NearestSearchHelper;
+import ru.nsu.fit.wheretogo.utils.stub.RouteData;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -242,23 +243,7 @@ public class RecommenderServiceImpl implements RecommenderService {
 
         LOGGER.debug("Результат работы алгоритма:{}", geneticAlgResponse);
 
-        var keyPoints = new ArrayList<>(List.of(
-                LatLong
-                        .builder()
-                        .latitude(startPlace.get(0).getLatitude())
-                        .longitude(startPlace.get(0).getLongitude())
-                        .build(),
-                LatLong
-                        .builder()
-                        .latitude("54.97187")
-                        .longitude("82.71999")
-                        .build(),
-                LatLong
-                        .builder()
-                        .latitude("54.56074")
-                        .longitude("83.62234")
-                        .build()
-        ));
+        var keyPoints = RouteData.getData();
 
         ORSDirectionResponse orsResponse = null;
 

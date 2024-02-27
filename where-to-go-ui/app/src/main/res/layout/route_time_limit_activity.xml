@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/question_time_limit_str"
+        android:layout_width="288dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="101dp"
+        android:layout_marginEnd="62dp"
+        android:layout_marginBottom="51dp"
+        android:text="@string/question_time_str"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/textView9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/str_minutes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="43dp"
+        android:layout_marginBottom="235dp"
+        android:text="мин."
+        android:textColor="#000000"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toTopOf="@+id/build_route_after_time_id"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/str_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="407dp"
+        android:text="ч."
+        android:textColor="#000000"
+        android:textSize="19sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/textInputLayout2" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="99dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="61dp"
+        android:layout_marginEnd="13dp"
+        android:layout_marginBottom="389dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/str_hours"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_hours_field_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Часы"
+            android:inputType="number"
+            android:textColor="#000000" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout2"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="99dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="215dp"
+        app:layout_constraintBottom_toTopOf="@+id/build_route_after_time_id"
+        app:layout_constraintEnd_toStartOf="@+id/str_minutes">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/input_minutes_field_id"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Минуты"
+            android:inputType="number"
+            android:textColor="#000000" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="349dp"
+        android:layout_height="63dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginEnd="31dp"
+        android:layout_marginBottom="74dp"
+        android:text="Вы можете указать время как в часах, так и в минутах"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/textInputLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/build_route_after_time_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="243dp"
+        android:layout_marginEnd="43dp"
+        android:layout_marginBottom="138dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/build_route_btn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

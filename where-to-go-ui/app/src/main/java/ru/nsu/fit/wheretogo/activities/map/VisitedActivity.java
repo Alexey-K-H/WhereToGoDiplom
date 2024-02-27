@@ -1,9 +1,8 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.map;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,17 +21,17 @@ import ru.nsu.fit.wheretogo.model.place.Place;
 import ru.nsu.fit.wheretogo.service.PlaceService;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 
-public class FavouritesActivity extends AppCompatActivity {
+public class VisitedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_favourites);
-        getFavoritePlaces();
+        setContentView(R.layout.activity_visited);
+        getVisitedPlaces();
     }
 
-    private void getFavoritePlaces() {
+    private void getVisitedPlaces() {
         PlaceService placeService = ServiceGenerator.createService(PlaceService.class);
-        Call<List<Place>> placeCall = placeService.getFavouritePlaces();
+        Call<List<Place>> placeCall = placeService.getVisitedPlaces();
         Context context = this;
         placeCall.enqueue(new Callback<List<Place>>() {
             @Override
@@ -48,22 +47,19 @@ public class FavouritesActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
     }
 
     private void initView(List<Place> places) {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
-        RecyclerView recycleView = findViewById(R.id.favourites_recycler);
+        RecyclerView recycleView = findViewById(R.id.visited_recycler);
         recycleView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recycleView.setLayoutManager(layoutManager);
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, height);
         recycleView.setAdapter(adapter);
         PictureLoader.loadRecyclerPictures(this, places, adapter);
-    }
-
-    public void goBack(View view) {
-        super.onBackPressed();
     }
 }

@@ -1,6 +1,5 @@
 package ru.nsu.fit.wheretogo.util.tracker;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,8 +28,8 @@ import java.util.Objects;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import ru.nsu.fit.wheretogo.activities.LocationHistoryActivity;
 import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.activities.map.LocationHistoryActivity;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.service.StayPointService;
 

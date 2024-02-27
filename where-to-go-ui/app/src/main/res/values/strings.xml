@@ -50,5 +50,8 @@
     <string name="new_pwd_str">Новый пароль</string>
     <string name="username_str">Изменить имя пользователя</string>
     <string name="location_history_btn_str">История перемещений</string>
+    <string name="question_known_nsk">Как хорошо вы знаете Новосибирск?</string>
+    <string name="questionnaire_statements_str">Какие утверждения вам ближе?</string>
+    <string name="question_time_str">Укажите, сколько времени вы готовы выделить на маршрут?</string>
 
 </resources>

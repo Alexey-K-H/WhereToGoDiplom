@@ -16,8 +16,8 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.List;
 
-import ru.nsu.fit.wheretogo.activities.RecyclerViewAdapter;
-import ru.nsu.fit.wheretogo.activities.MapsActivity;
+import ru.nsu.fit.wheretogo.activities.map.MapsActivity;
+import ru.nsu.fit.wheretogo.activities.map.RecyclerViewAdapter;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.place.Place;
 

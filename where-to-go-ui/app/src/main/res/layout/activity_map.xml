@@ -6,12 +6,12 @@
     android:id="@+id/mapSlidingPane"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MapsActivity">
+    tools:context=".activities.map.MapsActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activities.MapsActivity">
+        tools:context=".activities.map.MapsActivity">
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"

@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,8 +11,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.activities.map.LocationHistoryActivity;
+import ru.nsu.fit.wheretogo.activities.map.MapsActivity;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText loginEmailText;
@@ -27,8 +29,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login(View view) {
-        String email = loginEmailText.getText().toString();
-        String password = loginPasswordText.getText().toString();
+        var email = loginEmailText.getText().toString();
+        var password = loginPasswordText.getText().toString();
         if (email.isEmpty()) {
             showNotification(getString(R.string.emptyEmailMsg));
             return;
@@ -57,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void openLocationHistoryAdvice() {
         finish();
-        Intent intent = new Intent(this, LocationHistoryActivity.class);
+        var intent = new Intent(this, LocationHistoryActivity.class);
         intent.putExtra("advice", "location_history");
         startActivity(intent);
     }

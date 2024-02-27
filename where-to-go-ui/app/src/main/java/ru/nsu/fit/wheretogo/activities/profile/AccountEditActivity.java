@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.profile;
 
 import android.content.Intent;
 import android.os.Bundle;

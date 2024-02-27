@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.map;
 
 import android.content.Context;
 import android.graphics.Bitmap;

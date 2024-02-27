@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.map;
 
 import android.Manifest;
 import android.app.ActivityManager;
@@ -19,8 +19,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
 import ru.nsu.fit.wheretogo.util.tracker.LocationTrackerService;
+import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
 
 public class LocationHistoryActivity extends AppCompatActivity {
 
@@ -34,12 +34,12 @@ public class LocationHistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.history_location_manager);
 
-        ImageButton skipBtn = (ImageButton) findViewById(R.id.skip_btn_history);
+        var skipBtn = (ImageButton) findViewById(R.id.skip_btn_history);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            String advice = extras.getString("advice");
-            String from = extras.getString("from");
+            var advice = extras.getString("advice");
+            var from = extras.getString("from");
             if (advice != null && advice.equals("location_history")) {
                 skipBtn.setOnClickListener(this::skip);
                 advise = true;

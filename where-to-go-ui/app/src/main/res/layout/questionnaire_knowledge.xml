@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/well_known_str"
+        android:layout_width="336dp"
+        android:layout_height="71dp"
+        android:layout_marginTop="61dp"
+        android:layout_marginBottom="73dp"
+        android:text="@string/question_known_nsk"
+        android:textAlignment="viewStart"
+        android:textColor="#000000"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/firstly_here_btn_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/firstly_here_btn_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="60dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/visit_early_btn_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/firstly_here" />
+
+    <ImageButton
+        android:id="@+id/local_btn_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="100dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/quest_know_next_btn_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/local" />
+
+    <ImageButton
+        android:id="@+id/visit_early_btn_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="53dp"
+        android:layout_marginEnd="54dp"
+        android:layout_marginBottom="72dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toTopOf="@+id/local_btn_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/visit_early" />
+
+    <ImageButton
+        android:id="@+id/quest_know_next_btn_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="296dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginBottom="58dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/next_btn" />
+</androidx.constraintlayout.widget.ConstraintLayout>

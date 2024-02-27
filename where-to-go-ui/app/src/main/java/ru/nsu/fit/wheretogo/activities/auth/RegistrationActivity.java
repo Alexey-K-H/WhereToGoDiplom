@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.auth;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,8 +16,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.activities.map.LocationHistoryActivity;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class RegistrationActivity extends AppCompatActivity {
     private EditText registerNameText;

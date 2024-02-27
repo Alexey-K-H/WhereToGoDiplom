@@ -21,37 +21,46 @@
         android:theme="@style/Theme.WhereToGo"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".activities.FavouritesActivity"
+            android:name=".activities.map.FavouritesActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.RegistrationActivity"
+            android:name=".activities.auth.RegistrationActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".activities.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.AccountActivity"
+            android:name=".activities.profile.AccountActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.RecommenderActivity"
+            android:name=".activities.recommender.RecommenderActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.PlaceActivity"
+            android:name=".activities.map.PlaceActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.VisitedActivity"
+            android:name=".activities.map.VisitedActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.AuthorizationActivity"
+            android:name=".activities.auth.AuthorizationActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.LocationHistoryActivity"
+            android:name=".activities.map.LocationHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.AccountEditActivity"
+            android:name=".activities.profile.AccountEditActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.ChangePasswordActivity"
+            android:name=".activities.profile.ChangePasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.questionnaire.QuestionnaireKnowledgeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.questionnaire.QuestionnaireStatementsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.recommender.RouteTimeLimitActivity"
             android:exported="false" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -69,7 +78,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".activities.MapsActivity"
+            android:name=".activities.map.MapsActivity"
             android:exported="false"
             android:label="@string/title_activity_maps" />
         <activity

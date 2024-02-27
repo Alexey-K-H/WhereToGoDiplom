@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.recommender;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +17,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.activities.map.MapsActivity;
+import ru.nsu.fit.wheretogo.activities.questionnaire.QuestionnaireKnowledgeActivity;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;
 import ru.nsu.fit.wheretogo.model.ShowMapMode;
 import ru.nsu.fit.wheretogo.service.ScoreService;
@@ -36,6 +38,8 @@ public class RecommenderActivity extends AppCompatActivity {
     private ImageButton recommendRoute;
     private Location lastLocation;
 
+    private static AppCompatActivity activityTrigger;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +52,11 @@ public class RecommenderActivity extends AppCompatActivity {
                     + lastLocation.getLatitude() + "," + lastLocation.getLongitude() + "]");
         }
 
-        recommendByVisitedBtn = (ImageButton) findViewById(R.id.by_visited_btn);
-        recommendByScoredBtn = (ImageButton) findViewById(R.id.by_scored_btn);
-        recommendByOthersBtn = (ImageButton) findViewById(R.id.by_others_btn);
-        recommendByGPSBtn = (ImageButton) findViewById(R.id.by_gps_btn);
-        recommendRoute = (ImageButton) findViewById(R.id.make_path_btn);
+        recommendByVisitedBtn = findViewById(R.id.by_visited_btn);
+        recommendByScoredBtn = findViewById(R.id.by_scored_btn);
+        recommendByOthersBtn = findViewById(R.id.by_others_btn);
+        recommendByGPSBtn = findViewById(R.id.by_gps_btn);
+        recommendRoute = findViewById(R.id.make_path_btn);
 
         Call<Boolean> checkStayPoints = ServiceGenerator.createService(StayPointService.class).isUserHasStayPoints();
         checkStayPoints.enqueue(new Callback<>() {
@@ -144,6 +148,8 @@ public class RecommenderActivity extends AppCompatActivity {
         }
 
         recommendRoute.setOnClickListener(this::openRouteRecommender);
+
+        setActivityTrigger(this);
     }
 
     public void openNearestRecommender(View view) {
@@ -183,13 +189,24 @@ public class RecommenderActivity extends AppCompatActivity {
     }
 
     public void openRouteRecommender(View view) {
+        finish();
         Log.d(TAG, "Запуск службы по рекомендации маршрута");
         recommendRoute.setImageResource(R.drawable.make_path_btn_selected);
-        finish();
-        var intent = new Intent(this, MapsActivity.class);
+
+        Log.d(TAG, "Запуск опросника");
+        var intent = new Intent(this, QuestionnaireKnowledgeActivity.class);
         intent.putExtra(SHOW_MAP_MODE_STRING, ShowMapMode.RECOMMENDED_ROUTE.name());
         intent.putExtra(LAST_LOCATION_STRING, lastLocation);
+
         startActivity(intent);
+    }
+
+    public static void setActivityTrigger(AppCompatActivity activity) {
+        activityTrigger = activity;
+    }
+
+    public static void finishFromAnother() {
+        activityTrigger.finish();
     }
 
 }

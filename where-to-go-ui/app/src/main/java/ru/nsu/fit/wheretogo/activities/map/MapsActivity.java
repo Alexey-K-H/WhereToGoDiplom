@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.map;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -57,6 +57,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nsu.fit.wheretogo.R;
+import ru.nsu.fit.wheretogo.activities.profile.AccountActivity;
+import ru.nsu.fit.wheretogo.activities.recommender.RecommenderActivity;
 import ru.nsu.fit.wheretogo.databinding.ActivityMapBinding;
 import ru.nsu.fit.wheretogo.model.ClusterMarker;
 import ru.nsu.fit.wheretogo.model.ServiceGenerator;

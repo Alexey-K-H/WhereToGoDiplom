@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/reg_login_back"
     android:orientation="vertical"
-    tools:context=".activities.RegistrationActivity">
+    tools:context=".activities.auth.RegistrationActivity">
 
     <EditText
         android:id="@+id/curr_pwd"

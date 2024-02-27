@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.profile;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -15,10 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
-import ru.nsu.fit.wheretogo.util.tracker.LocationTrackerService;
-import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.activities.auth.AuthorizationActivity;
+import ru.nsu.fit.wheretogo.activities.map.LocationHistoryActivity;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
+import ru.nsu.fit.wheretogo.util.tracker.LocationTrackerService;
+import ru.nsu.fit.wheretogo.util.tracker.TrackerConstants;
 
 public class AccountActivity extends AppCompatActivity {
 

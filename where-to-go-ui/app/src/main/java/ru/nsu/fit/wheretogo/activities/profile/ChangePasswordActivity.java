@@ -1,4 +1,4 @@
-package ru.nsu.fit.wheretogo.activities;
+package ru.nsu.fit.wheretogo.activities.profile;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import ru.nsu.fit.wheretogo.R;
-import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.ObscuredSharedPreferences;
+import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 
 public class ChangePasswordActivity extends AppCompatActivity {
 
@@ -33,8 +33,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
     }
 
     public void updateUserPassword(View view) {
-        String oldPwd = oldPasswordText.getText().toString();
-        String newPwd = newPasswordText.getText().toString();
+        var oldPwd = oldPasswordText.getText().toString();
+        var newPwd = newPasswordText.getText().toString();
 
         if (oldPwd.isEmpty() || !oldPwd.equals(AuthorizationHelper.getPassword())) {
             showNotification("Неправильно введен старый пароль!");
