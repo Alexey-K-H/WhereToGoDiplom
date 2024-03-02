@@ -1,5 +1,7 @@
 package ru.nsu.fit.wheretogo.service.place;
 
+import jakarta.transaction.Transactional;
+import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -10,8 +12,6 @@ import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 import ru.nsu.fit.wheretogo.repository.place.PlaceRepository;
 
-import javax.transaction.Transactional;
-import javax.validation.ValidationException;
 import java.util.List;
 
 @Service
@@ -105,7 +105,7 @@ public class PlaceServiceImpl implements PlaceService {
                 place.getName(),
                 place.getDescription(),
                 place.getCoordinates())) {
-            throw new ValidationException("Place with such name, description or coords is already exist");
+            throw new ValidationException("Место с таким именем/координатами/описанием уже существует");
         }
     }
 }

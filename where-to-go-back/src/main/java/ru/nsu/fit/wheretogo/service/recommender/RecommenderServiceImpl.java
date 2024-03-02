@@ -1,5 +1,6 @@
 package ru.nsu.fit.wheretogo.service.recommender;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,6 @@ import ru.nsu.fit.wheretogo.utils.helpers.SecurityContextHelper;
 import ru.nsu.fit.wheretogo.utils.helpers.nearest.search.NearestSearchHelper;
 import ru.nsu.fit.wheretogo.utils.stub.RouteData;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

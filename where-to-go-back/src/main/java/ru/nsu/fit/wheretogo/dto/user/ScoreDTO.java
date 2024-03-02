@@ -1,12 +1,11 @@
 package ru.nsu.fit.wheretogo.dto.user;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.score.Score;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 @Getter
 @Setter

@@ -1,5 +1,6 @@
 package ru.nsu.fit.wheretogo.controller.place;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +18,6 @@ import ru.nsu.fit.wheretogo.service.place.CategoryService;
 import ru.nsu.fit.wheretogo.service.place.PlaceService;
 import ru.nsu.fit.wheretogo.service.user.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;

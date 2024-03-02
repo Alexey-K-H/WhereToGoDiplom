@@ -1,12 +1,12 @@
 package ru.nsu.fit.wheretogo.service.place;
 
+import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.nsu.fit.wheretogo.dto.place.CategoryDTO;
 import ru.nsu.fit.wheretogo.entity.place.Category;
 import ru.nsu.fit.wheretogo.repository.place.CategoryRepository;
 
-import javax.validation.ValidationException;
 import java.util.List;
 
 @Service

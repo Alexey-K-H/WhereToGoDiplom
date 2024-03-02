@@ -1,12 +1,12 @@
 package ru.nsu.fit.wheretogo.dto.user;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import ru.nsu.fit.wheretogo.dto.BaseDTO;
 import ru.nsu.fit.wheretogo.entity.user.User;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.time.Instant;
 
 @Getter

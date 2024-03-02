@@ -1,8 +1,8 @@
 package ru.nsu.fit.wheretogo.entity.place;
 
+import jakarta.persistence.Embeddable;
 import lombok.Data;
 
-import javax.persistence.Embeddable;
 import java.math.BigDecimal;
 
 @Embeddable

@@ -1,5 +1,13 @@
 package ru.nsu.fit.wheretogo.entity.score;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,15 +17,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import ru.nsu.fit.wheretogo.dto.user.ScoreDTO;
 import ru.nsu.fit.wheretogo.entity.place.Place;
 import ru.nsu.fit.wheretogo.entity.user.User;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.Table;
 
 @Entity
 @Table(name = "T_SCORE")
