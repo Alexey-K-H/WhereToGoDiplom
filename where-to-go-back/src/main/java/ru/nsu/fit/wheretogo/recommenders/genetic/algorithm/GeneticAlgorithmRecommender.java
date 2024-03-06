@@ -54,14 +54,13 @@ public class GeneticAlgorithmRecommender {
 
         LOGGER.debug("Временное ограничение пользователя:{}", request.getTimeLimit());
 
-        if (DurationMatrix.getMatrix() == null) {
-            DurationMatrix.setMatrix(buildDurationMatrix(request.getCurrentUserLocation(), request.getMode()));
-        }
+        var durationMatrix = new DurationMatrix();
+        durationMatrix.setMatrix(buildDurationMatrix(request.getCurrentUserLocation(), request.getMode()));
 
-        LOGGER.debug("Матрица временных затрат:\n{}", MatrixHelper.printDurationsMatrix());
-        LOGGER.debug("Количество мест в матрице:{}", DurationMatrix.getMatrix().size());
+        LOGGER.debug("Матрица временных затрат:\n{}", MatrixHelper.printDurationsMatrix(durationMatrix));
+        LOGGER.debug("Количество мест в матрице:{}", durationMatrix.getMatrix().size());
 
-        var population = populationBuilder.buildPopulation(maxPopulationSize, request.getTimeLimit());
+        var population = populationBuilder.buildPopulation(maxPopulationSize, request.getTimeLimit(), durationMatrix);
 
         LOGGER.debug("Вычисление рангов маршрутов...");
         rankFiller.updateRoutesAttractionCoefficients(population);
@@ -109,10 +108,12 @@ public class GeneticAlgorithmRecommender {
 
         var result = new ArrayList<List<String>>();
 
-        result.add(List.of(startPosition.getLongitude(), startPosition.getLatitude()));
+        result.add(0, List.of(startPosition.getLongitude(), startPosition.getLatitude()));
 
         for (var place : placesData) {
-            result.add(List.of(
+            result.add(
+                    place.getId().intValue(),
+                    List.of(
                     place.getCoordinates().getLongitude().toString(),
                     place.getCoordinates().getLatitude().toString()));
         }

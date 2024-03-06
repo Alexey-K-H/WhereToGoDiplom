@@ -15,10 +15,10 @@ public final class MatrixHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatrixHelper.class);
 
-    public static String printDurationsMatrix() {
+    public static String printDurationsMatrix(DurationMatrix durationMatrix) {
         var result = new StringBuilder();
 
-        for (var raw : DurationMatrix.getMatrix()) {
+        for (var raw : durationMatrix.getMatrix()) {
             result.append("[");
             for (var element : raw) {
                 result.append(element).append(" ");

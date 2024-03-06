@@ -51,7 +51,10 @@ public class CrossoverOperator {
         LOGGER.debug("Временные метки родителя 2:{}", secondParentTags);
 
         var cutTags = getCutIndexes(firstParentTags, secondParentTags);
-        if (cutTags == null || cutTags.getFirstTag() == 0 || cutTags.getSecondTag() == 0) {
+        if (cutTags == null
+                || cutTags.getFirstTag() == 0 || cutTags.getSecondTag() == 0
+                || cutTags.getFirstTag() == firstParentTags.getTags().size() - 1
+                || cutTags.getSecondTag() == secondParentTags.getTags().size() - 1) {
             LOGGER.debug("Не найдено подходящих тегов, скрещивание пропускается");
             return population;
         } else {

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
 import ru.nsu.fit.wheretogo.dto.place.PlaceDescriptionDTO;
@@ -97,7 +98,7 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<PlaceBriefDTO> getAllPlaces() {
-        return placeRepository.findAll().stream().map(PlaceBriefDTO::getFromEntity).toList();
+        return placeRepository.findAll(Sort.by(Sort.Direction.ASC, "id")).stream().map(PlaceBriefDTO::getFromEntity).toList();
     }
 
     private void validatePlace(PlaceDescriptionDTO place) {

@@ -21,13 +21,13 @@ public final class PopulationBuilder {
 
     private final PlaceService placeService;
 
-    public List<Individual> buildPopulation(int populationSize, int timeLimit) {
+    public List<Individual> buildPopulation(int populationSize, int timeLimit, DurationMatrix durationMatrix) {
 
         var population = new ArrayList<Individual>();
-        initStartLocations(population, populationSize);
+        initStartLocations(population, populationSize, durationMatrix);
         LOGGER.debug("Начальные позиции в популяции:{}", population);
 
-        fillRoutes(population, timeLimit);
+        fillRoutes(population, timeLimit, durationMatrix);
         LOGGER.debug("Начальная популяция:\n{}", printPopulation(population));
 
         return population;
@@ -39,10 +39,10 @@ public final class PopulationBuilder {
      * @param populationSize размер популяции
      * @param population     хранилище популяции
      */
-    private void initStartLocations(List<Individual> population, int populationSize) {
+    private void initStartLocations(List<Individual> population, int populationSize, DurationMatrix durationMatrix) {
 
         var startMatrixPlacesData = MatrixHelper.getFirstNNearestPlacesToPoint(
-                DurationMatrix.getMatrix().get(0),
+                durationMatrix.getMatrix().get(0),
                 populationSize,
                 List.of(0L)
         );
@@ -65,7 +65,7 @@ public final class PopulationBuilder {
      * @param population пути в популяции
      * @param timeLimit  временное ограничение
      */
-    private void fillRoutes(List<Individual> population, int timeLimit) {
+    private void fillRoutes(List<Individual> population, int timeLimit, DurationMatrix durationMatrix) {
         for (var individual : population) {
             var index = 0;
             var usedIndexes = new ArrayList<Long>();
@@ -80,7 +80,7 @@ public final class PopulationBuilder {
                 usedIndexes.add((long) currPlaceIndex);
 
                 var nextNearPlaceMatrixData = MatrixHelper.getFirstNNearestPlacesToPoint(
-                        DurationMatrix.getMatrix().get(currPlaceIndex),
+                        durationMatrix.getMatrix().get(currPlaceIndex),
                         1,
                         usedIndexes
                 );
