@@ -66,7 +66,15 @@ public class GeneticAlgorithmRecommender {
         rankFiller.updateRoutesAttractionCoefficients(population);
         LOGGER.debug("Популяция с рангами:\n{}", population);
 
+        long startTime = System.currentTimeMillis();
+        long endTime = startTime + 15 * 1000;
         for (var generationNumber = 0; generationNumber < 1; generationNumber++) {
+
+            if (System.currentTimeMillis() >= endTime) {
+                LOGGER.debug("Время работы алгоритма вышло");
+                break;
+            }
+
             LOGGER.debug("Поколение:{}", generationNumber);
 
             var nextGeneration = mutationOperator.execute(
