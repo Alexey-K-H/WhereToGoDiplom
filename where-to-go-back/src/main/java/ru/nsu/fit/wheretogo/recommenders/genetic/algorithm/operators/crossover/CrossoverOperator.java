@@ -159,7 +159,7 @@ public class CrossoverOperator {
     private Individual getPartOfParent(Individual parent, int startIndex, int endIndex) {
         var result = new Individual();
 
-        for (int i = startIndex; i < endIndex; i++) {
+        for (int i = startIndex; i <= endIndex; i++) {
             result.addPlace(
                     parent.getRoutePlaces().get(i).getPlaceDescription(),
                     parent.getMovementsDurations().get(i),
