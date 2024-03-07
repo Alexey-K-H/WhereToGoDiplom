@@ -74,7 +74,7 @@ public class CrossoverOperator {
         var timeTagValue = 0;
         var index = 0;
         for (var place : individual.getRoutePlaces()) {
-            timeTagValue += place.getDuration();
+            timeTagValue += place.getPlaceDescription().getDuration();
 
             result.addTag(TimeTag
                     .builder()
@@ -97,7 +97,11 @@ public class CrossoverOperator {
         var merged = new TagSequence();
 
         while (i < firstParentTags.getTags().size() && j < secondParentTags.getTags().size()) {
-            if (Math.abs(firstParentTags.getTags().get(i).getValue() - secondParentTags.getTags().get(j).getValue()) <= deltaTime) {
+            if (Math.abs(firstParentTags.getTags().get(i).getValue() - secondParentTags.getTags().get(j).getValue()) <= deltaTime
+                    && firstParentTags.getTags().get(i).getIndex() != 0
+                    && firstParentTags.getTags().get(i).getIndex() != firstParentTags.getTags().size() - 1
+                    && secondParentTags.getTags().get(j).getIndex() != 0
+                    && secondParentTags.getTags().get(j).getIndex() != secondParentTags.getTags().size() - 1) {
                 tagPairs.add(TagPair
                         .builder()
                         .firstTag(i)
@@ -157,8 +161,9 @@ public class CrossoverOperator {
 
         for (int i = startIndex; i < endIndex; i++) {
             result.addPlace(
-                    parent.getRoutePlaces().get(i),
-                    parent.getMovementsDurations().get(i)
+                    parent.getRoutePlaces().get(i).getPlaceDescription(),
+                    parent.getMovementsDurations().get(i),
+                    parent.getRoutePlaces().get(i).getPlaceAttractionCoefficient()
             );
         }
 
@@ -172,18 +177,20 @@ public class CrossoverOperator {
 
         for (int i = 0; i < head.getRoutePlaces().size(); i++) {
             result.addPlace(
-                    head.getRoutePlaces().get(i),
-                    head.getMovementsDurations().get(i)
+                    head.getRoutePlaces().get(i).getPlaceDescription(),
+                    head.getMovementsDurations().get(i),
+                    head.getRoutePlaces().get(i).getPlaceAttractionCoefficient()
             );
 
-            headPlaceIds.add(head.getRoutePlaces().get(i).getId());
+            headPlaceIds.add(head.getRoutePlaces().get(i).getPlaceDescription().getId());
         }
 
         for (int i = 0; i < tail.getRoutePlaces().size(); i++) {
-            if (!headPlaceIds.contains(tail.getRoutePlaces().get(i).getId())) {
+            if (!headPlaceIds.contains(tail.getRoutePlaces().get(i).getPlaceDescription().getId())) {
                 result.addPlace(
-                        tail.getRoutePlaces().get(i),
-                        tail.getMovementsDurations().get(i)
+                        tail.getRoutePlaces().get(i).getPlaceDescription(),
+                        tail.getMovementsDurations().get(i),
+                        tail.getRoutePlaces().get(i).getPlaceAttractionCoefficient()
                 );
             }
         }
@@ -192,7 +199,20 @@ public class CrossoverOperator {
     }
 
     private Individual selectBestOffspring(Individual firstOffspring, Individual secondOffspring) {
-        //TODO: Реализовать метод получения лучшего потомка
-        return null;
+        double firstOffspringRank = 0.0;
+        double secondOffspringRank = 0.0;
+
+        for (var place : firstOffspring.getRoutePlaces()) {
+            firstOffspringRank += place.getPlaceAttractionCoefficient();
+        }
+
+        for (var place : secondOffspring.getRoutePlaces()) {
+            secondOffspringRank += place.getPlaceAttractionCoefficient();
+        }
+
+        LOGGER.debug("Ранг первого потомка:{}", firstOffspringRank);
+        LOGGER.debug("Ранг второго потомка:{}", secondOffspringRank);
+
+        return firstOffspringRank > secondOffspringRank ? firstOffspring : secondOffspring;
     }
 }

@@ -52,7 +52,8 @@ public final class PopulationBuilder {
             var individual = new Individual();
             individual.addPlace(
                     PlaceBriefDTO.getFromFullDescription(placeData),
-                    0
+                    0,
+                    0.0
             );
 
             population.add(individual);
@@ -75,7 +76,7 @@ public final class PopulationBuilder {
             while (individual.calculateFullDuration() <= timeLimit
                     && (double) individual.getSummaryMoveDuration() <= timeLimit * MOVE_TIME_PART
                     && (double) individual.getSummaryStayDuration() <= timeLimit * STAY_TIME_PART) {
-                var currPlaceIndex = individual.getRoutePlaces().get(index).getId().intValue();
+                var currPlaceIndex = individual.getRoutePlaces().get(index).getPlaceDescription().getId().intValue();
                 LOGGER.debug("Текущая позиция в списке маршрута:{}", currPlaceIndex);
                 usedIndexes.add((long) currPlaceIndex);
 
@@ -99,7 +100,8 @@ public final class PopulationBuilder {
 
                 individual.addPlace(
                         PlaceBriefDTO.getFromFullDescription(placeData),
-                        (nextNearPlaceMatrixData.get(0).getDuration() / 60)
+                        (nextNearPlaceMatrixData.get(0).getDuration() / 60),
+                        0.0
                 );
 
                 index++;

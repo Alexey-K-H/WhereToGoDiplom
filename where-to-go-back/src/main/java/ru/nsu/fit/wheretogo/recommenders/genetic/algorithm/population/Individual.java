@@ -8,14 +8,19 @@ import java.util.List;
 
 @Data
 public class Individual {
-    private List<PlaceBriefDTO> routePlaces = new ArrayList<>();
+    private List<IndividualGene> routePlaces = new ArrayList<>();
     private List<Integer> movementsDurations = new ArrayList<>();
     private Integer summaryStayDuration = 0;
     private Integer summaryMoveDuration = 0;
     private Double summaryAttractionCoefficient;
 
-    public void addPlace(PlaceBriefDTO place, int moveDuration) {
-        this.routePlaces.add(place);
+    public void addPlace(PlaceBriefDTO place, int moveDuration, double attractionCoefficient) {
+        this.routePlaces.add(IndividualGene
+                .builder()
+                .placeDescription(place)
+                .placeAttractionCoefficient(attractionCoefficient)
+                .build()
+        );
         this.movementsDurations.add(moveDuration);
         this.summaryStayDuration += place.getDuration();
         this.summaryMoveDuration += moveDuration;
@@ -39,7 +44,14 @@ public class Individual {
         var result = new StringBuilder();
         result.append("[");
         for (var place : this.routePlaces) {
-            result.append("#").append(place.getId()).append(place.getName()).append(",");
+            result
+                    .append("#")
+                    .append(place.getPlaceDescription().getId())
+                    .append(" ")
+                    .append(place.getPlaceDescription().getName())
+                    .append(" ")
+                    .append(place.getPlaceAttractionCoefficient())
+                    .append(",");
         }
         result.deleteCharAt(result.lastIndexOf(","));
         result.append("]");

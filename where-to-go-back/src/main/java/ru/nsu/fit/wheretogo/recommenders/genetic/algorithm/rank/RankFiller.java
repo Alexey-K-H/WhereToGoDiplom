@@ -41,10 +41,12 @@ public class RankFiller {
             var routeCoefficient = 0.0;
 
             for (var place : individual.getRoutePlaces()) {
-                var placeEntity = Place.getFromBriefDTO(place);
+                var placeEntity = Place.getFromBriefDTO(place.getPlaceDescription());
                 Map<Category, Double> currItemVector = ItemVectorBuilder.getItemVector(placeEntity, categoryList);
 
-                routeCoefficient += getPlaceCoefficient(userVector, currItemVector, categoryList);
+                var coefficient = getPlaceCoefficient(userVector, currItemVector, categoryList);
+                routeCoefficient += coefficient;
+                place.setPlaceAttractionCoefficient(coefficient);
             }
 
             individual.setSummaryAttractionCoefficient(routeCoefficient);
