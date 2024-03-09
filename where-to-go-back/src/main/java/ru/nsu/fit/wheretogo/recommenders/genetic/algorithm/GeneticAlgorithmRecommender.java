@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.nsu.fit.wheretogo.dto.place.PlaceBriefDTO;
+import ru.nsu.fit.wheretogo.model.ors.ORSDirectionResponse;
 import ru.nsu.fit.wheretogo.model.ors.ORSMatrixRequest;
 import ru.nsu.fit.wheretogo.model.ors.common.OrsMode;
 import ru.nsu.fit.wheretogo.model.ors.direction.LatLong;
@@ -68,7 +70,7 @@ public class GeneticAlgorithmRecommender {
 
         long startTime = System.currentTimeMillis();
         long endTime = startTime + 15 * 1000;
-        for (var generationNumber = 0; generationNumber < 1; generationNumber++) {
+        for (var generationNumber = 0; generationNumber < maxGenerationsSize; generationNumber++) {
 
             if (System.currentTimeMillis() >= endTime) {
                 LOGGER.debug("Время работы алгоритма вышло");
@@ -96,14 +98,14 @@ public class GeneticAlgorithmRecommender {
             rankFiller.updateRoutesAttractionCoefficients(population);
             LOGGER.debug("Обновление рангов маршрутов:{}", population);
 
-            population = fitnessFunction.selection(population);
+            population = fitnessFunction.selection(population, maxPopulationSize);
             LOGGER.debug("Поколение после селекции:{}", population);
         }
 
-        var bestPath = fitnessFunction.findTheBest(population);
+        var bestPath = fitnessFunction.selection(population, 1).get(0);
         LOGGER.debug("Лучший путь:{}", bestPath);
 
-        return buildFromIndividual(bestPath);
+        return buildFromIndividual(bestPath, request.getMode());
     }
 
     private List<List<String>> buildDurationMatrix(LatLong startPosition, OrsMode mode) {
@@ -148,9 +150,35 @@ public class GeneticAlgorithmRecommender {
         }
     }
 
-    private RouteRecommenderResponse buildFromIndividual(Individual individual) {
+    private RouteRecommenderResponse buildFromIndividual(Individual individual, OrsMode mode) {
         if (individual != null) {
 
+            var routePlaces = new ArrayList<PlaceBriefDTO>();
+            var keyPoints = new ArrayList<LatLong>();
+
+            for (var gene : individual.getRoutePlaces()) {
+                routePlaces.add(gene.getPlaceDescription());
+                keyPoints.add(LatLong
+                        .builder()
+                        .latitude(gene.getPlaceDescription().getCoordinates().getLatitude().toString())
+                        .longitude(gene.getPlaceDescription().getCoordinates().getLongitude().toString())
+                        .build());
+            }
+
+            LOGGER.debug("Ключевые точки:{}", keyPoints);
+
+            ORSDirectionResponse orsResponse = null;
+
+            switch (mode) {
+                case WALKING -> orsResponse = openRouteService.getDirectionWalking(keyPoints);
+                case DRIVING -> orsResponse = openRouteService.getDirectionDriving(keyPoints);
+            }
+
+            return RouteRecommenderResponse
+                    .builder()
+                    .routePlaces(routePlaces)
+                    .direction(orsResponse)
+                    .build();
         }
 
         return null;

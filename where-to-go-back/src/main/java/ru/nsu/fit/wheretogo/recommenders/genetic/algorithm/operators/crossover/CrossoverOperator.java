@@ -24,10 +24,12 @@ public class CrossoverOperator {
 
     public Individual execute(List<Individual> population) {
 
+        var result = new ArrayList<>(population);
+
         LOGGER.debug("Запуск оператора скрещивания.\nПараметры\nМаксимальная разность между разрезами:{}", deltaTime);
 
         LOGGER.debug("Сортировка популяции по коэффициенту значимости");
-        population.sort((o1, o2) -> {
+        result.sort((o1, o2) -> {
             var diff = o1.getSummaryAttractionCoefficient() - o2.getSummaryAttractionCoefficient();
 
             if (diff < 0) {
@@ -40,10 +42,10 @@ public class CrossoverOperator {
 
             return 0;
         });
-        LOGGER.debug("Отсортированная популяция:{}", population);
+        LOGGER.debug("Отсортированная популяция:{}", result);
 
-        var firstParent = population.get(0);
-        var secondParent = population.get(1);
+        var firstParent = result.get(0);
+        var secondParent = result.get(1);
 
         var firstParentTags = buildTagSequence(firstParent);
         LOGGER.debug("Временные метки родителя 1:{}", firstParentTags);

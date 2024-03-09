@@ -219,49 +219,39 @@ public class RecommenderServiceImpl implements RecommenderService {
 
         LOGGER.debug("Получен запрос на получение пути-рекомендации:{}", request);
 
-        var startPlace = nearestSearchHelper.findNearestPlaces2Point(
-                LatLong
-                        .builder()
-                        .latitude(request.getCurrentUserLocation().getLatitude())
-                        .longitude(request.getCurrentUserLocation().getLongitude())
-                        .build(),
-                1,
-                1.0,
-                5.0
-        );
-
-        LOGGER.debug("Координаты ближайшего стартового места:{}", startPlace.get(0));
-
         var geneticAlgResponse = geneticAlgorithmRecommender.execute(request);
 
         LOGGER.debug("Результат работы алгоритма:{}", geneticAlgResponse);
 
-        var keyPoints = RouteData.getData();
+        if (geneticAlgResponse != null && !geneticAlgResponse.getRoutePlaces().isEmpty()) {
+            return geneticAlgResponse;
+        } else {
+            LOGGER.debug("Путь-рекомендация не найден. Отображение пути-рекомендации по умолчанию.");
+            var keyPoints = RouteData.getData();
 
-        ORSDirectionResponse orsResponse = null;
+            ORSDirectionResponse orsResponse = null;
 
-        switch (request.getMode()) {
-            case WALKING -> orsResponse = openRouteService.getDirectionWalking(keyPoints);
-            case DRIVING -> orsResponse = openRouteService.getDirectionDriving(keyPoints);
+            switch (request.getMode()) {
+                case WALKING -> orsResponse = openRouteService.getDirectionWalking(keyPoints);
+                case DRIVING -> orsResponse = openRouteService.getDirectionDriving(keyPoints);
+            }
+
+            var coordinateSequences = getCoordinateSequences(keyPoints);
+
+            LOGGER.debug("Последовательности координат: Широты:[{}] Долготы:[{}]",
+                    coordinateSequences.getLatitudes(),
+                    coordinateSequences.getLongitudes());
+
+            var keyPlacesResponse = placeRepository.findAllByLatLong(
+                    coordinateSequences.getLatitudes(),
+                    coordinateSequences.getLongitudes());
+
+            return RouteRecommenderResponse
+                    .builder()
+                    .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
+                    .direction(orsResponse)
+                    .build();
         }
-
-        keyPoints.add(startPlace.get(0));
-
-        var coordinateSequences = getCoordinateSequences(keyPoints);
-
-        LOGGER.debug("Последовательности координат: Широты:[{}] Долготы:[{}]",
-                coordinateSequences.getLatitudes(),
-                coordinateSequences.getLongitudes());
-
-        var keyPlacesResponse = placeRepository.findAllByLatLong(
-                coordinateSequences.getLatitudes(),
-                coordinateSequences.getLongitudes());
-
-        return RouteRecommenderResponse
-                .builder()
-                .routePlaces(keyPlacesResponse.stream().map(PlaceBriefDTO::getFromEntity).toList())
-                .direction(orsResponse)
-                .build();
     }
 
     private void prepareCollaborativeDataFromScoreList(Map<User, HashMap<Place, Double>> data, List<Score> scoreList) {

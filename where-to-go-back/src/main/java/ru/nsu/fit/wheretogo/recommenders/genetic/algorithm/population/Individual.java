@@ -13,6 +13,7 @@ public class Individual {
     private Integer summaryStayDuration = 0;
     private Integer summaryMoveDuration = 0;
     private Double summaryAttractionCoefficient;
+    private Double fitnessValue;
 
     public void addPlace(PlaceBriefDTO place, int moveDuration, double attractionCoefficient) {
         this.routePlaces.add(IndividualGene
@@ -37,6 +38,7 @@ public class Individual {
                 ", summaryStayDuration=" + summaryStayDuration +
                 ", summaryMoveDuration=" + summaryMoveDuration +
                 ", summaryAttractionCoefficient=" + summaryAttractionCoefficient +
+                ", fitnessValue=" + fitnessValue +
                 '}';
     }
 
