@@ -103,7 +103,6 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    @Transactional
     public ScoreDTO getByPlaceScoreFromUser(Long userId, Long placeId) {
         if (userId == null || placeId == null) {
             return null;
@@ -112,7 +111,6 @@ public class ScoreServiceImpl implements ScoreService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ScoreDTO> getByUser(UserDTO userDto) {
         List<Score> scores = scoreRepository.findByUserId(User.getFromDTO(userDto).getId());
 

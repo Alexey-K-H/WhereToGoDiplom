@@ -37,13 +37,11 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    @Transactional
     public void deletePlace(PlaceDescriptionDTO place) {
         placeRepository.deleteById(place.getId());
     }
 
     @Override
-    @Transactional
     public PlaceDescriptionDTO getPlaceById(Long id) {
         if (id == null) {
             return null;
@@ -52,7 +50,6 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getNearestPlacesToPoint(
             double myLat,
             double myLon,
@@ -67,7 +64,7 @@ public class PlaceServiceImpl implements PlaceService {
                 .toList();
     }
 
-    @Transactional
+    @Override
     public List<PlaceBriefDTO> getPlaces(
             String categoryIds
     ) {
@@ -81,6 +78,7 @@ public class PlaceServiceImpl implements PlaceService {
                 .toList();
     }
 
+    @Override
     @Transactional
     public void addPlaceCategory(Long placeId, Long categoryId) {
         if (categoryId == null

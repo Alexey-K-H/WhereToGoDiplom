@@ -63,13 +63,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserDTO getCurrentUser() {
         return UserDTO.getFromEntity(userRepository.findByEmail(SecurityContextHelper.email()).orElse(null));
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PlaceBriefDTO> getFavourites() {
         return userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow().getFavouritePlaces().stream().map(
@@ -78,7 +76,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PlaceBriefDTO> getVisited() {
         return userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow().getVisitedPlaces().stream().map(
@@ -87,7 +84,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean findVisitedById(Long placeId) {
         List<PlaceBriefDTO> userVisitedPlaces = userRepository.findByEmail(
                         SecurityContextHelper.email())
@@ -106,7 +102,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean findFavouriteById(Long placeId) {
         List<PlaceBriefDTO> userFavouritePlaces = userRepository.findByEmail(
                         SecurityContextHelper.email())

@@ -77,16 +77,24 @@ public class GeneticAlgorithmRecommender {
 
             LOGGER.debug("Поколение:{}", generationNumber);
 
-            var nextGeneration = mutationOperator.execute(
-                    crossoverOperator.execute(
-                            population
-                    )
-            );
+            var nextGeneration = new ArrayList<Individual>();
+
+            while (nextGeneration.size() < maxPopulationSize) {
+                var nextGenerationIndividual = crossoverOperator.execute(population);
+
+                if (nextGenerationIndividual != null) {
+                    mutationOperator.execute(nextGenerationIndividual);
+                    nextGeneration.add(nextGenerationIndividual);
+                }
+            }
 
             LOGGER.debug("Новое поколение:{}", nextGeneration);
 
             population = populationUnion(population, nextGeneration);
             LOGGER.debug("Объединение родителей и потомков:{}", population);
+
+            rankFiller.updateRoutesAttractionCoefficients(population);
+            LOGGER.debug("Обновление рангов маршрутов:{}", population);
 
             population = fitnessFunction.selection(population);
             LOGGER.debug("Поколение после селекции:{}", population);

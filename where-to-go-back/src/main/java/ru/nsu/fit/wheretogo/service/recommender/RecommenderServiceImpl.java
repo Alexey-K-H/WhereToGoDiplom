@@ -1,6 +1,5 @@
 package ru.nsu.fit.wheretogo.service.recommender;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +55,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     private final NearestSearchHelper nearestSearchHelper;
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getNearestPlacesByCategory(
             double myLat,
             double myLon,
@@ -81,7 +79,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getNearestPlacesByStayPoints() {
         List<StayPointDTO> stayPoints = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity).toList();
@@ -134,7 +131,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getNearestPlacesByVisited() {
         List<PlaceBriefDTO> visitedPlaces = userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow().getVisitedPlaces().stream().map(
@@ -166,7 +162,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getContentBasedRecommendations() {
         List<Category> categoryList = categoryRepository.findAll();
 
@@ -185,7 +180,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getCollaborativeRecommendationsByScores() {
         var user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
         List<Place> placeList = placeRepository.findNotVisitedByUser(user.getId());
@@ -200,7 +194,6 @@ public class RecommenderServiceImpl implements RecommenderService {
     }
 
     @Override
-    @Transactional
     public List<PlaceBriefDTO> getCollaborativeRecommendationsByFavourites() {
         var user = userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow();
         List<Place> placeList = placeRepository.findNotVisitedByUser(user.getId());

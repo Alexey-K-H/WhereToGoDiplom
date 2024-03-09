@@ -22,7 +22,7 @@ public class CrossoverOperator {
     @Value("${ru.nsu.fit.wheretogo.genetic.crossover.time_delta}")
     private Integer deltaTime;
 
-    public List<Individual> execute(List<Individual> population) {
+    public Individual execute(List<Individual> population) {
 
         LOGGER.debug("Запуск оператора скрещивания.\nПараметры\nМаксимальная разность между разрезами:{}", deltaTime);
 
@@ -56,17 +56,13 @@ public class CrossoverOperator {
                 || cutTags.getFirstTag() == firstParentTags.getTags().size() - 1
                 || cutTags.getSecondTag() == secondParentTags.getTags().size() - 1) {
             LOGGER.debug("Не найдено подходящих тегов, скрещивание пропускается");
-            return population;
+            return null;
         } else {
             LOGGER.debug("Найдены точки разреза маршрутов-родителей:\nДля первого:{}\nДля второго:{}\nРазность:{}",
                     cutTags.getFirstTag(), cutTags.getSecondTag(), cutTags.getDiffTags());
 
-            var offspring = getOffspring(firstParent, secondParent, cutTags);
-
-            population.add(offspring);
+            return getOffspring(firstParent, secondParent, cutTags);
         }
-
-        return population;
     }
 
     private TagSequence buildTagSequence(Individual individual) {

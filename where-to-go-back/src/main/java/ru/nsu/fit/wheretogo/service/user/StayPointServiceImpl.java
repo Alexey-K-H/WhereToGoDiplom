@@ -88,7 +88,6 @@ public class StayPointServiceImpl implements StayPointService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<StayPointDTO> getByUser() {
         return userRepository.findByEmail(SecurityContextHelper.email()).orElseThrow().getStayPoints().stream().map(
                 StayPointDTO::getFromEntity
@@ -96,7 +95,6 @@ public class StayPointServiceImpl implements StayPointService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean ifUserHasStayPoints() {
         return stayPointRepository.existsByUserId(userRepository.findByEmail(SecurityContextHelper.email())
                 .orElseThrow().getId());
