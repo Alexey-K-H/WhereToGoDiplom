@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -79,6 +78,7 @@ import ru.nsu.fit.wheretogo.util.ClusterManagerRenderer;
 import ru.nsu.fit.wheretogo.util.PictureLoader;
 import ru.nsu.fit.wheretogo.util.helper.AuthorizationHelper;
 import ru.nsu.fit.wheretogo.util.helper.RouteCallsHandler;
+import ru.nsu.fit.wheretogo.util.map.VisibleBoundsAlgorithm;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMapsSdkInitializedCallback {
 
@@ -105,6 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LinearLayout filtersLayout;
     private ShowMapMode showMapMode;
     private BroadcastReceiver broadcastReceiver;
+    private VisibleBoundsAlgorithm<ClusterMarker> visibleBoundsAlgorithm;
 
     private final Callback<List<Place>> placesCallsCallback = new Callback<>() {
         @Override
@@ -200,7 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-       var binding = ActivityMapBinding.inflate(getLayoutInflater());
+        var binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         mapSlidingPane = findViewById(R.id.mapSlidingPane);
@@ -315,7 +316,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public View getInfoContents(@NonNull Marker marker) {
                 View infoWindow = getLayoutInflater().inflate(R.layout.custom_info_contents,
-                        (FrameLayout) findViewById(R.id.map), false);
+                        findViewById(R.id.map), false);
 
                 TextView title = infoWindow.findViewById(R.id.title);
                 title.setText(marker.getTitle());
@@ -481,8 +482,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateMapMarkers() {
         if (map != null) {
-            var builder = LatLngBounds.builder();
-
             if (clusterManager == null) {
                 clusterManager = new ClusterManager<>(this.getApplicationContext(), map);
                 clusterManager.setOnClusterItemClickListener(item -> {
@@ -500,14 +499,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 clusterManager.setRenderer(clusterManagerRenderer);
             }
 
+            this.visibleBoundsAlgorithm = new VisibleBoundsAlgorithm<>(this.map);
+
+            clusterManager.setAlgorithm(visibleBoundsAlgorithm);
             clusterManager.clearItems();
             clusterMarkers.clear();
             clusterManager.cluster();
 
-
             for (Place place : places) {
                 try {
-                    builder.include(new LatLng(place.getLatitude(), place.getLongitude()));
                     PictureLoader.loadPlaceThumbnail(this, place,
                             clusterMarkers, clusterManager);
                     Log.d(TAG, "Добавлен маркер на карту. Позиция:[ "
@@ -517,6 +517,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.e(TAG, "Ошибка при добавлении маркера:\n" + e.getMessage());
                 }
             }
+
+            this.map.setOnCameraIdleListener(() -> {
+                visibleBoundsAlgorithm.updateBounds();
+                clusterManager.cluster();
+            });
         }
     }
 
