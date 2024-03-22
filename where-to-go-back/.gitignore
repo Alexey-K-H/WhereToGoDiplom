@@ -39,5 +39,7 @@ db/db-data/*
 /src/main/resources/properties.env
 
 /docker/ors/resources/*
-/docker/ors/docker/*
+/docker/ors/docker/elevation_cache/*
+/docker/ors/docker/graphs/*
+/docker/ors/docker/logs/*
 /tripadvisor/*
