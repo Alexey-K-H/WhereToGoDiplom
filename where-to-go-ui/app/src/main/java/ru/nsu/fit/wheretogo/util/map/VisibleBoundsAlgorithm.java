@@ -11,11 +11,13 @@ import com.google.maps.android.quadtree.PointQuadTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class VisibleBoundsAlgorithm<T extends ClusterItem> extends NonHierarchicalDistanceBasedAlgorithm<T>
         implements ScreenBasedAlgorithm<T> {
 
+    private final float MIN_ZOOM_LEVEL = 12.8f;
     private final GoogleMap map;
     private LatLngBounds bounds;
 
@@ -24,12 +26,15 @@ public class VisibleBoundsAlgorithm<T extends ClusterItem> extends NonHierarchic
         bounds = map.getProjection().getVisibleRegion().latLngBounds;
     }
 
-
     @Override
     protected Collection<QuadItem<T>> getClusteringItems(PointQuadTree<QuadItem<T>> quadTree, float zoom) {
 
         List<QuadItem<T>> items = new ArrayList<>(quadTree.search(new Bounds(0, 1, 0, 1)));
         items.removeIf(item -> !bounds.contains(item.getPosition()));
+
+        if (zoom < MIN_ZOOM_LEVEL) {
+            return Collections.emptySet();
+        }
 
         return items;
     }
