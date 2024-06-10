@@ -2,7 +2,7 @@
 
 == Рекомендательная система мест для посещения в Новосибирске
 
-image::where-to-go-back/docs/admin-guide/images/Route_Screen.png[]
+image::where-to-go-back/docs/admin-guide/images/Route_Screen.png[width=50%,align='center']
 
 Проект разрабатывался в рамках выполнения выпускной квалификационной работы в бакалавре. Сейчас продолжается работа над проектом уже в рамках магистерской работы.
 
@@ -13,4 +13,4 @@ image::where-to-go-back/docs/admin-guide/images/Route_Screen.png[]
 * Android-приложение клиента
 * Spring-сервер с базой данных PostgreSQL
 
-image::where-to-go-back/docs/admin-guide/images/КА_WhereToGo_extended.png[]
+image::where-to-go-back/docs/admin-guide/images/КА_WhereToGo_extended.png[align='center']
