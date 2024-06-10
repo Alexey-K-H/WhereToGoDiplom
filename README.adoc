@@ -14,3 +14,16 @@ image::where-to-go-back/docs/admin-guide/images/Route_Screen.png[width=50%,align
 * Spring-сервер с базой данных PostgreSQL
 
 image::where-to-go-back/docs/admin-guide/images/КА_WhereToGo_extended.png[align='center']
+
+== Структура файлов проекта
+
+Структура делится на 2 основных модуля - для клиентской и серверной части.
+
+image::docs/images/Project_folder_structure.PNG[]
+
+Для компиляции и запуска обеих частей приложения необходимо использовать следующие ПО:
+
+ * Intellij IDEA CE - серверная часть (открывать директорию *_where-to-go-back/_*)
+ * Android Studio - клиентская часть (открывать директорию *_where-to-go-ui/_*)
+
+Подробные инструкции по настройке и запуску обеих частей описаны в разделах *WhereToGo.NSK Backend* и *WhereToGo.NSK Android*.
